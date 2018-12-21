@@ -5,6 +5,7 @@ values
 -- TODO Define values here
 instance variables
 -- TODO Define instance variables here
+	public id: Utils`String;
 	public capacity: nat;
 	public area: real;
 	public heigth: real;
@@ -12,7 +13,18 @@ instance variables
 	public lenght: real;
 	inv area = width * lenght;
 operations
--- TODO Define operations here
+	public Installation: Utils`String * nat * real * real * real ==> Installation
+		Installation(i, c, h, w, l) == (
+			id := i;
+			capacity := c;
+			heigth := h;
+			width := w;
+			lenght := l;
+			area := w * l;
+			return self
+			);
+	public getCapacity: () ==> nat
+		getCapacity() == return capacity;
 functions
 -- TODO Define functiones here
 traces

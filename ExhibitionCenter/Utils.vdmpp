@@ -10,8 +10,10 @@ functions
 	public DaysOfMonth: nat * nat -> nat 
 	DaysOfMonth(y, m) == y*m -- TODO: implementar
 	pre y > 0 and m > 0 and m < 13;
+	-- TODO: post
 	
 	public before: Date * Date -> bool 
 	before(b, a) == true -- TODO: implementar
+	-- TODO: pre post
 traces
 end Utils
