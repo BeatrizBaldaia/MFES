@@ -1,0 +1,13 @@
+class Event
+instance variables
+-- TODO Define instance variables here
+	public begin: Utils`Date;
+	public ending: Utils`Date;
+	public isPulic: bool;
+	public name: Utils`String;
+	public totalTickets: nat;
+	public ticketPrice: real;
+	inv Utils`before(begin, ending);
+operations
+-- TODO Define operations here
+end Event
