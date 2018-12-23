@@ -9,8 +9,19 @@ instance variables
 	public ceilingLighting: bool;
 	public blackOutCurtains: bool;
 	public computerNetwork: bool;
+	public rooms: set of Room := {};
+	public foyers: set of Foyer := {};
 operations
--- TODO Define operations here
+	public Pavilion: Utils`String * nat * real * real * real * bool * bool * bool * bool * bool ==> Pavilion
+		Pavilion(i, c, h, w, l, airC, natL, ceilL, blackC, compN) == (
+			airCondition := airC;
+			naturalLigth := natL;
+			ceilingLighting := ceilL;
+			blackOutCurtains := blackC;
+			computerNetwork := compN;
+			Installation(i, c, h, w, l);
+		)
+		pre c > 0 and h > 0 and w > 0 and l > 0;
 functions
 -- TODO Define functiones here
 traces
