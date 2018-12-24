@@ -13,7 +13,6 @@ instance variables
 	protected lenght: real;
 	inv area = width * lenght;
 operations
--- Constructor
 	public Installation: Utils`String * nat * real * real * real ==> Installation
 		Installation(i, c, h, w, l) == (
 			id := i;
@@ -25,9 +24,6 @@ operations
 			)
 			pre c > 0 and h > 0 and w > 0 and l > 0;
 
--- Return installation id
-	public getID: () ==> Utils`String
-		getID() == return id;
 functions
 -- TODO Define functiones here
 end Installation

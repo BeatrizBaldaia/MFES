@@ -9,16 +9,7 @@ instance variables
 	public ceilingLighting: bool;
 	public computerNetwork: bool;
 operations
--- Constructor
-	public Foyer: Utils`String * nat * real * real * real * bool * bool * bool * bool ==> Foyer
-		Foyer(i, c, h, w, l, airC, natL, ceilL, compN) == (
-			airCondition := airC;
-			naturalLigth := natL;
-			ceilingLighting := ceilL;
-			computerNetwork := compN;
-			Installation(i, c, h, w, l);
-		)
-		pre c > 0 and h > 0 and w > 0 and l > 0;
+-- TODO Define operations here
 functions
 -- TODO Define functiones here
 traces

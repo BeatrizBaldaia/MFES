@@ -6,12 +6,7 @@ values
 instance variables
 -- TODO Define instance variables here
 operations
--- Constructor
-	public CarParking: Utils`String * nat * real * real * real ==> CarParking
-		CarParking(i, c, h, w, l) == (
-			Installation(i, c, h, w, l);
-		)
-		pre c > 0 and h > 0 and w > 0 and l > 0;
+-- TODO Define operations here
 functions
 -- TODO Define functiones here
 traces

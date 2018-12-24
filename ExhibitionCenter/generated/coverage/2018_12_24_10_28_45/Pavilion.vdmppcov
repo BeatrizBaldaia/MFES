@@ -35,18 +35,6 @@ operations
 		addFoyer(f) == foyers := foyers union {f}
 		pre f not in set foyers
 		post	card foyers = card foyers~ + 1 and f in set foyers; 
-		
--- Remove room from rooms set
-	public removeRoom : Room ==> ()
-		removeRoom(r) == rooms := rooms \ {r}
-		pre r in set rooms
-		post card rooms = card rooms~ - 1 and r not in set rooms;
-		
--- Remove foyer from foyers set
-	public removeFoyer : Foyer ==> ()
-		removeFoyer(f) == foyers := foyers \ {f}
-		pre f in set foyers
-		post card foyers = card foyers~ - 1 and f not in set foyers;
 functions
 -- TODO Define functiones here
 traces

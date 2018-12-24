@@ -23,4 +23,6 @@ operations
 		post card dom installations = card dom installations~ + 1 and inst in set rng installations;
 functions
 -- TODO Define functiones here
+traces
+-- TODO Define Combinatorial Test Traces here
 end Center
