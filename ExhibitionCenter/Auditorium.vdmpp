@@ -36,6 +36,11 @@ operations
 		removeFoyer(f) == foyers := foyers \ {f}
 		pre f in set foyers
 		post card foyers = card foyers~ - 1 and f not in set foyers;
+
+	public addRoom : Room ==> ()
+		addRoom(-) == return;
+	public removeRoom : Room ==> ()
+		removeRoom(-) == return;
 functions
 
 traces

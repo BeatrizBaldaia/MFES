@@ -12,6 +12,15 @@ operations
 			Installation(i, c, h, w, l);
 		)
 		pre c > 0 and h > 0 and w > 0 and l > 0;
+		
+	public addFoyer : Foyer ==> ()
+		addFoyer(-) == return;
+	public removeFoyer : Foyer ==> ()
+		removeFoyer(-) == return;
+	public addRoom : Room ==> ()
+		addRoom(-) == return;
+	public removeRoom : Room ==> ()
+		removeRoom(-) == return;
 functions
 -- TODO Define functiones here
 traces
