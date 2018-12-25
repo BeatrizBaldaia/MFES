@@ -6,7 +6,10 @@ values
 instance variables
 	public name: Utils`String;
 	public installations: map Utils`String to Installation;
-	inv card dom installations > 0;
+	inv card dom installations > 0 and 
+	forall id in set dom installations &  installations(id).id = id;
+	public services: map Service`ServiceType to Service;
+	inv forall type in set dom services & services(type).type = type;
 operations
 	public Center:  Utils`String * Installation ==> Center
 		Center(n, inst) == (
@@ -15,12 +18,22 @@ operations
 			name := n;
 		)
 		post card dom installations = 1 and name = n;
-			
+
+-- Add one installation to installations set		
 	public addInstallations: Installation ==> ()
 		addInstallations(inst) == let instID = inst.getID() in 
 		installations := installations ++ {instID |-> inst}
 		pre inst not in set rng installations
 		post card dom installations = card dom installations~ + 1 and inst in set rng installations;
+
+-- Add one service to services set
+	public addService: Service ==> ()
+		addService(serv) == let type = serv.type in
+		services := service ++ {type |-> serv}
+		pre serv not in set rng services
+		post card dom services = card dom services~ + 1 and serv in set rng services;
+		
+		
 functions
 -- TODO Define functiones here
 end Center

@@ -1,0 +1,23 @@
+class Service
+types
+	public ServiceType = <AudioVisual> | <Catering> | <IT> | <Cleaning> | <Security> | <Decoration>;
+values
+
+instance variables
+	public price: real;
+	inv price > 0;
+	public type: ServiceType;
+operations
+--Constructor
+	public Service: real * ServiceType ==> Service
+		Service(p, t) == (
+			price := p;
+			type := t;
+		)
+		pre p > 0 
+		post price = p and type <> nil;
+functions
+-- TODO Define functiones here
+traces
+-- TODO Define Combinatorial Test Traces here
+end Service
