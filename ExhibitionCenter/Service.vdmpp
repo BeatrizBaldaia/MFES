@@ -16,6 +16,13 @@ operations
 		)
 		pre p > 0 
 		post price = p and type <> nil;
+		
+-- Changes service price
+	public setPrice: real ==> ()
+	setPrice(p) ==
+		price := p
+	pre p > 0
+	post price = p;
 functions
 -- TODO Define functiones here
 traces

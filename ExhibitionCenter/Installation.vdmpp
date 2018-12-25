@@ -28,6 +28,16 @@ operations
 -- Return installation id
 	public getID: () ==> Utils`String
 		getID() == return id;
+		
+	public addFoyer : Foyer ==> ()
+		addFoyer(f) == is subclass responsibility;
+	public removeFoyer : Foyer ==> ()
+		removeFoyer(f) == is subclass responsibility;
+	public addRoom : Room ==> ()
+		addRoom(r) == is subclass responsibility;
+	public removeRoom : Room ==> ()
+		removeRoom(r) == is subclass responsibility;
+	
 functions
 -- TODO Define functiones here
 end Installation

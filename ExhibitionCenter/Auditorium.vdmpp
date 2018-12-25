@@ -37,7 +37,7 @@ operations
 		pre f in set foyers
 		post card foyers = card foyers~ - 1 and f not in set foyers;
 functions
--- TODO Define functiones here
+
 traces
 -- TODO Define Combinatorial Test Traces here
 end Auditorium
