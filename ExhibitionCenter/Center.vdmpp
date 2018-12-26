@@ -103,6 +103,19 @@ operations
 	env.installation <> inst
 	post n in set dom events;
 	
+--Gets all the installations available in the given period
+	public getAvailableInstallations: Utils`Date * Utils`Date ==> map Utils`String to Installation
+	getAvailableInstallations(b, e) == (
+		dcl usedInsts: set of Installation := {};
+		let env in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) in (
+			usedInsts := usedInsts union {env.installation}
+		);
+		return installations :-> usedInsts
+	)
+	pre Utils`before(b, e)
+	post rng RESULT subset rng installations;
+	
+	
 functions
 -- Verify if pavilion has a specific installation (room or foyer)
 	public hasInstallation: Installation * Installation -> bool
