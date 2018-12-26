@@ -23,9 +23,7 @@ functions
 		b.year < a.year or
 		(b.year = a.year and b.month < a.month) or
 		(b.year = a.year and b.month = a.month and b.day < a.day)
-		;	
-	 -- TODO: implementar
-		
+		;
 	-- TODO: pre post
 	
 	public isLeapYear: nat -> bool
