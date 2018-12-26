@@ -1,6 +1,5 @@
 class Event
 types
--- TODO Define types here
 	public EventType=<Conferences> | <TradeFair> | <Party> | <Musical> | <TeamBuilding>;
 instance variables
 	public name: Utils`String := "untitled";
@@ -13,7 +12,7 @@ instance variables
 	public type: EventType := nil;
 	inv Utils`before(begin, ending);
 	public installation: Installation;
-	public services: [seq of Service`ServiceType] := [];
+	public services: [seq of Service`ServiceType] := []; -- TODO: why seq e nao set
 operations
 
 --Constructor
@@ -27,7 +26,7 @@ operations
 		type := t;
 		installation := inst
 	)
-	pre tTickets > 0;
+	pre tTickets > 0 and Utils`before(b,e);
 	
 --Changes the installation where the event will occur
 	public changeInstallation: Installation ==> ()
