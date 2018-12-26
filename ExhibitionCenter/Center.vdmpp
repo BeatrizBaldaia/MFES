@@ -113,7 +113,9 @@ operations
 		return installations :-> usedInsts
 	)
 	pre Utils`before(b, e)
-	post rng RESULT subset rng installations;
+	post rng RESULT subset rng installations and
+	forall env in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
+	env.installation not in set rng RESULT;
 	
 	
 functions
