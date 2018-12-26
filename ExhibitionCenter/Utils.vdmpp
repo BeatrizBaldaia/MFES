@@ -41,6 +41,16 @@ functions
 	public mfMap[@keyType, @returnType, @valueType]: (@valueType -> @returnType) * seq of @keyType * (map @keyType to @valueType) -> nat
 	mfMap (-, keys, -) == len keys;
 	
-
+--Turns set into seq
+	public setTOseq[@elem]: set of @elem -> seq of @elem
+	setTOseq(tmpSet) == (
+		[x | x in set tmpSet]
+	)
+	post elems RESULT subset tmpSet
+	measure msetTOseq;
+	
+-- setTOseq measure function
+	public msetTOseq[@elem]: set of @elem -> nat
+	msetTOseq(tmpSet) == card tmpSet;
 
 end Utils

@@ -91,7 +91,18 @@ operations
 	pre instID in set dom installations
 	post instID not in set dom installations and
 	not exists inst in set rng installations & hasInstallation(installations(instID), inst);
-		
+
+--Create an event	and add it to the events map
+	public createEvent:  Utils`String * nat * real * Utils`Date * Utils`Date * bool * Event`EventType * Installation ==> ()
+	createEvent(n, tTickets, tPrice, b, e, p, t, inst) == (
+		dcl event: Event := new Event(n, tTickets, tPrice, b, e, p, t, inst);
+		events := events ++ {n |-> event}
+	)
+	pre n not in set dom events and Utils`before(b, e) and
+	forall env in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
+	env.installation <> inst
+	post n in set dom events;
+	
 functions
 -- Verify if pavilion has a specific installation (room or foyer)
 	public hasInstallation: Installation * Installation -> bool
@@ -108,4 +119,13 @@ functions
 	)
 	pre (isofclass(Foyer, inst1) or isofclass(Room, inst1)) and
 	(isofclass(Auditorium, inst2) or isofclass(Pavilion, inst2));
+	
+--Checks if this event has conflicts with the period given in the arguments
+	public hasDatesConflict: Event * Utils`Date * Utils`Date -> bool
+	hasDatesConflict(env, b2, e2) == (
+		def b1 = env.begin; e1 = env.ending in
+		if(Utils`before(b2, b1)) then Utils`before(b1, e2)
+		else Utils`before(b2, e1)
+	)
+	pre Utils`before(env.begin, env.ending) and Utils`before(b2, e2);
 end Center
