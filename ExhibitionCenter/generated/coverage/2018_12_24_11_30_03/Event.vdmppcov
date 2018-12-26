@@ -1,0 +1,17 @@
+class Event
+types
+-- TODO Define types here
+	public Type=<Conferences> | <TradeFair> | <Party> | <Musical> | <TeamBuilding>;
+instance variables
+-- TODO Define instance variables here
+	public begin: Utils`Date;
+	public ending: Utils`Date;
+	public isPulic: bool;
+	public name: Utils`String;
+	public totalTickets: nat;
+	public ticketPrice: real;
+	public type: Type;
+	inv Utils`before(begin, ending);
+operations
+
+end Event

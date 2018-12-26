@@ -1,0 +1,26 @@
+class Foyer is subclass of Installation
+types
+-- TODO Define types here
+values
+-- TODO Define values here
+instance variables
+	public airCondition: bool;
+	public naturalLigth: bool;
+	public ceilingLighting: bool;
+	public computerNetwork: bool;
+operations
+-- Constructor
+	public Foyer: Utils`String * nat * real * real * real * bool * bool * bool * bool ==> Foyer
+		Foyer(i, c, h, w, l, airC, natL, ceilL, compN) == (
+			airCondition := airC;
+			naturalLigth := natL;
+			ceilingLighting := ceilL;
+			computerNetwork := compN;
+			Installation(i, c, h, w, l);
+		)
+		pre c > 0 and h > 0 and w > 0 and l > 0;
+functions
+-- TODO Define functiones here
+traces
+-- TODO Define Combinatorial Test Traces here
+end Foyer

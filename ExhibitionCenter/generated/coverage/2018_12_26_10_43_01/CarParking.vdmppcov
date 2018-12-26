@@ -1,0 +1,32 @@
+class CarParking is subclass of Installation
+types
+-- TODO Define types here
+values
+-- TODO Define values here
+instance variables
+-- TODO Define instance variables here
+operations
+-- Constructor (must have all conditions always false)
+	public CarParking: Utils`String * nat * real * real * real ==> CarParking
+		CarParking(i, c, h, w, l) == (
+			--Measures
+			id := i;
+			capacity := c;
+			heigth := h;
+			atomic(width := w; lenght := l; area := w * l);
+		)
+		pre c > 0 and h > 0 and w > 0 and l > 0;
+		
+	public addFoyer : Foyer ==> ()
+		addFoyer(-) == return;
+	public removeFoyer : Foyer ==> ()
+		removeFoyer(-) == return;
+	public addRoom : Room ==> ()
+		addRoom(-) == return;
+	public removeRoom : Room ==> ()
+		removeRoom(-) == return;
+functions
+-- TODO Define functiones here
+traces
+-- TODO Define Combinatorial Test Traces here
+end CarParking

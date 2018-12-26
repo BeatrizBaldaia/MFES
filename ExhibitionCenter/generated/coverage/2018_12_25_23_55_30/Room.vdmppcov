@@ -1,0 +1,43 @@
+class Room is subclass of Installation
+types
+-- TODO Define types here
+values
+-- TODO Define values here
+instance variables
+	public airCondition: bool;
+	public naturalLigth: bool;
+	public ceilingLighting: bool;
+	public blackOutCurtains: bool;
+	public telephones: bool;
+	public computerNetwork: bool;
+	public soundproofWalls: bool;
+	public movingWalls: bool;
+operations
+-- Constructor
+	public Room: Utils`String * nat * real * real * real * bool * bool * bool * bool * bool * bool * bool * bool ==> Room
+		Room(i, c, h, w, l, airC, natL, ceilL, blackC, tele, compN, soundP, movW) == (
+			airCondition := airC;
+			naturalLigth := natL;
+			ceilingLighting := ceilL;
+			blackOutCurtains := blackC;
+			telephones := tele;
+			computerNetwork := compN;
+			soundproofWalls := soundP;
+			movingWalls := movW;
+			Installation(i, c, h, w, l);
+		)
+		pre c > 0 and h > 0 and w > 0 and l > 0;
+		
+	public addFoyer : Foyer ==> ()
+		addFoyer(-) == return;
+	public removeFoyer : Foyer ==> ()
+		removeFoyer(-) == return;
+	public addRoom : Room ==> ()
+		addRoom(-) == return;
+	public removeRoom : Room ==> ()
+		removeRoom(-) == return;
+functions
+-- TODO Define functiones here
+traces
+-- TODO Define Combinatorial Test Traces here
+end Room

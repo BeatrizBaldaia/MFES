@@ -1,0 +1,55 @@
+class Pavilion is subclass of Installation
+types
+-- TODO Define types here
+values
+-- TODO Define values here
+instance variables
+	public airCondition: bool;
+	public naturalLigth: bool;
+	public ceilingLighting: bool;
+	public blackOutCurtains: bool;
+	public computerNetwork: bool;
+	public rooms: set of Room := {};
+	public foyers: set of Foyer := {};
+operations
+-- Constructor
+	public Pavilion: Utils`String * nat * real * real * real * bool * bool * bool * bool * bool ==> Pavilion
+		Pavilion(i, c, h, w, l, airC, natL, ceilL, blackC, compN) == (
+			airCondition := airC;
+			naturalLigth := natL;
+			ceilingLighting := ceilL;
+			blackOutCurtains := blackC;
+			computerNetwork := compN;
+			Installation(i, c, h, w, l);
+		)
+		pre c > 0 and h > 0 and w > 0 and l > 0;
+
+-- Add room to rooms set		
+	public addRoom : Room ==> ()
+		addRoom(r) == rooms := rooms union {r}
+		pre r not in set rooms
+		post	card rooms = card rooms~ + 1 and r in set rooms; 
+		
+-- Add foyer to foyers set
+	public addFoyer : Foyer ==> ()
+		addFoyer(f) == foyers := foyers union {f}
+		pre f not in set foyers
+		post	card foyers = card foyers~ + 1 and f in set foyers; 
+		
+-- Remove room from rooms set
+	public removeRoom : Room ==> ()
+		removeRoom(r) == rooms := rooms \ {r}
+		pre r in set rooms
+		post card rooms = card rooms~ - 1 and r not in set rooms;
+		
+-- Remove foyer from foyers set
+	public removeFoyer : Foyer ==> ()
+		removeFoyer(f) == foyers := foyers \ {f}
+		pre f in set foyers
+		post card foyers = card foyers~ - 1 and f not in set foyers;
+
+functions
+-- TODO Define functiones here
+traces
+-- TODO Define Combinatorial Test Traces here
+end Pavilion

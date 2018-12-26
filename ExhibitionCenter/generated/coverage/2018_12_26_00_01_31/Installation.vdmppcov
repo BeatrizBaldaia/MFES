@@ -1,0 +1,43 @@
+class Installation
+types
+-- TODO Define types here
+values
+-- TODO Define values here
+instance variables
+-- TODO Define instance variables here
+	public id: Utils`String;
+	protected capacity: nat;
+	protected area: real;
+	protected heigth: real;
+	protected width: real;
+	protected lenght: real;
+	inv area = width * lenght;
+operations
+-- Constructor
+	public Installation: Utils`String * nat * real * real * real ==> Installation
+		Installation(i, c, h, w, l) == (
+			id := i;
+			capacity := c;
+			heigth := h;
+			width := w;
+			lenght := l;
+			area := w * l;
+			)
+			pre c > 0 and h > 0 and w > 0 and l > 0;
+
+-- Return installation id
+	public getID: () ==> Utils`String
+		getID() == return id;
+		
+	public addFoyer : Foyer ==> ()
+		addFoyer(f) == is subclass responsibility;
+	public removeFoyer : Foyer ==> ()
+		removeFoyer(f) == is subclass responsibility;
+	public addRoom : Room ==> ()
+		addRoom(r) == is subclass responsibility;
+	public removeRoom : Room ==> ()
+		removeRoom(r) == is subclass responsibility;
+	
+functions
+-- TODO Define functiones here
+end Installation
