@@ -1,17 +1,42 @@
 class Event
 types
 -- TODO Define types here
-	public Type=<Conferences> | <TradeFair> | <Party> | <Musical> | <TeamBuilding>;
+	public EventType=<Conferences> | <TradeFair> | <Party> | <Musical> | <TeamBuilding>;
 instance variables
--- TODO Define instance variables here
-	public begin: Utils`Date;
-	public ending: Utils`Date;
-	public isPulic: bool;
-	public name: Utils`String;
-	public totalTickets: nat;
-	public ticketPrice: real;
-	public type: Type;
+	public name: Utils`String := "untitled";
+	public totalTickets: nat := 1;
+	inv totalTickets > 0;
+	public ticketPrice: real := 0;
+	public begin: Utils`Date := mk_Utils`Date(1,1,2018);
+	public ending: Utils`Date := mk_Utils`Date(2,1,2018);
+	public privacy: bool := false;
+	public type: EventType := nil;
 	inv Utils`before(begin, ending);
+	public installation: Installation;
+	public services: [seq of Service`ServiceType] := [];
 operations
 
+--Constructor
+	public Event: Utils`String * nat * real * Utils`Date * Utils`Date * bool * EventType * Installation ==> Event
+	Event(n, tTickets, tPrice, b, e, p, t, inst) == (
+		name := n;
+		totalTickets := tTickets;
+		ticketPrice := tPrice;
+		atomic(begin := b; ending := e);
+		privacy := p;
+		type := t;
+		installation := inst
+	)
+	pre tTickets > 0;
+	
+--Changes the installation where the event will occur
+	public changeInstallation: Installation ==> ()
+	changeInstallation(inst) == installation := inst
+	post installation = inst;
+	
+--Add one service to services sequence
+	public addService: Service`ServiceType ==> ()
+	addService(service) == services := services ^ [service]
+	pre service not in set elems services
+	post len services = len services~ + 1 and service in set elems services;
 end Event

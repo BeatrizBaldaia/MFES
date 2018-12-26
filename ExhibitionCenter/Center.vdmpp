@@ -7,9 +7,10 @@ instance variables
 	public name: Utils`String;
 	public installations: map Utils`String to Installation;
 	inv card dom installations > 0 and 
-	forall id in set dom installations &  installations(id).id = id;
+		forall id in set dom installations &  installations(id).id = id;
 	public services: map Service`ServiceType to Service := {|->};
 	inv forall type in set dom services & services(type).type = type;
+	public events: map Utils`String to Event := {|->};
 operations
 	public Center:  Utils`String * Installation ==> Center
 		Center(n, inst) == (
@@ -61,7 +62,7 @@ operations
 	)
 	post inst1 in set rng installations and hasInstallation(inst1, installations(instID));
 	
-	-- Remove installation, foyer or room, to other installation, auditorium or pavilion\
+-- Remove installation, foyer or room, to other installation, auditorium or pavilion\
 	public removeInstallationFromInstallation: Utils`String * Installation ==> ()
 	removeInstallationFromInstallation(instID, inst1) == (
 		def inst2 = installations(instID) in (
