@@ -1,4 +1,4 @@
-class Room is subclass of Installation
+class Foyer is subclass of Installation
 types
 -- TODO Define types here
 values
@@ -6,23 +6,21 @@ values
 instance variables
 
 operations
--- Constructor
-	public Room: Utils`String * nat * real * real * real * bool * bool * bool * bool * bool * bool * bool * bool ==> Room
-		Room(i, c, h, w, l, airC, natL, ceilL, blackC, tele, compN, soundP, movW) == (
+-- Constructor (must have blackOutCurtains, telephones, soundproofWalls and movingWalls always false)
+	public Foyer: Utils`String * nat * real * real * real * bool * bool * bool * bool ==> Foyer
+		Foyer(i, c, h, w, l, airC, natL, ceilL, compN) == (
 			--Measures
 			id := i;
 			capacity := c;
 			heigth := h;
-			atomic(width := w; lenght := l; area := w * l);
+			width := w;
+			lenght := l;
+			area := w * l;
 			--Conditions
 			airCondition := airC;
 			naturalLigth := natL;
 			ceilingLighting := ceilL;
-			blackOutCurtains := blackC;
-			telephones := tele;
 			computerNetwork := compN;
-			soundproofWalls := soundP;
-			movingWalls := movW;
 		)
 		pre c > 0 and h > 0 and w > 0 and l > 0;
 		
@@ -38,4 +36,4 @@ functions
 -- TODO Define functiones here
 traces
 -- TODO Define Combinatorial Test Traces here
-end Room
+end Foyer

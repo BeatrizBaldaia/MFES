@@ -4,7 +4,7 @@ types
 									month: nat
 									day : nat
 				inv d == d.month <= 12 and d.day <= DaysOfMonth(d.year, d.month);
-	public String = seq of char;
+	public String :: seq of char;
 values
 functions
 	public DaysOfMonth: nat * nat -> nat 

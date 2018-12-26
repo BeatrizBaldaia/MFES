@@ -1,28 +1,19 @@
-class Room is subclass of Installation
+class CarParking is subclass of Installation
 types
 -- TODO Define types here
 values
 -- TODO Define values here
 instance variables
-
+-- TODO Define instance variables here
 operations
--- Constructor
-	public Room: Utils`String * nat * real * real * real * bool * bool * bool * bool * bool * bool * bool * bool ==> Room
-		Room(i, c, h, w, l, airC, natL, ceilL, blackC, tele, compN, soundP, movW) == (
+-- Constructor (must have all conditions always false)
+	public CarParking: Utils`String * nat * real * real * real ==> CarParking
+		CarParking(i, c, h, w, l) == (
 			--Measures
 			id := i;
 			capacity := c;
 			heigth := h;
 			atomic(width := w; lenght := l; area := w * l);
-			--Conditions
-			airCondition := airC;
-			naturalLigth := natL;
-			ceilingLighting := ceilL;
-			blackOutCurtains := blackC;
-			telephones := tele;
-			computerNetwork := compN;
-			soundproofWalls := soundP;
-			movingWalls := movW;
 		)
 		pre c > 0 and h > 0 and w > 0 and l > 0;
 		
@@ -38,4 +29,4 @@ functions
 -- TODO Define functiones here
 traces
 -- TODO Define Combinatorial Test Traces here
-end Room
+end CarParking
