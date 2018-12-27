@@ -6,10 +6,10 @@ instance variables
 	public totalTickets: nat := 1;
 	inv totalTickets > 0;
 	public ticketPrice: real := 0;
-	public begin: Utils`Date := mk_Utils`Date(2018, 1, 1);
-	public ending: Utils`Date := mk_Utils`Date(2018, 1, 2);
+	public begin: Utils`Date := mk_Utils`Date(1,1,2018);
+	public ending: Utils`Date := mk_Utils`Date(2,1,2018);
 	public privacy: bool := false;
-	public type: [EventType] := nil;
+	public type: EventType := nil;
 	inv Utils`before(begin, ending);
 	public installation: Installation;
 	public services: [seq of Service`ServiceType] := [];

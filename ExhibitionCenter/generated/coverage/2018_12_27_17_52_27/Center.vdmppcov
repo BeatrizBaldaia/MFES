@@ -257,7 +257,7 @@ operations
 --Add user to our center
 	public addUser: User ==> ()
 	addUser(user) == users := users ++ {user.name |-> user}
-	pre user.name not in set dom users
+	pre user not in set rng users
 	post user in set rng users;
 	
 --Add user to event
