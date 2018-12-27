@@ -8,13 +8,28 @@ types
 values
 functions
 	public DaysOfMonth: nat * nat -> nat 
-	DaysOfMonth(y, m) == y*m -- TODO: implementar
+	DaysOfMonth(y, m) ==
+				if (m = 2)
+				then
+						(if (isLeapYear(y))
+						then 29
+						else 28)
+        else (31 - (m - 1) mod 7 mod 2)
 	pre y > 0 and m > 0 and m < 13;
 	-- TODO: post
 	
 	public before: Date * Date -> bool 
-	before(b, a) == true; -- TODO: implementar
+	before(b, a) ==
+		b.year < a.year or
+		(b.year = a.year and b.month < a.month) or
+		(b.year = a.year and b.month = a.month and b.day < a.day)
+		;
 	-- TODO: pre post
+	
+	public isLeapYear: nat -> bool
+	isLeapYear(y) == 
+		y mod 4 = 0 and y mod 100 <> 0 or y mod 400 = 0
+	pre y > 0;
 
 -- Curried Function
 -- Received function can return a boolean or an element of the same map value type
