@@ -31,6 +31,10 @@ operations
 		addRoom(-) == return;
 	public removeRoom : Room ==> ()
 		removeRoom(-) == return;
+--Verify if has installation
+	public hasInstallation: Installation ==> bool
+		hasInstallation(inst) == return false
+		pre inst <> self;
 functions
 -- TODO Define functiones here
 traces

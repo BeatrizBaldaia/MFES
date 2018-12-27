@@ -106,17 +106,33 @@ operations
 --Gets all the installations available in the given period
 	public getAvailableInstallations: Utils`Date * Utils`Date ==> map Utils`String to Installation
 	getAvailableInstallations(b, e) == (
+		dcl tmpUsedInsts: set of Installation := {};
 		dcl usedInsts: set of Installation := {};
+		dcl tmpFreeInsts: map Utils`String to Installation := {|->};
 		let env in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) in (
-			usedInsts := usedInsts union {env.installation}
+			tmpUsedInsts :=  tmpUsedInsts union {env.installation}
 		);
-		return installations :-> usedInsts
+		tmpFreeInsts := installations :-> usedInsts;
+		usedInsts := tmpUsedInsts;
+		let inst1 in set rng tmpFreeInsts in (
+			let inst2 in set tmpUsedInsts in (
+				if(inst1.hasInstallation(inst2)) then usedInsts :=  usedInsts union {inst1}
+			)
+		);
+		return tmpFreeInsts :-> usedInsts;
 	)
 	pre Utils`before(b, e)
 	post rng RESULT subset rng installations and
 	forall env in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
 	env.installation not in set rng RESULT;
 	
+--Checks if this two installations are the same or associated
+-- (if inst2 is part of inst1)
+	public associatedInstallations: Installation * Installation ==> bool
+	associatedInstallations(inst1, inst2) == (
+		if(inst1 = inst2) then return true
+		else inst1.hasInstallation(inst2)
+	)
 	
 functions
 -- Verify if pavilion has a specific installation (room or foyer)
@@ -143,4 +159,5 @@ functions
 		else Utils`before(b2, e1)
 	)
 	pre Utils`before(env.begin, env.ending) and Utils`before(b2, e2);
+	
 end Center

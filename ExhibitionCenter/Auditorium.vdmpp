@@ -41,6 +41,14 @@ operations
 		addRoom(-) == return;
 	public removeRoom : Room ==> ()
 		removeRoom(-) == return;
+
+--Verify if has installation
+	public hasInstallation: Installation ==> bool
+		hasInstallation(inst) == (
+			if(isofclass(Foyer, inst)) then return (let f = narrow_(inst, Foyer) in f in set foyers)
+			else return false
+		)
+		pre inst <> self;
 functions
 
 traces

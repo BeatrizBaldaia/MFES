@@ -49,6 +49,14 @@ operations
 		pre f in set foyers
 		post card foyers = card foyers~ - 1 and f not in set foyers;
 
+--Verify if has installation
+	public hasInstallation: Installation ==> bool
+		hasInstallation(inst) == (
+			if(isofclass(Foyer, inst)) then return (let f = narrow_(inst, Foyer) in f in set foyers)
+			elseif(isofclass(Room, inst)) then return (let r = narrow_(inst, Room) in r in set rooms)
+			else return false
+		)
+		pre inst <> self;
 functions
 -- TODO Define functiones here
 traces
