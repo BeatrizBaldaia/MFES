@@ -1,0 +1,29 @@
+class CenterTest
+instance variables
+	name : Utils`String := ['T','e','s','t'];
+	room : Room := new Room(name, 1,1,1,1,false,false,false,false,false,false,false,false);
+ c : Center := new Center(name, room);
+operations
+private assertTrue: bool ==> ()
+ assertTrue(cond) == return
+ pre cond;
+private testCenter: () ==> ()
+ testCenter() ==
+ (
+ dcl inst_0 : Auditorium := new Auditorium();
+ assertTrue(not inst_0.id in set dom c.installations);
+ c.addInstallations(inst_0);
+ assertTrue(inst_0.id in set dom c.installations);
+ assertTrue(inst_0 = c.installations(inst_0.id));
+ );
+ public static main: () ==> ()
+  main() ==
+ (
+ new CenterTest().testCenter();
+
+ );
+functions
+-- TODO Define functiones here
+traces
+-- TODO Define Combinatorial Test Traces here
+end CenterTest

@@ -28,6 +28,7 @@ public static main: () ==> ()
   assertTrue(not Utils`before(date_0, date_0));
   assertTrue(Utils`before(date_1, date_2));
   assertTrue(not Utils`before(date_3, date_2));
+  assertTrue(not Utils`before(date_5, date_4));
   
  );
 functions
