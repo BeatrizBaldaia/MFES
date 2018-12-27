@@ -27,6 +27,40 @@ operations
 		installation := inst
 	)
 	pre tTickets > 0 and Utils`before(b,e);
+
+--Set event name
+	public setName: Utils`String ==> ()
+	setName(n) == name := n
+	post name = n;
+--Set event number of tickets
+	public setTotalTickets: nat ==> ()
+	setTotalTickets(tTickets) == totalTickets := tTickets
+	pre tTickets > 0
+	post totalTickets = tTickets;
+--Set event price of tickets
+	public setTicketPrice: nat ==> ()
+	setTicketPrice(tPrice) == ticketPrice := tPrice
+	pre tPrice >= 0
+	post ticketPrice = tPrice;
+--Set event begin date
+	public setBeginDate: Utils`Date ==> ()
+	setBeginDate(b) == begin := b
+	pre Utils`before(b, ending)
+	post begin = b;
+--Set event ending date
+	public setEndingDate: Utils`Date ==> ()
+	setEndingDate(e) == ending := e
+	pre Utils`before(begin, e)
+	post ending = e;
+--Set event privacy condition
+	public setPrivacy: bool ==> ()
+	setPrivacy(p) == privacy := p
+	post privacy = p;
+--Set event type
+	public setType: EventType ==> ()
+	setType(t) == type := t
+	pre t in set {<Conferences>, <TradeFair>, <Party>, <Musical>, <TeamBuilding>}
+	post type = t;
 	
 --Changes the installation where the event will occur
 	public changeInstallation: Installation ==> ()
@@ -38,4 +72,18 @@ operations
 	addService(service) == services := services ^ [service]
 	pre service not in set elems services
 	post len services = len services~ + 1 and service in set elems services;
+
+--Remove one service from services sequence
+	public removeService: Service`ServiceType ==> ()
+	removeService(service) == (
+		dcl tmpServices: seq of Service`ServiceType := services;
+		services := [];
+		while(tmpServices <> []) do (
+			if(hd tmpServices <> service) then services := services ^ [hd tmpServices];
+			tmpServices := tl tmpServices
+		)
+	)
+	pre service in set elems services
+	post service not in set elems services;
+	
 end Event

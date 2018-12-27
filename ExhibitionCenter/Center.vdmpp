@@ -1,6 +1,6 @@
 class Center
 types
--- TODO Define types here
+	public DateType = <begin> | <ending>;
 values
 -- TODO Define values here
 instance variables
@@ -20,26 +20,13 @@ operations
 		)
 		post card dom installations = 1 and name = n;
 
+--INSTALLATION OPERATIONS
 -- Add one installation to installations set		
 	public addInstallations: Installation ==> ()
 		addInstallations(inst) == let instID = inst.getID() in 
 		installations := installations ++ {instID |-> inst}
 		pre inst not in set rng installations and isofbaseclass(Installation, inst)
 		post card dom installations = card dom installations~ + 1 and inst in set rng installations;
-
--- Add one service to services set
-	public addService: Service ==> ()
-		addService(serv) == let type = serv.type in
-		services := services ++ {type |-> serv}
-		pre serv not in set rng services
-		post card dom services = card dom services~ + 1 and serv in set rng services;
-		
--- Changes a service price
-	public changeServicePrice: Service`ServiceType * real ==> ()
-	changeServicePrice(serviceType, price) == def service = services(serviceType) in
-	service.setPrice(price)
-	pre price > 0 and serviceType in set dom services
-	post services(serviceType).price = price;
 	
 -- Add installation, foyer or room, to other installation, auditorium or pavilion\
 	public addInstallationToInstallation: Utils`String * Installation ==> ()
@@ -81,7 +68,7 @@ operations
 	post inst1 in set rng installations and
 	not hasInstallation(inst1, installations(instID));
 	
--- Remove installation from installations map
+--Remove installation from installations map
 	public removeInstallation: Utils`String ==> ()
 	removeInstallation(instID) == (
 		let inst in set rng installations \ {installations(instID)} in
@@ -92,25 +79,14 @@ operations
 	post instID not in set dom installations and
 	not exists inst in set rng installations & hasInstallation(installations(instID), inst);
 
---Create an event	and add it to the events map
-	public createEvent:  Utils`String * nat * real * Utils`Date * Utils`Date * bool * Event`EventType * Installation ==> ()
-	createEvent(n, tTickets, tPrice, b, e, p, t, inst) == (
-		dcl event: Event := new Event(n, tTickets, tPrice, b, e, p, t, inst);
-		events := events ++ {n |-> event}
-	)
-	pre n not in set dom events and Utils`before(b, e) and
-	forall env in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
-	env.installation <> inst
-	post n in set dom events;
-	
 --Gets all the installations available in the given period
 	public getAvailableInstallations: Utils`Date * Utils`Date ==> map Utils`String to Installation
 	getAvailableInstallations(b, e) == (
 		dcl tmpUsedInsts: set of Installation := {};
 		dcl usedInsts: set of Installation := {};
 		dcl tmpFreeInsts: map Utils`String to Installation := {|->};
-		let env in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) in (
-			tmpUsedInsts :=  tmpUsedInsts union {env.installation}
+		let ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) in (
+			tmpUsedInsts :=  tmpUsedInsts union {ev.installation}
 		);
 		tmpFreeInsts := installations :-> usedInsts;
 		usedInsts := tmpUsedInsts;
@@ -123,8 +99,8 @@ operations
 	)
 	pre Utils`before(b, e)
 	post rng RESULT subset rng installations and
-	forall env in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
-	env.installation not in set rng RESULT;
+	forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
+	ev.installation not in set rng RESULT;
 	
 --Checks if this two installations are the same or associated
 -- (if inst2 is part of inst1)
@@ -133,7 +109,134 @@ operations
 		if(inst1 = inst2) then return true
 		else inst1.hasInstallation(inst2)
 	)
+	pre {inst1, inst2} subset rng installations;
+
+--SERVICE OPERATIONS
+-- Add one service to services set
+	public addService: Service ==> ()
+		addService(serv) == let type = serv.type in
+		services := services ++ {type |-> serv}
+		pre serv not in set rng services
+		post card dom services = card dom services~ + 1 and serv in set rng services;
+
+--Remove service from services map
+	public removeService: Service`ServiceType ==> ()
+		removeService(service) == (
+			let e in set {x | x in set rng events & service in set elems x.services} in
+				e.removeService(service);
+			services := {service} <-: services
+		)
+		pre service in set dom services
+		post service not in set dom services and
+			forall e in set rng events & service not in set elems e.services;
+		
+-- Changes a service price
+	public changeServicePrice: Service`ServiceType * real ==> ()
+	changeServicePrice(serviceType, price) == def service = services(serviceType) in
+	service.setPrice(price)
+	pre price > 0 and serviceType in set dom services
+	post services(serviceType).price = price;
+
+--EVENT OPERATIONS
+--Create an event	and add it to the events map
+	public createEvent:  Utils`String * nat * real * Utils`Date * Utils`Date * bool * Event`EventType * Installation ==> ()
+	createEvent(n, tTickets, tPrice, b, e, p, t, inst) == (
+		dcl event: Event := new Event(n, tTickets, tPrice, b, e, p, t, inst);
+		events := events ++ {n |-> event}
+	)
+	pre n not in set dom events and Utils`before(b, e) and
+	forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
+	ev.installation <> inst
+	post n in set dom events;
 	
+--OPERATIONS TO CHANGE EVENTS ATTRIBUTES	
+--Change event name
+	public changeEventName: Utils`String * Utils`String ==> ()
+	changeEventName(evName, value) == (
+		dcl ev: Event := events(evName);
+		ev.setName(value);
+		events := events ++ {value |-> ev}
+	)
+	pre evName in set dom events and value not in set dom events
+	post evName not in set dom events and value in set dom events;
+
+--Change event number of tickets
+	public changeEventTotalTickets: Utils`String * nat ==> ()
+	changeEventTotalTickets(evName, value) == (
+		dcl ev: Event := events(evName);
+		ev.setTotalTickets(value)
+		--events := events ++ {evName |-> ev} Se ev for uma referencia, nao e preciso atualizar
+	)
+	pre evName in set dom events and value > 0
+	post events(evName).totalTickets = value;
+
+--Change event ticket price
+	public changeEventTicketPrice: Utils`String * real ==> ()
+	changeEventTicketPrice(evName, value) == (
+		dcl ev: Event := events(evName);
+		ev.setTicketPrice(value)
+		--events := events ++ {evName |-> ev}
+	)
+	pre evName in set dom events and value >= 0
+	post events(evName).ticketPrice = value;
+
+--Change event date (begin or ending)
+	public changeEventDate: Utils`String * DateType * Utils`Date ==> ()
+	changeEventDate(evName, dateType, value) == (
+		dcl ev: Event := events(evName);
+		cases dateType:
+			<begin> -> ev.setBeginDate(value),
+			<ending> -> ev.setEndingDate(value)
+			--others -> error
+			end
+	)
+	pre evName in set dom events and (dateType = <begin> or dateType = <ending>)
+	post if(dateType = <begin>) then events(evName).begin = value
+		else events(evName).ending = value;
+
+--Change event privacy condition
+	public changeEventPrivacy: Utils`String * bool ==> ()
+	changeEventPrivacy(evName, value) == (
+		dcl ev: Event := events(evName);
+		ev.setPrivacy(value)
+	)
+	pre evName in set dom events
+	post events(evName).privacy = value;
+
+--Change event type
+	public changeEventType: Utils`String * Event`EventType ==> ()
+	changeEventType(evName, value) == (
+		dcl ev: Event := events(evName);
+		ev.setType(value)
+	)
+	pre evName in set dom events
+	post events(evName).type = value;
+
+--Change where event will occur
+	public changeEventInstallation: Utils`String * Utils`String ==> ()
+	changeEventInstallation(evName, instName) == (
+		dcl ev: Event := events(evName);
+		ev.changeInstallation(installations(instName))
+	)
+	pre evName in set dom events and
+		let b = events(evName).begin, e = events(evName).ending in (
+			forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
+			instName <> ev.installation.id
+		)
+	post events(evName).installation.id = instName;
+
+--Add service to event
+	public addServiceToEvent: Utils`String * Service`ServiceType ==> ()
+	addServiceToEvent(evName, servType) == events(evName).addService(servType)
+	pre evName in set dom events and servType in set dom services
+	post servType in set elems events(evName).services;
+
+--Remove service from event
+	public removeServiceFromEvent: Utils`String * Service`ServiceType ==> ()
+	removeServiceFromEvent(evName, servType) == events(evName).removeService(servType)
+	pre evName in set dom events and servType in set dom services and
+		servType in set elems events(evName).services
+	post servType not in set elems events(evName).services;
 functions
 -- Verify if pavilion has a specific installation (room or foyer)
 	public hasInstallation: Installation * Installation -> bool
@@ -153,11 +256,11 @@ functions
 	
 --Checks if this event has conflicts with the period given in the arguments
 	public hasDatesConflict: Event * Utils`Date * Utils`Date -> bool
-	hasDatesConflict(env, b2, e2) == (
-		def b1 = env.begin; e1 = env.ending in
+	hasDatesConflict(ev, b2, e2) == (
+		def b1 = ev.begin; e1 = ev.ending in
 		if(Utils`before(b2, b1)) then Utils`before(b1, e2)
 		else Utils`before(b2, e1)
 	)
-	pre Utils`before(env.begin, env.ending) and Utils`before(b2, e2);
+	pre Utils`before(ev.begin, ev.ending) and Utils`before(b2, e2);
 	
 end Center
