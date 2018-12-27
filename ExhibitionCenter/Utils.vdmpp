@@ -26,9 +26,7 @@ functions
 		(b.year = a.year and b.month < a.month) or
 		(b.year = a.year and b.month = a.month and b.day < a.day)
 	pre true
-	post b.year < a.year or
-		(b.year = a.year and b.month < a.month) or
-		(b.year = a.year and b.month = a.month and b.day < a.day);
+	post RESULT = (b.year < a.year or (b.year = a.year and b.month < a.month) or (b.year = a.year and b.month = a.month and b.day < a.day));
 
 	public isLeapYear: nat -> bool
 	isLeapYear(y) == 

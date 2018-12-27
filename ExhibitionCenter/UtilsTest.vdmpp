@@ -6,7 +6,24 @@ values
 instance variables
 -- TODO Define instance variables here
 operations
--- TODO Define operations here
+private assertTrue: bool ==> ()
+ assertTrue(cond) == return
+ pre cond;
+public static main: () ==> ()
+  main() ==
+ (
+  new UtilsTest().testbefore();
+ );
+ private testbefore: () ==> ()
+ testbefore() ==
+ (
+	dcl date_0 : Utils`Date := mk_Utils`Date(2018,12,27);
+ 	dcl date_1 : Utils`Date := mk_Utils`Date(2018,12,28);
+  assertTrue(Utils`before(date_0, date_1));
+  assertTrue(not Utils`before(date_1, date_0));
+  assertTrue(not Utils`before(date_0, date_0));
+  
+ );
 functions
 -- TODO Define functiones here
 traces
