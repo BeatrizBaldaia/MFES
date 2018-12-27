@@ -1,0 +1,38 @@
+class CenterTest
+instance variables
+	name : Utils`String := ['T','e','s','t'];
+	room : Room := new Room(name, 1,1,1,1,false,false,false,false,false,false,false,false);
+ c : Center := new Center(name, room);
+operations
+private assertTrue: bool ==> ()
+ assertTrue(cond) == return
+ pre cond;
+private testCenter: () ==> ()
+ testCenter() ==
+ (
+ dcl name_1 : Utils`String := ['F','o','y','e','r'];
+ dcl inst_0 : Auditorium := new Auditorium(); -- TODO Sera possivel
+ dcl inst_1 : Foyer := new Foyer(name_1,1,1,1,1,true,true,true,true);
+ assertTrue(not inst_0.id in set dom c.installations);
+ c.addInstallations(inst_0);
+ assertTrue(inst_0.id in set dom c.installations);
+ assertTrue(inst_0 = c.installations(inst_0.id));
+ assertTrue(not inst_0.hasInstallation(room));
+ inst_0.addRoom(room);
+-- assertTrue(inst_0.hasInstallation(room)); -- TODO Descomentar quando implementado
+
+ assertTrue(not inst_0.hasInstallation(inst_1));
+ inst_0.addFoyer(inst_1);
+ assertTrue(inst_0.hasInstallation(inst_1));
+ );
+ public static main: () ==> ()
+  main() ==
+ (
+ new CenterTest().testCenter();
+ UtilsTest`main();
+ );
+functions
+-- TODO Define functiones here
+traces
+-- TODO Define Combinatorial Test Traces here
+end CenterTest

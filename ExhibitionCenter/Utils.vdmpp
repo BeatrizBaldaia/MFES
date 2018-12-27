@@ -15,21 +15,24 @@ functions
 						then 29
 						else 28)
         else (31 - (m - 1) mod 7 mod 2)
-	pre y > 0 and m > 0 and m < 13;
-	-- TODO: post
+	pre y > 0 and m > 0 and m < 13
+	post (m = 2 and isLeapYear(y) and RESULT = 29) or
+		(m = 2 and not isLeapYear(y) and RESULT = 28) or
+		(RESULT = (31 - (m - 1) mod 7 mod 2)); 
 	
 	public before: Date * Date -> bool 
 	before(b, a) ==
 		b.year < a.year or
 		(b.year = a.year and b.month < a.month) or
 		(b.year = a.year and b.month = a.month and b.day < a.day)
-		;
-	-- TODO: pre post
-	
+	pre true
+	post RESULT = (b.year < a.year or (b.year = a.year and b.month < a.month) or (b.year = a.year and b.month = a.month and b.day < a.day));
+
 	public isLeapYear: nat -> bool
 	isLeapYear(y) == 
 		y mod 4 = 0 and y mod 100 <> 0 or y mod 400 = 0
-	pre y > 0;
+	pre y > 0
+	post RESULT = (y mod 4 = 0 and y mod 100 <> 0 or y mod 400 = 0);
 
 -- Curried Function
 -- Received function can return a boolean or an element of the same map value type
