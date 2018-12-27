@@ -10,7 +10,7 @@ instance variables
 	public ending: Utils`Date := mk_Utils`Date(2018, 1, 2);
 	public privacy: bool := false;
 	public type: [EventType] := nil;
-	inv Utils`before(begin, ending);
+	inv begin = ending or Utils`before(begin, ending);
 	public installation: Installation;
 	public services: [seq of Service`ServiceType] := [];
 	public attendees: [set of Utils`String] := {};
