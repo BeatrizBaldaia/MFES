@@ -32,7 +32,7 @@ functions
 	isLeapYear(y) == 
 		y mod 4 = 0 and y mod 100 <> 0 or y mod 400 = 0
 	pre y > 0
-	post y mod 4 = 0 and y mod 100 <> 0 or y mod 400 = 0;
+	post RESULT = (y mod 4 = 0 and y mod 100 <> 0 or y mod 400 = 0);
 
 -- Curried Function
 -- Received function can return a boolean or an element of the same map value type
