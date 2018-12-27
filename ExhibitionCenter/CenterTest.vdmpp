@@ -5,8 +5,8 @@ operations
 private assertTrue: bool ==> ()
  assertTrue(cond) == return
  pre cond;
-private testCenter: () ==> ()
- testCenter() ==
+private testInstallations: () ==> ()
+ testInstallations() ==
  (
  dcl name : Utils`String := "Test";
  dcl room : Room := new Room(name, 1,1,1,1,false,false,false,false,false,false,false,false);
@@ -14,21 +14,40 @@ private testCenter: () ==> ()
  dcl name_1 : Utils`String := "Foyer";
  dcl inst_0 : Auditorium := new Auditorium(); -- TODO deve dar erro
  dcl inst_1 : Foyer := new Foyer(name_1,1,1,1,1,true,true,true,true);
+ dcl inst_2 : Pavilion := new Pavilion("Pav",1,1,1,1,false,false,false,false,false);
  -- dcl tet : Utils`Date := mk_Utils`Date(1,1,40); -- TODO dar erro
+
  assertTrue(not inst_0.id in set dom c.installations);
  c.addInstallations(inst_0);
  assertTrue(inst_0.id in set dom c.installations);
  assertTrue(inst_0 = c.installations(inst_0.id));
+ 
+ assertTrue(not inst_2.id in set dom c.installations);
+ c.addInstallations(inst_2);
+ assertTrue(inst_2.id in set dom c.installations);
+ assertTrue(inst_2 = c.installations(inst_2.id));
+ 
+ 
  assertTrue(not inst_0.hasInstallation(room));
- inst_0.addRoom(room);
--- assertTrue(inst_0.hasInstallation(room)); -- TODO Descomentar quando implementado
-
  assertTrue(not inst_0.hasInstallation(inst_1));
- inst_0.addFoyer(inst_1);
+-- c.addInstallationToInstallation(inst_0.id, room); pre = falso
+ c.addInstallationToInstallation(inst_0.id, inst_1);
+ assertTrue(not inst_0.hasInstallation(room)); -- Impossivel, pre = false
  assertTrue(inst_0.hasInstallation(inst_1));
+ 
+ assertTrue(not inst_2.hasInstallation(room));
+ assertTrue(not inst_2.hasInstallation(inst_1));
+ c.addInstallationToInstallation(inst_2.id, room);
+ -- c.addInstallationToInstallation(inst_2.id, inst_1); -- TODO Alreay in the auditorium
+ assertTrue(inst_2.hasInstallation(room));
+ assertTrue(not inst_2.hasInstallation(inst_1)); -- TODO retirar o not
+ 
+ 
+ assertTrue(c.installations("Foyer") = inst_1);
+ assertTrue(c.installations("Test") = room);
  );
- private testAddUser: () ==> ()
- testAddUser() ==
+ private testUser: () ==> ()
+ testUser() ==
  (
 	dcl user1 : User := new User("eduardo", "123");
 	-- dcl user2 : User := new User("anabela", "");
@@ -65,8 +84,8 @@ private testCenter: () ==> ()
   main() ==
  (
  dcl c : CenterTest := new CenterTest();
- c.testCenter();
- c.testAddUser();
+ c.testInstallations();
+ c.testUser();
  UtilsTest`main();
  
  );

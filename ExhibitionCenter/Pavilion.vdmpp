@@ -1,8 +1,4 @@
 class Pavilion is subclass of Installation
-types
--- TODO Define types here
-values
--- TODO Define values here
 instance variables
 	public rooms: set of Room := {};
 	public foyers: set of Foyer := {};
@@ -57,8 +53,5 @@ operations
 			else return false
 		)
 		pre inst <> self;
-functions
--- TODO Define functiones here
-traces
--- TODO Define Combinatorial Test Traces here
+
 end Pavilion
