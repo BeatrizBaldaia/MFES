@@ -1,5 +1,4 @@
 class User
-
 instance variables
 	public name: Utils`String := "default_name";
 	public password: Utils`String := "pass1234";

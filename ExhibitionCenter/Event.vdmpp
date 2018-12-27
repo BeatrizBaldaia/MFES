@@ -137,4 +137,9 @@ operations
 	 removeStaff(user) == staff := staff \ {user}
 	 pre user in set staff
 	 post user not in set staff;
+	 --Remove user from host
+	public unsetHost: Utils`String ==> ()
+	 unsetHost(user) == host := undefined
+	 pre user = host
+	 post not user = host;
 end Event

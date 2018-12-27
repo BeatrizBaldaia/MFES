@@ -1,10 +1,4 @@
 class UtilsTest
-types
--- TODO Define types here
-values
--- TODO Define values here
-instance variables
--- TODO Define instance variables here
 operations
 private assertTrue: bool ==> ()
  assertTrue(cond) == return
@@ -31,8 +25,4 @@ public static main: () ==> ()
   assertTrue(not Utils`before(date_5, date_4));
   
  );
-functions
--- TODO Define functiones here
-traces
--- TODO Define Combinatorial Test Traces here
 end UtilsTest

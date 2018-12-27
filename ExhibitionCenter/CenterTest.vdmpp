@@ -1,4 +1,5 @@
 class CenterTest
+-- TODO not possible new Room(), teste failing
 operations
 private assertTrue: bool ==> ()
  assertTrue(cond) == return
@@ -6,10 +7,10 @@ private assertTrue: bool ==> ()
 private testCenter: () ==> ()
  testCenter() ==
  (
- dcl name : Utils`String := ['T','e','s','t'];
+ dcl name : Utils`String := "Test";
  dcl room : Room := new Room(name, 1,1,1,1,false,false,false,false,false,false,false,false);
  dcl c : Center := new Center(name, room);
- dcl name_1 : Utils`String := ['F','o','y','e','r'];
+ dcl name_1 : Utils`String := "Foyer";
  dcl inst_0 : Auditorium := new Auditorium(); -- TODO deve dar erro
  dcl inst_1 : Foyer := new Foyer(name_1,1,1,1,1,true,true,true,true);
  -- dcl tet : Utils`Date := mk_Utils`Date(1,1,40); -- TODO dar erro
