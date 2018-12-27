@@ -30,6 +30,7 @@ private testCenter: () ==> ()
  testAddUser() ==
  (
 	dcl user1 : User := new User("eduardo", "123");
+	-- dcl user2 : User := new User("anabela", "");
 	dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 100, 20, 20, 20, true, true, true, true, true);
 	dcl center : Center := new Center("Super Center", pavilion1);
 	assertTrue({|->} = center.events);
@@ -52,6 +53,11 @@ private testCenter: () ==> ()
 	center.addUserToEvent("Coffee Break", "eduardo", <attendee>);
 	assertTrue(center.events("Coffee Break").attendees = {"eduardo"});
 	assertTrue(center.users(user1.name).events = {"Coffee Break"});
+	assertTrue(center.users(user1.name).attendEvent("Coffee Break"));
+	assertTrue( not center.users(user1.name).attendEvent("Tezst"));
+	center.removeUserFromEvent("Coffee Break", "eduardo", <attendee>);
+	assertTrue(center.events("Coffee Break").attendees = {});
+	assertTrue(center.users(user1.name).events = {});
 	
  );
  public static main: () ==> ()
