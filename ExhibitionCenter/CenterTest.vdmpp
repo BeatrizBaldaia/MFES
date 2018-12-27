@@ -1,8 +1,4 @@
 class CenterTest
-instance variables
-	name : Utils`String := ['T','e','s','t'];
-	room : Room := new Room(name, 1,1,1,1,false,false,false,false,false,false,false,false);
- c : Center := new Center(name, room);
 operations
 private assertTrue: bool ==> ()
  assertTrue(cond) == return
@@ -10,9 +6,13 @@ private assertTrue: bool ==> ()
 private testCenter: () ==> ()
  testCenter() ==
  (
+ dcl name : Utils`String := ['T','e','s','t'];
+ dcl room : Room := new Room(name, 1,1,1,1,false,false,false,false,false,false,false,false);
+ dcl c : Center := new Center(name, room);
  dcl name_1 : Utils`String := ['F','o','y','e','r'];
- dcl inst_0 : Auditorium := new Auditorium(); -- TODO Sera possivel
+ dcl inst_0 : Auditorium := new Auditorium(); -- TODO deve dar erro
  dcl inst_1 : Foyer := new Foyer(name_1,1,1,1,1,true,true,true,true);
+ -- dcl tet : Utils`Date := mk_Utils`Date(1,1,40); -- TODO dar erro
  assertTrue(not inst_0.id in set dom c.installations);
  c.addInstallations(inst_0);
  assertTrue(inst_0.id in set dom c.installations);
@@ -25,11 +25,42 @@ private testCenter: () ==> ()
  inst_0.addFoyer(inst_1);
  assertTrue(inst_0.hasInstallation(inst_1));
  );
+ private testAddUser: () ==> ()
+ testAddUser() ==
+ (
+	dcl user1 : User := new User("eduardo", "123");
+	dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 100, 20, 20, 20, true, true, true, true, true);
+	dcl center : Center := new Center("Super Center", pavilion1);
+	assertTrue({|->} = center.events);
+	center.createEvent("Coffee Break", 3, 0, mk_Utils`Date(2018, 12, 27), mk_Utils`Date(2018, 12, 28), false, <Party>, pavilion1);
+	assertTrue(center.events("Coffee Break").name = "Coffee Break");
+	assertTrue(center.events("Coffee Break").totalTickets = 3);
+	assertTrue(center.events("Coffee Break").ticketPrice = 0);
+	assertTrue(center.events("Coffee Break").begin = mk_Utils`Date(2018, 12, 27));
+	assertTrue(center.events("Coffee Break").ending = mk_Utils`Date(2018, 12, 28));
+	assertTrue(center.events("Coffee Break").privacy = false);
+	assertTrue(center.events("Coffee Break").type = <Party>);
+	assertTrue(center.events("Coffee Break").installation = pavilion1);
+	assertTrue(center.events("Coffee Break").services = []);
+	assertTrue(center.events("Coffee Break").attendees = {});
+	assertTrue(center.events("Coffee Break").staff = {});
+	assertTrue(center.users = {|->});
+	center.addUser(user1);
+	assertTrue(center.users(user1.name) = user1);
+	assertTrue(center.users(user1.name).events = {});
+	center.addUserToEvent("Coffee Break", "eduardo", <attendee>);
+	assertTrue(center.events("Coffee Break").attendees = {"eduardo"});
+	assertTrue(center.users(user1.name).events = {"Coffee Break"});
+	
+ );
  public static main: () ==> ()
   main() ==
  (
- new CenterTest().testCenter();
+ dcl c : CenterTest := new CenterTest();
+ c.testCenter();
+ c.testAddUser();
  UtilsTest`main();
+ 
  );
 functions
 -- TODO Define functiones here

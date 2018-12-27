@@ -16,7 +16,7 @@ instance variables
 	public attendees: [set of Utils`String] := {};
 	inv card attendees <= totalTickets;
 	public staff: [set of Utils`String] := {};
-	public host: Utils`String;
+	public host: Utils`String := undefined;
 	inv host not in set attendees and host not in set staff;
 	inv forall attendee in set attendees & attendee not in set staff;
 operations

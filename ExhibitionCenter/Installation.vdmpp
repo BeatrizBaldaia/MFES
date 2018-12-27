@@ -1,8 +1,4 @@
 class Installation
-types
--- TODO Define types here
-values
--- TODO Define values here
 instance variables
 -- Measures
 	public id: Utils`String := "untitled";
@@ -36,7 +32,4 @@ operations
 		removeRoom(r) == is subclass responsibility;
 	public hasInstallation: Installation ==> bool
 		hasInstallation(inst) == is subclass responsibility;
-	
-functions
--- TODO Define functiones here
 end Installation
