@@ -1,8 +1,4 @@
 class Auditorium is subclass of Installation
-types
--- TODO Define types here
-values
--- TODO Define values here
 instance variables
 	public foyers: set of Foyer := {};
 operations
@@ -38,9 +34,11 @@ operations
 		post card foyers = card foyers~ - 1 and f not in set foyers;
 
 	public addRoom : Room ==> ()
-		addRoom(-) == return;
+		addRoom(-) == return
+		pre false;
 	public removeRoom : Room ==> ()
-		removeRoom(-) == return;
+		removeRoom(-) == return
+		pre false;
 
 --Verify if has installation
 	public hasInstallation: Installation ==> bool
@@ -49,8 +47,4 @@ operations
 			else return false
 		)
 		pre inst <> self;
-functions
-
-traces
--- TODO Define Combinatorial Test Traces here
 end Auditorium

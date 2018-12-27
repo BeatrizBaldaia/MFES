@@ -1,5 +1,6 @@
 class CenterTest
 -- TODO not possible new Room(), teste failing
+ --TODO addFoyer/ Room ; pre = false
 operations
 private assertTrue: bool ==> ()
  assertTrue(cond) == return

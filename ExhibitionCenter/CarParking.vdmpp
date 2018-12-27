@@ -1,10 +1,5 @@
 class CarParking is subclass of Installation
-types
--- TODO Define types here
-values
--- TODO Define values here
-instance variables
--- TODO Define instance variables here
+
 operations
 -- Constructor (must have all conditions always false)
 	public CarParking: Utils`String * nat * real * real * real ==> CarParking
@@ -21,19 +16,19 @@ operations
 		soundproofWalls or movingWalls);
 		
 	public addFoyer : Foyer ==> ()
-		addFoyer(-) == return;
+		addFoyer(-) == return
+		pre false;
 	public removeFoyer : Foyer ==> ()
-		removeFoyer(-) == return;
+		removeFoyer(-) == return
+		pre false;
 	public addRoom : Room ==> ()
-		addRoom(-) == return;
+		addRoom(-) == return
+		pre false;
 	public removeRoom : Room ==> ()
-		removeRoom(-) == return;
+		removeRoom(-) == return
+		pre false;
 --Verify if has installation
 	public hasInstallation: Installation ==> bool
 		hasInstallation(inst) == return false
 		pre inst <> self;
-functions
--- TODO Define functiones here
-traces
--- TODO Define Combinatorial Test Traces here
 end CarParking
