@@ -24,12 +24,14 @@ operations
 
 --Change installation's conditions	
 	public setConditions: bool * bool * bool * bool * bool * bool * bool * bool ==> ()
-		setConditions(airC, natL, ceilL, -, -, compN, -, -) == (
+		setConditions(airC, natL, ceilL, b, t, compN, s, m) == (
 			airCondition := airC;
 			naturalLigth := natL;
 			ceilingLighting := ceilL;
 			computerNetwork := compN
-		);
+		)
+		pre not (b or t or s or m)
+		post not (blackOutCurtains or telephones or soundproofWalls or movingWalls);
 		
 --Shows all installation information
 	public showDetails: () ==> map Utils`String to Utils`String

@@ -72,9 +72,11 @@ operations
 		testSetConditions(room1,false,false,false,false,false,false,false,false);
 		testSetConditions(room1,true,true,true,true,true,true,true,true);
 		testSetConditions(pavilion1,false,false,false,false,false,false,false,false);
-		testSetConditions(pavilion1,true,true,true,true,true,true,true,true);
+		testSetConditions(pavilion1,true,true,true,true,false,true,false,false);
 		testSetConditions(foyer1,false,false,false,false,false,false,false,false);
-		testSetConditions(foyer1,true,true,true,true,true,true,true,true);
+		testSetConditions(foyer1,true,true,true,false,false,true,false,false);
+		-- TODO testSetConditions auditorion
+		-- TODO testHasInstallation ...
 	);
 	
 	-- TODO TEST WITH INVALID INPUTS
