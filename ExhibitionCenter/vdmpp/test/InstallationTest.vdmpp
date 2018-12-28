@@ -1,8 +1,5 @@
-class InstallationTest
+class InstallationTest is subclass of Test
 operations
-	private assertTrue: bool ==> ()
-	 assertTrue(cond) == return
-	 pre cond;
 	public static main: () ==> ()
 	main() == (
 		dcl i : InstallationTest := new InstallationTest();
