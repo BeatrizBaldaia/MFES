@@ -98,48 +98,16 @@ private testInstallations: () ==> ()
 	assertTrue(center.users(user1.name).events = {});
 	
  );
- private testEvents: () ==> ()
- testEvents() ==
- (
-	dcl host : User := new User("host", "123");
-	dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 100, 20, 20, 20, true, true, true, true, true);
-	dcl center : Center := new Center("Super Center", pavilion1);
-	center.addUser(host);
-	center.createEvent("Coffee Break", 3, 0, mk_Utils`Date(2018, 12, 27), mk_Utils`Date(2018, 12, 28), false, <Party>, pavilion1, host);
-	assertTrue(center.events("Coffee Break").name = "Coffee Break");
-	assertTrue(center.events("Coffee Break").totalTickets = 3);
-	assertTrue(center.events("Coffee Break").ticketPrice = 0);
-	assertTrue(center.events("Coffee Break").begin = mk_Utils`Date(2018, 12, 27));
-	assertTrue(center.events("Coffee Break").ending = mk_Utils`Date(2018, 12, 28));
-	assertTrue(center.events("Coffee Break").privacy = false);
-	assertTrue(center.events("Coffee Break").type = <Party>);
-	assertTrue(center.events("Coffee Break").installation = pavilion1);
-	assertTrue(center.events("Coffee Break").services = []);
-	assertTrue(center.events("Coffee Break").attendees = {});
-	assertTrue(center.events("Coffee Break").staff = {});
-	center.createEvent("DLC", 3, 0, mk_Utils`Date(2018, 12, 29), mk_Utils`Date(2018, 12, 30), false, <Conference>, pavilion1, host);
-	assertTrue(center.events("DLC").name = "DLC");
-	assertTrue(center.events("DLC").totalTickets = 3);
-	assertTrue(center.events("DLC").ticketPrice = 0);
-	assertTrue(center.events("DLC").begin = mk_Utils`Date(2018, 12, 27));
-	assertTrue(center.events("DLC").ending = mk_Utils`Date(2018, 12, 28));
-	assertTrue(center.events("DLC").privacy = false);
-	assertTrue(center.events("DLC").type = <Party>);
-	assertTrue(center.events("DLC").installation = pavilion1);
-	assertTrue(center.events("DLC").services = []);
-	assertTrue(center.events("DLC").attendees = {});
-	assertTrue(center.events("DLC").staff = {});
- );
+
  public static main: () ==> ()
   main() ==
  (
  dcl c : CenterTest := new CenterTest();
  c.testInstallations();
- --c.testEvents(); -- TODO Descomentar
  c.testUser();
  
  UtilsTest`main();
- 
+ EventTest`main();
  );
 functions
 -- TODO Define functiones here
