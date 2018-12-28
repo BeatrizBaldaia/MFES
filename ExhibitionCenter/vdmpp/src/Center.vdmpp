@@ -164,6 +164,15 @@ operations
 	)
 	pre evName in set dom events;
 	
+--In case of a private event, host can invite users (so they will be
+-- the only ones capable of seeing and buying a ticket to the event)
+	public inviteToEvent: Utils`String * Utils`String * Utils`String ==> ()
+	inviteToEvent(evName, hName, uName) == events(evName).inviteUser(hName, uName)
+	pre evName in set dom events and uName in set dom users and
+		hName in set dom users and hName <> uName and
+		events(evName).privacy = true
+	post uName in set events(evName).guests;
+	
 --OPERATIONS TO CHANGE EVENTS ATTRIBUTES	
 --Change event name
 	public changeEventName: Utils`String * Utils`String ==> ()
