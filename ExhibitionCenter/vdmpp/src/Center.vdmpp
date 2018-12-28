@@ -144,12 +144,12 @@ operations
 
 --EVENT OPERATIONS
 --Create an event	and add it to the events map
-	public createEvent:  Utils`String * nat * real * Utils`Date * Utils`Date * bool * Event`EventType * Installation * User ==> ()
+	public createEvent:  Utils`String * nat * real * Utils`Date * Utils`Date * bool * Event`EventType * Installation * Utils`String ==> ()
 	createEvent(n, tTickets, tPrice, b, e, p, t, inst, h) == (
 		dcl event: Event := new Event(n, tTickets, tPrice, b, e, p, t, inst, h);
 		events := events ++ {n |-> event}
 	)
-	pre h = users(h.name) and n not in set dom events and 
+	pre h in set dom users and n not in set dom events and 
 		(Utils`before(b, e) or b = e) and
 		forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
 			ev.installation <> inst

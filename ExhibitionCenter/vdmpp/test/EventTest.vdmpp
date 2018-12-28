@@ -1,13 +1,65 @@
-class EventTest
+class EventTest is subclass of Test
 operations
-	private assertTrue: bool ==> ()
- 		assertTrue(cond) == return
- 	pre cond;
-	public static main: () ==> ()
-  	main() ==
- 	(
-  	new EventTest().testEvents();
+
+/***** USE CASE SCENARIOS ******/
+
+--Create an event
+	public createEvent: Utils`String * nat * real * Utils`Date * Utils`Date * bool * EventType * Installation * User ==> Event
+	createEvent(n, tTickets, tPrice, b, e, p, t, inst, h) == (
+		dcl event: Event := new Event(n, tTickets, tPrice, b, e, p, t, inst, h);
+		return event
+	);
+	
+--Add services to the event
+	public addServices: Event * [seq of Service`ServiceType] ==> ()
+	addServices(event, services) == (
+		dcl oldServicesSet: seq of Service`ServiceType := event.services;
+		let s in seq services in event.addService(s);
+		assertEqual(event.services, oldServicesSet  ^ services)
+	)
+	pre event <> undefined
+	post elems services subset elems event.services;
+
+--Remove services from event
+	public removeServices: Event * [seq of Service`ServiceType] ==> ()
+	removeServices(event, services) == (
+		let s in seq services in event.removeService(s);
+		assertTrue(forall service in set event.services & service not in set elems services)
+	)
+	pre card elems services = len services
+	post elems services inter elems event.services = {};
+
+--Change event's installation
+	public changeInstallation: Event * seq of Installation ==> ()
+	changeInstallation(event, installations) == (
+		dcl tmpInstallations: seq of Installation := installations;
+		while(tmpInstallations <> []) do (
+			event.changeInstallation(hd tmpInstallations);
+			tmpInstallations := tl tmpInstallations
+		);
+		assertEqual(event.installation, installations(len installations))
+	)
+	pre event <> undefined and len installations > 0
+	post event.installation = installations(len installations);
+ 
+ /***** TEST CASES WITH VALID INPUTS ******/
+ 
+ --Run all tests with valid inputa
+ 	public testAll: () ==> ()
+ 	testAll() == (
+ 		dcl room1: Installation := new Room("Room1", 10, 7, 20, 20, false, true, true, true, false, false, true, false);
+		dcl room2: Installation := new Room("Room2", 5, 4, 10, 20, true, false, true, true, false, false, true, true);
+		dcl pavilion1: Installation := new Pavilion("Pavilion1", 50, 10, 50, 70, false, false, true, false, false);
+		dcl pavilion2: Installation := new Pavilion("Pavilion2", 60, 15, 60, 70, true, false, true, false, true);
+		dcl foyer1: Installation := new Foyer("Foyer1", 15, 4, 6, 6, false, true, false, true);
+		dcl event: Event := new Event("Exit Games", 5, 10, mk_Utils`Date(2018, 12, 28), mk_Utils`Date(2018, 12, 28), true, <TeamBuilding>, room1, "Beatriz");
+		addServices(event, [<AudioVisual>, <Catering>, <IT>]);
+		removeServices(event, [<AudioVisual>, <IT>]);
+		changeInstallation(event, [room2, pavilion1, room1, pavilion1])
+		
  	);
+ /***** TEST CASES WITH INVALID INPUTS (EXECUTE ONE AT A TIME) ******/
+ 
  private testEvents: () ==> ()
  testEvents() ==
  (
