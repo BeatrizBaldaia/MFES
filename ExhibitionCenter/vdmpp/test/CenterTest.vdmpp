@@ -32,12 +32,11 @@ operations
   main() ==
  (
  dcl c : CenterTest := new CenterTest();
- 
  c.testUser();
  
  UtilsTest`main();
  InstallationTest`main();
- --EventTest`main();
+ new EventTest().testAll();
  );
 functions
 -- TODO Define functiones here

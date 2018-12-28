@@ -2,6 +2,7 @@ class InstallationTest is subclass of Test
 operations
 	public static main: () ==> ()
 	main() == (
+	-- Test with Valid Inputs
 		dcl i : InstallationTest := new InstallationTest();
 		i.testHasInstallation();
 		i.testAddInstallation();
@@ -107,4 +108,6 @@ operations
 		assertTrue("Foyer" not in set dom c.installations);
 		assertTrue(not inst_0.hasInstallation(inst_1)); 
 	);
+	
+	-- TODO TEST WITH INVALID INPUTS
 end InstallationTest
