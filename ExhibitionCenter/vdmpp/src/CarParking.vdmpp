@@ -2,10 +2,11 @@ class CarParking is subclass of Installation
 
 operations
 -- Constructor (must have all conditions always false)
-	public CarParking: Utils`String * nat * real * real * real ==> CarParking
-		CarParking(i, c, h, w, l) == (
+	public CarParking: Utils`String * real * nat * real * real * real ==> CarParking
+		CarParking(i, pr, c, h, w, l) == (
 			--Measures
 			id := i;
+			price := pr;
 			capacity := c;
 			heigth := h;
 			atomic(width := w; lenght := l; area := w * l);
@@ -14,10 +15,49 @@ operations
 		post not (airCondition or naturalLigth or ceilingLighting or 
 		blackOutCurtains or telephones or computerNetwork or 
 		soundproofWalls or movingWalls);
-	--Impossible to create a installation with out parameters
-		public CarParking: () ==> CarParking
+--Impossible to create a installation with out parameters
+	public CarParking: () ==> CarParking
 		CarParking() == return self
 		pre false;
+		
+--Change installation measures
+	public setMeasures: nat * real * real * real ==> ()
+			setMeasures(c, h, w, l) == (
+				atomic(
+					capacity := c;
+					heigth := h;
+					width := w;
+					lenght := l;
+					area := width * lenght;
+				)
+			)
+			pre c > 0 and h > 0 and w > 0 and l > 0
+			post capacity = c and heigth = h and width = w and lenght = l;
+
+--Change Installation price per day	
+	public setPrice: real ==> ()
+		setPrice(pr) == price := pr
+		pre pr > 0
+		post price = pr;
+
+--Change installation's conditions	
+	public setConditions: bool * bool * bool * bool * bool * bool * bool * bool ==> ()
+		setConditions(-, -, -, -, -, -, -, -) == (
+			skip;
+		);
+		
+--Shows all installation information
+	public showDetails: () ==> map Utils`String to Utils`String
+	showDetails() == (
+		dcl res: map Utils`String to Utils`String := {|->};
+		res := res ++ {
+				"ID" |-> id, "Price" |-> Utils`toString[real](price), "Capacity" |-> Utils`toString[nat](capacity),
+				"Area" |-> Utils`toString[real](area), "Heigth" |-> Utils`toString[real](heigth), 
+				"Width" |-> Utils`toString[real](width), "Lenght" |-> Utils`toString[real](lenght)
+		};
+		return res
+	);
+	
 	public addFoyer : Foyer ==> ()
 		addFoyer(-) == return
 		pre false;

@@ -14,10 +14,10 @@ operations
 	);
 	private testHasInstallation: () ==> ()
 	testHasInstallation() == (
-		dcl inst_0 : Auditorium := new Auditorium("Aud", 1,1,1,1, true, true, true, true, true, true);
-		dcl inst_1 : Foyer := new Foyer("Foyer",1,1,1,1,true,true,true,true);
-		dcl inst_2 : Pavilion := new Pavilion("Pav",1,1,1,1,false,false,false,false,false);
-		dcl inst_3 : CarParking := new CarParking("Parking",100,1,1,1);
+		dcl inst_0 : Auditorium := new Auditorium("Aud", 100, 1,1,1,1, true, true, true, true, true, true);
+		dcl inst_1 : Foyer := new Foyer("Foyer", 10, 1,1,1,1,true,true,true,true);
+		dcl inst_2 : Pavilion := new Pavilion("Pav", 250, 1,1,1,1,false,false,false,false,false);
+		dcl inst_3 : CarParking := new CarParking("Parking", 50, 100,1,1,1);
 		assertTrue(not inst_2.hasInstallation(inst_3));
 		assertTrue(not inst_3.hasInstallation(inst_2));
 		assertTrue(not inst_1.hasInstallation(inst_2));
@@ -25,34 +25,37 @@ operations
 	);
 	private testAddInstallation: () ==> ()
 	testAddInstallation() == (
-		dcl inst_0 : Auditorium := new Auditorium("Aud", 1,1,1,1, true, true, true, true, true, true);
-		dcl c : Center := new Center("Center", new Room("Room", 1,1,1,1,false,false,false,false,false,false,false,false));
+		dcl inst_0 : Auditorium := new Auditorium("Aud", 100, 1,1,1,1, true, true, true, true, true, true);
+		dcl c : Center := new Center("Center", new Room("Room", 25, 1,1,1,1,false,false,false,false,false,false,false,false));
+		dcl admin: User := new User("admin", "admin1234");
+		c.addUser(admin);
 		assertTrue(not inst_0.id in set dom c.installations);
-		c.addInstallations(inst_0);
+		c.addInstallations("admin", inst_0);
 		assertTrue(inst_0.id in set dom c.installations);
 	);
 	private testaddInstallationToInstallation: () ==> ()
 	testaddInstallationToInstallation() == (
-		dcl c : Center := new Center("Center", new Room("Room", 1,1,1,1,false,false,false,false,false,false,false,false));
-		dcl inst_0 : Auditorium := new Auditorium("Aud", 1,1,1,1, true, true, true, true, true, true);
-		dcl inst_1 : Foyer := new Foyer("Foyer",1,1,1,1,true,true,true,true);
-		dcl inst_2 : Room := new Room("R",1,1,1,1,true,true,true,true,true,true,true,true);
-		dcl inst_3 : Pavilion := new Pavilion("Pav",1,1,1,1,false,false,false,false,false);
-		dcl inst_4 : Foyer := new Foyer("F",1,1,1,1,true,true,true,true);
-		
-		c.addInstallations(inst_0);
-		c.addInstallations(inst_3);
+		dcl c : Center := new Center("Center", new Room("Room", 30, 1,1,1,1,false,false,false,false,false,false,false,false));
+		dcl inst_0 : Auditorium := new Auditorium("Aud", 100, 1,1,1,1, true, true, true, true, true, true);
+		dcl inst_1 : Foyer := new Foyer("Foyer", 10, 1,1,1,1,true,true,true,true);
+		dcl inst_2 : Room := new Room("R", 20, 1,1,1,1,true,true,true,true,true,true,true,true);
+		dcl inst_3 : Pavilion := new Pavilion("Pav", 200, 1,1,1,1,false,false,false,false,false);
+		dcl inst_4 : Foyer := new Foyer("F", 10, 1,1,1,1,true,true,true,true);
+		dcl admin: User := new User("admin", "admin1234");
+		c.addUser(admin);
+		c.addInstallations("admin", inst_0);
+		c.addInstallations("admin", inst_3);
 		
 		assertTrue(not inst_0.hasInstallation(inst_2));
 		assertTrue(not inst_0.hasInstallation(inst_1));
-		c.addInstallationToInstallation(inst_0.id, inst_1);
+		c.addInstallationToInstallation("admin", inst_0.id, inst_1);
 		assertTrue(not inst_0.hasInstallation(inst_2));
 		assertTrue(inst_0.hasInstallation(inst_1));
 		
 		assertTrue(not inst_3.hasInstallation(inst_2));
 		assertTrue(not inst_3.hasInstallation(inst_4));
-		c.addInstallationToInstallation(inst_3.id, inst_2);
-		c.addInstallationToInstallation(inst_3.id, inst_4);
+		c.addInstallationToInstallation("admin", inst_3.id, inst_2);
+		c.addInstallationToInstallation("admin", inst_3.id, inst_4);
 		assertTrue(c.associatedInstallations(inst_3, inst_2));
 		assertTrue(c.associatedInstallations(inst_3, inst_4));
 		assertTrue(not c.associatedInstallations(inst_2,inst_3));
@@ -61,27 +64,29 @@ operations
 	);
 	private testremoveInstallationFromInstallation: () ==> ()
 	testremoveInstallationFromInstallation() == (
-		dcl c : Center := new Center("Center", new Room("Room", 1,1,1,1,false,false,false,false,false,false,false,false));
-		dcl inst_0 : Auditorium := new Auditorium("Aud", 1,1,1,1, true, true, true, true, true, true);
-		dcl inst_1 : Foyer := new Foyer("Foyer",1,1,1,1,true,true,true,true);
-		dcl inst_2 : Pavilion := new Pavilion("Pav",1,1,1,1,false,false,false,false,false);
-		dcl inst_3 : Room := new Room("R",1,1,1,1,true,true,true,true,true,true,true,true);
-		dcl inst_4 : Foyer := new Foyer("F",1,1,1,1,true,true,true,true);
-		c.addInstallations(inst_0);
-		c.addInstallationToInstallation(inst_0.id, inst_1);
+		dcl c : Center := new Center("Center", new Room("Room", 25, 1,1,1,1,false,false,false,false,false,false,false,false));
+		dcl inst_0 : Auditorium := new Auditorium("Aud", 100, 1,1,1,1, true, true, true, true, true, true);
+		dcl inst_1 : Foyer := new Foyer("Foyer", 10, 1,1,1,1,true,true,true,true);
+		dcl inst_2 : Pavilion := new Pavilion("Pav", 400, 1,1,1,1,false,false,false,false,false);
+		dcl inst_3 : Room := new Room("R", 20, 1,1,1,1,true,true,true,true,true,true,true,true);
+		dcl inst_4 : Foyer := new Foyer("F", 15, 1,1,1,1,true,true,true,true);
+		dcl admin: User := new User("admin", "admin1234");
+		c.addUser(admin);
+		c.addInstallations("admin", inst_0);
+		c.addInstallationToInstallation("admin", inst_0.id, inst_1);
 
 		assertTrue(inst_0.hasInstallation(inst_1));
-		c.removeInstallationFromInstallation(inst_0.id, inst_1);
+		c.removeInstallationFromInstallation("admin", inst_0.id, inst_1);
 		assertTrue(not inst_0.hasInstallation(inst_1)); 
 
-		c.addInstallations(inst_2);
-		c.addInstallationToInstallation(inst_2.id, inst_3);
-		c.addInstallationToInstallation(inst_2.id, inst_4);
+		c.addInstallations("admin", inst_2);
+		c.addInstallationToInstallation("admin", inst_2.id, inst_3);
+		c.addInstallationToInstallation("admin", inst_2.id, inst_4);
 		
 		assertTrue(inst_2.hasInstallation(inst_3));
 		assertTrue(inst_2.hasInstallation(inst_4));
-		c.removeInstallationFromInstallation(inst_2.id, inst_3);
-		c.removeInstallationFromInstallation(inst_2.id, inst_4);
+		c.removeInstallationFromInstallation("admin", inst_2.id, inst_3);
+		c.removeInstallationFromInstallation("admin", inst_2.id, inst_4);
 		assertTrue(not c.associatedInstallations(inst_2, inst_3));
 		assertTrue(not c.associatedInstallations(inst_3,inst_2));
 		assertTrue(not inst_2.hasInstallation(inst_3));
@@ -90,23 +95,25 @@ operations
 
 	private testremoveInstallation: () ==> ()
 	testremoveInstallation() == (
-		dcl c : Center := new Center("Center", new Room("Room", 1,1,1,1,false,false,false,false,false,false,false,false));
-		dcl inst_0 : Auditorium := new Auditorium("Aud", 1,1,1,1, true, true, true, true, true, true);
-		dcl inst_1 : Foyer := new Foyer("Foyer",1,1,1,1,true,true,true,true);
-		dcl inst_2 : Room := new Room("R",1,1,1,1,true,true,true,true,true,true,true,true);
-		c.addInstallations(inst_0);
-		c.addInstallations(inst_1);
-		c.addInstallations(inst_2);
+		dcl c : Center := new Center("Center", new Room("Room", 20, 1,1,1,1,false,false,false,false,false,false,false,false));
+		dcl inst_0 : Auditorium := new Auditorium("Aud", 100, 1,1,1,1, true, true, true, true, true, true);
+		dcl inst_1 : Foyer := new Foyer("Foyer", 15, 1,1,1,1,true,true,true,true);
+		dcl inst_2 : Room := new Room("R", 25, 1,1,1,1,true,true,true,true,true,true,true,true);
+		dcl admin: User := new User("admin", "admin1234");
+		c.addUser(admin);
+		c.addInstallations("admin", inst_0);
+		c.addInstallations("admin", inst_1);
+		c.addInstallations("admin", inst_2);
 		
 		assertTrue(c.installations("Foyer") = inst_1);
 		assertTrue(c.installations("R") = inst_2);
-		c.removeInstallation("Foyer");
-		c.removeInstallation("R");
+		c.removeInstallation("admin", "Foyer");
+		c.removeInstallation("admin", "R");
 		assertTrue("Foyer" not in set dom c.installations);
 		assertTrue("R" not in set dom c.installations);
 		
-		c.addInstallationToInstallation(inst_0.id, inst_1);
-		c.removeInstallation("Foyer");
+		c.addInstallationToInstallation("admin", inst_0.id, inst_1);
+		c.removeInstallation("admin", "Foyer");
 		assertTrue("Foyer" not in set dom c.installations);
 		assertTrue(not inst_0.hasInstallation(inst_1)); 
 	);

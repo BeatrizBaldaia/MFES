@@ -9,20 +9,7 @@ types
 values
 functions
 
-
-	public DaysOfMonth: nat * nat -> nat 
-	DaysOfMonth(y, m) ==
-				if (m = 2)
-				then
-						(if (isLeapYear(y))
-						then 29
-						else 28)
-        else (31 - (m - 1) mod 7 mod 2)
-	pre y > 0 and m > 0 and m < 13
-	post (m = 2 and isLeapYear(y) and RESULT = 29) or
-		(m = 2 and not isLeapYear(y) and RESULT = 28) or
-		(RESULT = (31 - (m - 1) mod 7 mod 2)); 
-	
+--Checks if date b is before date a
 	public before: Date * Date -> bool 
 	before(b, a) ==
 		b.year < a.year or
@@ -31,11 +18,42 @@ functions
 	pre true
 	post RESULT = (b.year < a.year or (b.year = a.year and b.month < a.month) or (b.year = a.year and b.month = a.month and b.day < a.day));
 
+--Get the number os days per month
+	public DaysOfMonth: nat * nat -> nat 
+		DaysOfMonth(y, m) ==
+					if (m = 2)
+					then
+							(if (isLeapYear(y))
+							then 29
+							else 28)
+	        else (31 - (m - 1) mod 7 mod 2)
+		pre y > 0 and m > 0 and m < 13
+		post (m = 2 and isLeapYear(y) and RESULT = 29) or
+			(m = 2 and not isLeapYear(y) and RESULT = 28) or
+			(RESULT = (31 - (m - 1) mod 7 mod 2)); 
+
+--Checks if this year is a leap year (with 366 days)			
 	public isLeapYear: nat -> bool
 	isLeapYear(y) == 
 		y mod 4 = 0 and y mod 100 <> 0 or y mod 400 = 0
 	pre y > 0
 	post RESULT = (y mod 4 = 0 and y mod 100 <> 0 or y mod 400 = 0);
+	
+--Calculates the difference between two dates
+	public getDatesDifference: Date * Date -> int
+	getDatesDifference(date1, date2) == (
+		dateCount(date2.year, date2.month, 1, date2.year * 365 + date2.day) -
+		dateCount(date1.year, date1.month, 1, date1.year * 365 + date1.day)
+	)
+	pre date1 = date2 or before(date1, date2)
+	post RESULT >= 0;
+	
+	public dateCount: nat * nat * int * nat -> int
+	dateCount(year, month, i, res) == ( 
+    if(i = month) then res
+    else dateCount(year, month, i + 1, res + DaysOfMonth(year, i))
+	)
+	pre year > 0 and month > 0 and i > 0 and res > 0;
 
 -- Curried Function
 -- Received function can return a boolean or an element of the same map value type
@@ -73,5 +91,49 @@ functions
 -- setTOseq measure function
 	public msetTOseq[@elem]: set of @elem -> nat
 	msetTOseq(tmpSet) == card tmpSet;
+	
+-- converts an element to string
+	public toString[@elem]: @elem -> String
+	toString(value) == (
+		cases true:
+			(is_String(value)) -> value,
+			(is_nat(value)) -> natToString(value),
+			(is_real(value)) -> natToString(value) ^ [',', ' '] ^ natToString(getRemainder(value, 0)),
+			(is_bool(value)) -> boolToString(value)
+		end
+	)
+	measure 1;
+	
+	public boolToString: bool -> String
+	boolToString(value) == if(value) then "yes" else "no";
+
+	public natToString: real -> String
+	natToString(value) == (
+		if(floor(value) < 10) then mapNat(floor(value))
+		else natToString(floor(value) div 10) ^ mapNat(floor(value) rem 10)
+	);
+	
+	public getRemainder: real * int -> int
+	getRemainder(value, n) == (
+		if(is_int(value)) then value rem (10 ** n)
+		else getRemainder(value * 10, n + 1)
+	);
+	
+	public mapNat: nat -> String
+	mapNat(n) == (
+		cases n:
+			0 -> "0",
+			1 -> "1",
+			2 -> "2",
+			3 -> "3",
+			4 -> "4",
+			5 -> "5",
+			6 -> "6",
+			7 -> "7",
+			8 -> "8",
+			9 -> "9"
+		end
+	);
+
 
 end Utils

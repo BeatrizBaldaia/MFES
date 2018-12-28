@@ -12,12 +12,14 @@ private assertTrue: bool ==> ()
 	dcl user1 : User := new User("eduardo", "123");
 	dcl host : User := new User("host", "123");
 	-- dcl user2 : User := new User("anabela", "");
-	dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 100, 20, 20, 20, true, true, true, true, true);
+	dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 500, 100, 20, 20, 20, true, true, true, true, true);
 	dcl center : Center := new Center("Super Center", pavilion1);
+	dcl admin: User := new User("admin", "admin1234");
+	center.addUser(admin);
 	assertTrue(center.users = {|->});
 	center.addUser(host);
 	assertTrue({|->} = center.events);
-	center.createEvent("Coffee Break", 3, 0, mk_Utils`Date(2018, 12, 27), mk_Utils`Date(2018, 12, 28), false, <Party>, pavilion1, host);
+	center.createEvent("Coffee Break", 3, 0, mk_Utils`Date(2018, 12, 27), mk_Utils`Date(2018, 12, 28), false, <Party>, pavilion1, "eduardo");
 	center.addUser(user1);
 	assertTrue(center.users(user1.name) = user1);
 	assertTrue(center.users(user1.name).events = {});

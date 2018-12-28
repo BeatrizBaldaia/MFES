@@ -2,6 +2,7 @@ class Installation
 instance variables
 -- Measures
 	public id: Utils`String := "untitled";
+	protected price: real := 0;
 	protected capacity: nat := 0;
 	protected area: real := 0;
 	protected heigth: real := 0;
@@ -32,4 +33,13 @@ operations
 		removeRoom(r) == is subclass responsibility;
 	public hasInstallation: Installation ==> bool
 		hasInstallation(inst) == is subclass responsibility;
+	public setMeasures: nat * real * real * real ==> ()
+		setMeasures(c, h, w, l) == is subclass responsibility;
+	public setPrice: real ==> ()
+		setPrice(pr) == is subclass responsibility;
+	public setConditions: bool * bool * bool * bool * bool * bool * bool * bool ==> ()
+		setConditions(airC, natL, ceilL, blackC, tele, compN, soundW, movW) == 
+			is subclass responsibility;
+	public showDetails: () ==> map Utils`String to Utils`String
+		showDetails() == is subclass responsibility;
 end Installation

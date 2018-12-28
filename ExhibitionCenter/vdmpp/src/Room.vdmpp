@@ -2,10 +2,11 @@ class Room is subclass of Installation
 
 operations
 -- Constructor
-	public Room: Utils`String * nat * real * real * real * bool * bool * bool * bool * bool * bool * bool * bool ==> Room
-		Room(i, c, h, w, l, airC, natL, ceilL, blackC, tele, compN, soundP, movW) == (
+	public Room: Utils`String * real * nat * real * real * real * bool * bool * bool * bool * bool * bool * bool * bool ==> Room
+		Room(i, pr, c, h, w, l, airC, natL, ceilL, blackC, tele, compN, soundP, movW) == (
 			--Measures
 			id := i;
+			price := pr;
 			capacity := c;
 			heigth := h;
 			atomic(width := w; lenght := l; area := w * l);
@@ -20,10 +21,63 @@ operations
 			movingWalls := movW;
 		)
 		pre c > 0 and h > 0 and w > 0 and l > 0;
-	--Impossible to create a installation with out parameters
-		public Room: () ==> Room
+--Impossible to create a installation with out parameters
+	public Room: () ==> Room
 		Room() == return self
 		pre false;
+		
+--Change installation measures
+	public setMeasures: nat * real * real * real ==> ()
+			setMeasures(c, h, w, l) == (
+				atomic(
+					capacity := c;
+					heigth := h;
+					width := w;
+					lenght := l;
+					area := width * lenght;
+				)
+			)
+			pre c > 0 and h > 0 and w > 0 and l > 0
+			post capacity = c and heigth = h and width = w and lenght = l;
+
+--Change Installation price per day	
+	public setPrice: real ==> ()
+		setPrice(pr) == price := pr
+		pre pr > 0
+		post price = pr;
+
+--Change installation's conditions	
+	public setConditions: bool * bool * bool * bool * bool * bool * bool * bool ==> ()
+		setConditions(airC, natL, ceilL, blackC, tele, compN, soundW, movW) == (
+			airCondition := airC;
+			naturalLigth := natL;
+			ceilingLighting := ceilL;
+			blackOutCurtains := blackC;
+			telephones := tele;
+			computerNetwork := compN;
+			soundproofWalls := soundW;
+			movingWalls := movW
+		);
+
+--Shows all installation information
+	public showDetails: () ==> map Utils`String to Utils`String
+	showDetails() == (
+		dcl res: map Utils`String to Utils`String := {|->};
+		res := res ++ {
+				"ID" |-> id, "Price" |-> Utils`toString[real](price), "Capacity" |-> Utils`toString[nat](capacity),
+				"Area" |-> Utils`toString[real](area), "Heigth" |-> Utils`toString[real](heigth), 
+				"Width" |-> Utils`toString[real](width), "Lenght" |-> Utils`toString[real](lenght), 
+				"Air Condition" |-> Utils`toString[bool](airCondition), 
+				"Natural Ligth" |-> Utils`toString[bool](naturalLigth),
+				"Ceiling Lighting" |-> Utils`toString[bool](ceilingLighting),
+				"Black Out Curtains" |-> Utils`toString[bool](blackOutCurtains),
+				"Telephones" |-> Utils`toString[bool](telephones),
+				"Computer Network" |-> Utils`toString[bool](computerNetwork),
+				"Soundproof Walls" |-> Utils`toString[bool](soundproofWalls),
+				"Moving Walls" |-> Utils`toString[bool](movingWalls)
+		};
+		return res
+	);
 	public addFoyer : Foyer ==> ()
 		addFoyer(-) == return
 		pre false;

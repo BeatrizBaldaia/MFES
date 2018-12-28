@@ -27,15 +27,16 @@ operations
 
 --INSTALLATION OPERATIONS
 -- Add one installation to installations set		
-	public addInstallations: Installation ==> ()
-		addInstallations(inst) == let instID = inst.getID() in 
+	public addInstallations: Utils`String * Installation ==> ()
+		addInstallations(uName, inst) == let instID = inst.getID() in 
 		installations := installations ++ {instID |-> inst}
-		pre inst not in set rng installations and isofbaseclass(Installation, inst)
+		pre uName in set dom users and uName = "admin" and
+			inst not in set rng installations and isofbaseclass(Installation, inst)
 		post card dom installations = card dom installations~ + 1 and inst in set rng installations;
 	
 -- Add installation, foyer or room, to other installation, auditorium or pavilion\
-	public addInstallationToInstallation: Utils`String * Installation ==> ()
-	addInstallationToInstallation(instID, inst1) == (
+	public addInstallationToInstallation: Utils`String * Utils`String * Installation ==> ()
+	addInstallationToInstallation(uName, instID, inst1) == (
 		installations := installations ++ {inst1.id |-> inst1};
 		def inst2 = installations(instID) in (
 			if(isofclass(Foyer, inst1)) then def foyer = narrow_(inst1, Foyer) in inst2.addFoyer(foyer)
@@ -43,45 +44,48 @@ operations
 			--TODO: else error 
 		)
 	)
-	pre instID in set dom installations and
-	(isofclass(Foyer, inst1) or isofclass(Room, inst1)) and
-	not exists inst in set rng installations & (
-		(isofclass(Auditorium, inst) or isofclass(Pavilion, inst)) and
-		hasInstallation(inst1, inst)
-	) and (
-		(isofclass(Foyer, inst1) and (isofclass(Auditorium, installations(instID)) or isofclass(Pavilion, installations(instID)))) or
-		(isofclass(Room, inst1) and isofclass(Pavilion, installations(instID)))
-	)
+	pre uName in set dom users and uName = "admin" and
+		instID in set dom installations and
+		(isofclass(Foyer, inst1) or isofclass(Room, inst1)) and
+		not exists inst in set rng installations & (
+			(isofclass(Auditorium, inst) or isofclass(Pavilion, inst)) and
+			hasInstallation(inst1, inst)
+		) and (
+			(isofclass(Foyer, inst1) and (isofclass(Auditorium, installations(instID)) or isofclass(Pavilion, installations(instID)))) or
+			(isofclass(Room, inst1) and isofclass(Pavilion, installations(instID)))
+		)
 	post inst1 in set rng installations
 		and hasInstallation(inst1,installations(instID));
 	
--- Remove installation, foyer or room, to other installation, auditorium or pavilion\
-	public removeInstallationFromInstallation: Utils`String * Installation ==> ()
-	removeInstallationFromInstallation(instID, inst1) == (
+-- Remove installation, foyer or room, from other installation, auditorium or pavilion\
+	public removeInstallationFromInstallation: Utils`String * Utils`String * Installation ==> ()
+	removeInstallationFromInstallation(uName, instID, inst1) == (
 		def inst2 = installations(instID) in (
 			if(isofclass(Foyer, inst1)) then def foyer = narrow_(inst1, Foyer) in inst2.removeFoyer(foyer)
 			elseif(isofclass(Room, inst1)) then def room = narrow_(inst1, Room) in inst2.removeRoom(room)
 			--TODO: else error 
 		)
 	)
-	pre instID in set dom installations and
-	inst1 in set rng installations and
-	(isofclass(Foyer, inst1) or isofclass(Room, inst1)) and
-	let inst = installations(instID) in hasInstallation(inst1, inst) and (
-		(isofclass(Foyer, inst1) and (isofclass(Auditorium, installations(instID)) or isofclass(Pavilion, installations(instID)))) or
-		(isofclass(Room, inst1) and isofclass(Pavilion, installations(instID)))
-	)
+	pre uName in set dom users and uName = "admin" and
+		instID in set dom installations and
+		inst1 in set rng installations and
+		(isofclass(Foyer, inst1) or isofclass(Room, inst1)) and
+		let inst = installations(instID) in hasInstallation(inst1, inst) and (
+			(isofclass(Foyer, inst1) and (isofclass(Auditorium, installations(instID)) or isofclass(Pavilion, installations(instID)))) or
+			(isofclass(Room, inst1) and isofclass(Pavilion, installations(instID)))
+		)
 	post inst1 in set rng installations and
 	not hasInstallation(inst1, installations(instID));
 	
 --Remove installation from installations map
-	public removeInstallation: Utils`String ==> ()
-	removeInstallation(instID) == (
+	public removeInstallation: Utils`String * Utils`String ==> ()
+	removeInstallation(uName, instID) == (
 		let inst in set rng installations \ {installations(instID)} in
-			if(hasInstallation(installations(instID), inst)) then removeInstallationFromInstallation(inst.id, installations(instID));
+			if(hasInstallation(installations(instID), inst)) then removeInstallationFromInstallation(uName, inst.id, installations(instID));
 		installations := {instID} <-: installations
 	)
-	pre instID in set dom installations
+	pre uName in set dom users and uName = "admin" and
+		instID in set dom installations
 	post instID not in set dom installations and
 	not exists inst in set rng installations & hasInstallation(installations~(instID), inst);
 
@@ -119,28 +123,31 @@ operations
 
 --SERVICE OPERATIONS
 -- Add one service to services set
-	public addService: Service ==> ()
-		addService(serv) == let type = serv.type in
+	public addService: Utils`String * Service ==> ()
+		addService(uName, serv) == let type = serv.type in
 		services := services ++ {type |-> serv}
-		pre serv not in set rng services
+		pre uName in set dom users and uName = "admin" and
+			serv not in set rng services
 		post card dom services = card dom services~ + 1 and serv in set rng services;
 
 --Remove service from services map
-	public removeService: Service`ServiceType ==> ()
-		removeService(service) == (
+	public removeService: Utils`String * Service`ServiceType ==> ()
+		removeService(uName, service) == (
 			let e in set {x | x in set rng events & service in set elems x.services} in
 				e.removeService(service);
 			services := {service} <-: services
 		)
-		pre service in set dom services
+		pre uName in set dom users and uName = "admin" and
+			service in set dom services
 		post service not in set dom services and
 			forall e in set rng events & service not in set elems e.services;
 		
 -- Changes a service price
-	public changeServicePrice: Service`ServiceType * real ==> ()
-	changeServicePrice(serviceType, price) == def service = services(serviceType) in
+	public changeServicePrice: Utils`String * Service`ServiceType * real ==> ()
+	changeServicePrice(uName, serviceType, price) == def service = services(serviceType) in
 	service.setPrice(price)
-	pre price > 0 and serviceType in set dom services
+	pre uName in set dom users and uName = "admin" and
+		price > 0 and serviceType in set dom services
 	post services(serviceType).price = price;
 
 --EVENT OPERATIONS
@@ -157,15 +164,24 @@ operations
 	post n in set dom events;
 	
 --Return how much an event spent in services
-	public moneySpentWithServices: Utils`String ==> real
-	moneySpentWithServices(evName) == (
+	public moneySpentWithServices: Utils`String * Utils`String ==> real
+	moneySpentWithServices(uName, evName) == (
 		dcl ev: Event := events(evName);
 		dcl res: real := 0;
 		let service in seq ev.services in res := res + services(service).price;
 		return res;
 	)
-	pre evName in set dom events;
+	pre uName in set dom users and (uName = events(evName).host or uName = "admin") and
+	 evName in set dom events;
 	
+--TODO: Return how much an event spent with installation rent
+	public moneySpentWithInstallation: Utils`String * Utils`String ==> real
+	moneySpentWithInstallation(uName, evName) == (
+		dcl days: int := Utils`getDatesDifference(events(evName).begin, events(evName).ending);
+		return days * events(evName).ticketPrice
+	)
+	pre uName in set dom users and (uName = events(evName).host or uName = "admin") and
+	 evName in set dom events;
 --In case of a private event, host can invite users (so they will be
 -- the only ones capable of seeing and buying a ticket to the event)
 	public inviteToEvent: Utils`String * Utils`String * Utils`String ==> ()
@@ -339,7 +355,7 @@ operations
 	post evName not in set users(uName).events;
 
 functions
--- Verify if pavilion has a specific installation (room or foyer)
+-- Verify if an installation has a specific installation (room or foyer)
 	public hasInstallation: Installation * Installation -> bool
 	hasInstallation(inst1, inst2) == (
 		if (isofclass(Auditorium, inst2)) then (
