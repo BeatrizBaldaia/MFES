@@ -24,7 +24,10 @@ operations
 		c.addInstallations(inst_0);
 		assertTrue(inst_0.id in set dom c.installations);
 		assertTrue(inst_0 = c.installations(inst_0.id));
-	 
+		assertTrue(not inst_2.hasInstallation(inst_3));
+		assertTrue(not inst_3.hasInstallation(inst_2));
+		assertTrue(not inst_1.hasInstallation(inst_2));
+		assertTrue(not inst_0.hasInstallation(inst_2));
 	 assertTrue(not inst_2.id in set dom c.installations);
 	 c.addInstallations(inst_2);
 	 assertTrue(inst_2.id in set dom c.installations);
@@ -33,9 +36,8 @@ operations
 	 
 	 assertTrue(not inst_0.hasInstallation(room));
 	 assertTrue(not inst_0.hasInstallation(inst_1));
-	-- c.addInstallationToInstallation(inst_0.id, room); pre = falso
 	 c.addInstallationToInstallation(inst_0.id, inst_1);
-	 assertTrue(not inst_0.hasInstallation(room)); -- Impossivel, pre = false
+	 assertTrue(not inst_0.hasInstallation(room));
 	 assertTrue(inst_0.hasInstallation(inst_1));
 	 
 	 assertTrue(not inst_0.hasInstallation(room)); -- TODO cant have rooms
@@ -49,7 +51,6 @@ operations
 	 assertTrue(not inst_2.hasInstallation(room));
 	 assertTrue(not inst_2.hasInstallation(inst_1));
 	 assertTrue(not c.associatedInstallations(inst_2, room));
-	 assertTrue(not c.associatedInstallations(room,inst_2));
 	 c.addInstallationToInstallation(inst_2.id, room);
 	 c.addInstallationToInstallation(inst_2.id, inst_1);
 	 assertTrue(c.associatedInstallations(inst_2, room));
@@ -70,7 +71,7 @@ operations
 	 
 	 assertTrue(c.installations("Foyer") = inst_1);
 	 assertTrue(c.installations("Test") = room);
-	-- c.removeInstallation("Foyer"); -- TODO post condition fail(error), errado
+		c.removeInstallation("Foyer"); -- TODO post condition fail(error), errado
 	-- c.removeInstallation("Test");
 	-- assertTrue(not c.installations("Foyer") = inst_1);
 	-- assertTrue(c.installations("Test") = room);

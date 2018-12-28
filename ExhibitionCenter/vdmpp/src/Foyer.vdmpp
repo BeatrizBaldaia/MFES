@@ -16,7 +16,10 @@ operations
 		)
 		pre c > 0 and h > 0 and w > 0 and l > 0
 		post not (blackOutCurtains or telephones or soundproofWalls or movingWalls);
-		
+	--Impossible to create a installation with out parameters
+		public Foyer: () ==> Foyer
+		Foyer() == return self
+		pre false;
 	public addFoyer : Foyer ==> ()
 		addFoyer(-) == return
 		pre false;

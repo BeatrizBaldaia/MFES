@@ -52,7 +52,8 @@ operations
 		(isofclass(Foyer, inst1) and (isofclass(Auditorium, installations(instID)) or isofclass(Pavilion, installations(instID)))) or
 		(isofclass(Room, inst1) and isofclass(Pavilion, installations(instID)))
 	)
-	post inst1 in set rng installations and hasInstallation(inst1, installations(instID));
+	post inst1 in set rng installations
+		and hasInstallation(inst1,installations(instID));
 	
 -- Remove installation, foyer or room, to other installation, auditorium or pavilion\
 	public removeInstallationFromInstallation: Utils`String * Installation ==> ()
@@ -82,7 +83,7 @@ operations
 	)
 	pre instID in set dom installations
 	post instID not in set dom installations and
-	not exists inst in set rng installations & hasInstallation(installations(instID), inst);
+	not exists inst in set rng installations & hasInstallation(installations~(instID), inst);
 
 --Gets all the installations available in the given period
 	public getAvailableInstallations: Utils`Date * Utils`Date ==> map Utils`String to Installation
@@ -345,14 +346,16 @@ functions
 			let inst = narrow_(inst2, Auditorium) in
 			if(isofclass(Foyer, inst1)) then let foyer = narrow_(inst1, Foyer) in foyer in set inst.foyers
 			else false
-		) else (
+		) elseif(isofclass(Pavilion, inst2)) then (
 			let inst = narrow_(inst2, Pavilion) in
 			if(isofclass(Foyer, inst1)) then let foyer = narrow_(inst1, Foyer) in foyer in set inst.foyers
 			else let room = narrow_(inst1, Room) in room in set inst.rooms
+		) else (
+			false
 		)
 	)
-	pre (isofclass(Foyer, inst1) or isofclass(Room, inst1)) and
-	(isofclass(Auditorium, inst2) or isofclass(Pavilion, inst2));
+	pre true;--(isofclass(Foyer, inst1) or isofclass(Room, inst1)) and
+	--(isofclass(Auditorium, inst2) or isofclass(Pavilion, inst2));
 	
 --Checks if this event has conflicts with the period given in the arguments
 	public hasDatesConflict: Event * Utils`Date * Utils`Date -> bool
