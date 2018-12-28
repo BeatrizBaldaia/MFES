@@ -281,12 +281,11 @@ operations
 		dcl user: User := users(uName);
 		cases uPos:
 			<attendee> -> (ev.removeAttendee(uName); user.removeEvent(evName)),
-			<staff> -> (ev.removeStaff(uName); user.removeEvent(evName)),
-			<host> -> (ev.unsetHost(uName); user.removeEvent(evName))
+			<staff> -> (ev.removeStaff(uName); user.removeEvent(evName))
 		end
 	)
 	pre evName in set dom events and uName in set dom users and
-		uPos in set {<attendee>, <staff>, <host>}
+		uPos in set {<attendee>, <staff>}
 	post evName not in set users(uName).events;
 
 functions
