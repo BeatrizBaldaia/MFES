@@ -14,8 +14,9 @@ operations
 	public addServices: Event * [seq of Service`ServiceType] ==> ()
 	addServices(event, services) == (
 		dcl oldServicesSet: seq of Service`ServiceType := event.services;
-		let s in seq services in event.addService(s);
-		assertEqual(event.services, oldServicesSet  ^ services)
+		--let s in seq services in event.addService(s);
+		for all s in set elems services do (event.addService(s));
+		assertEqual(event.services, oldServicesSet ^ services)
 	)
 	pre event <> undefined
 	post elems services subset elems event.services;
@@ -23,7 +24,8 @@ operations
 --Remove services from event
 	public removeServices: Event * [seq of Service`ServiceType] ==> ()
 	removeServices(event, services) == (
-		let s in seq services in event.removeService(s);
+		--let s in seq services in event.removeService(s);
+		for all s in set elems services do (event.removeService(s));
 		assertTrue(forall service in seq event.services & service not in set elems services)
 	)
 	pre card elems services = len services

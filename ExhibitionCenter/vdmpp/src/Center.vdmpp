@@ -133,8 +133,9 @@ operations
 --Remove service from services map
 	public removeService: Utils`String * Service`ServiceType ==> ()
 		removeService(uName, service) == (
-			let e in set {x | x in set rng events & service in set elems x.services} in
-				e.removeService(service);
+			--let e in set {x | x in set rng events & service in set elems x.services} in
+				--e.removeService(service);
+			for all e in set rng events do (if(service in set elems e.services) then e.removeService(service));
 			services := {service} <-: services
 		)
 		pre uName in set dom users and uName = "admin" and

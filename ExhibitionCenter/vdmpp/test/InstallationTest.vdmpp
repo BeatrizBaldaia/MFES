@@ -1,10 +1,8 @@
-class InstallationTest
+class InstallationTest is subclass of Test
 operations
-	private assertTrue: bool ==> ()
-	 assertTrue(cond) == return
-	 pre cond;
 	public static main: () ==> ()
 	main() == (
+	-- Test with Valid Inputs
 		dcl i : InstallationTest := new InstallationTest();
 		i.testHasInstallation();
 		i.testAddInstallation();
@@ -117,4 +115,6 @@ operations
 		assertTrue("Foyer" not in set dom c.installations);
 		assertTrue(not inst_0.hasInstallation(inst_1)); 
 	);
+	
+	-- TODO TEST WITH INVALID INPUTS
 end InstallationTest

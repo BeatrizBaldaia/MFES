@@ -23,8 +23,5 @@ operations
 		price := p
 	pre p > 0
 	post price = p;
-functions
--- TODO Define functiones here
-traces
--- TODO Define Combinatorial Test Traces here
+
 end Service

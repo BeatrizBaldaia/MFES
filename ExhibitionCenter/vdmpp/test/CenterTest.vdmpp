@@ -1,11 +1,7 @@
-class CenterTest
+class CenterTest  is subclass of Test
 -- TODO not possible new Room(), teste failing
  --TODO addFoyer/ Room ; pre = false
 operations
-private assertTrue: bool ==> ()
- assertTrue(cond) == return
- pre cond;
-
  private testUser: () ==> ()
  testUser() ==
  (
@@ -19,7 +15,8 @@ private assertTrue: bool ==> ()
 	assertTrue(center.users = {|->});
 	center.addUser(host);
 	assertTrue({|->} = center.events);
-	center.createEvent("Coffee Break", 3, 0, mk_Utils`Date(2018, 12, 27), mk_Utils`Date(2018, 12, 28), false, <Party>, pavilion1, "eduardo");
+
+	center.createEvent("Coffee Break", 3, 0, mk_Utils`Date(2018, 12, 27), mk_Utils`Date(2018, 12, 28), false, <Party>, pavilion1, host.name);
 	center.addUser(user1);
 	assertTrue(center.users(user1.name) = user1);
 	assertTrue(center.users(user1.name).events = {});
@@ -38,12 +35,12 @@ private assertTrue: bool ==> ()
   main() ==
  (
  dcl c : CenterTest := new CenterTest();
- 
  c.testUser();
  
  UtilsTest`main();
  InstallationTest`main();
- --EventTest`main();
+ new EventTest().testAll();
+ new ServiceTest().testAll();
  );
 functions
 -- TODO Define functiones here
