@@ -102,7 +102,7 @@ operations
 		);
 		return tmpFreeInsts :-> usedInsts;
 	)
-	pre Utils`before(b, e)
+	pre Utils`before(b, e) or b = e
 	post rng RESULT subset rng installations and
 	forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
 	ev.installation not in set rng RESULT;
@@ -149,9 +149,10 @@ operations
 		dcl event: Event := new Event(n, tTickets, tPrice, b, e, p, t, inst, h);
 		events := events ++ {n |-> event}
 	)
-	pre h = users(h.name) and n not in set dom events and Utils`before(b, e) and
-	forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
-	ev.installation <> inst
+	pre h = users(h.name) and n not in set dom events and 
+		(Utils`before(b, e) or b = e) and
+		forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
+			ev.installation <> inst
 	post n in set dom events;
 	
 --Return how much an event spent in services
@@ -172,41 +173,74 @@ operations
 		hName in set dom users and hName <> uName and
 		events(evName).privacy = true
 	post uName in set events(evName).guests;
-	
+
+--Shows all the available events
+	public showAvailableEvents: Utils`String ==> [set of Event]
+	showAvailableEvents(uName) == (
+		dcl res: set of Event := {};
+		let e in set rng events in (
+			if(card e.attendees = e.totalTickets) then skip;
+			if(e.privacy and uName in set e.guests) then res := res union {e};
+			if(not e.privacy) then res := res union {e}
+		);
+		return res
+	)
+	pre uName in set dom users
+	post RESULT subset rng events;
+
+--Shows all the available events in a period
+	public showAvailableEventsBetweenDates: Utils`String * Utils`Date * Utils`Date ==> [set of Event]
+	showAvailableEventsBetweenDates(uName, b, e) == (
+		dcl res: set of Event := {};
+		let ev in set rng events in 
+			if(hasDatesConflict(ev, b, e)) then (
+				if(card ev.attendees = ev.totalTickets) then skip;
+				if(ev.privacy and uName in set ev.guests) then res := res union {ev};
+				if(not ev.privacy) then res := res union {ev}
+			);
+		return res	
+	)
+	pre uName in set dom users and (Utils`before(b, e) or b = e)
+	post RESULT subset rng events and
+		forall event in set RESULT & hasDatesConflict(event, b, e);
+		
 --OPERATIONS TO CHANGE EVENTS ATTRIBUTES	
 --Change event name
-	public changeEventName: Utils`String * Utils`String ==> ()
-	changeEventName(evName, value) == (
+	public changeEventName: Utils`String * Utils`String * Utils`String ==> ()
+	changeEventName(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setName(value);
 		events := events ++ {value |-> ev}
 	)
-	pre evName in set dom events and value not in set dom events
+	pre evName in set dom events and value not in set dom events and
+		hName in set dom users and events(evName).host = hName
 	post evName not in set dom events and value in set dom events;
 
 --Change event number of tickets
-	public changeEventTotalTickets: Utils`String * nat ==> ()
-	changeEventTotalTickets(evName, value) == (
+	public changeEventTotalTickets: Utils`String * Utils`String * nat ==> ()
+	changeEventTotalTickets(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setTotalTickets(value)
 		--events := events ++ {evName |-> ev} Se ev for uma referencia, nao e preciso atualizar
 	)
-	pre evName in set dom events and value > 0
+	pre evName in set dom events and value > 0 and
+		hName in set dom users and events(evName).host = hName
 	post events(evName).totalTickets = value;
 
 --Change event ticket price
-	public changeEventTicketPrice: Utils`String * real ==> ()
-	changeEventTicketPrice(evName, value) == (
+	public changeEventTicketPrice: Utils`String * Utils`String * real ==> ()
+	changeEventTicketPrice(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setTicketPrice(value)
 		--events := events ++ {evName |-> ev}
 	)
-	pre evName in set dom events and value >= 0
+	pre evName in set dom events and value >= 0 and
+		hName in set dom users and events(evName).host = hName
 	post events(evName).ticketPrice = value;
 
 --Change event date (begin or ending)
-	public changeEventDate: Utils`String * DateType * Utils`Date ==> ()
-	changeEventDate(evName, dateType, value) == (
+	public changeEventDate: Utils`String * Utils`String * DateType * Utils`Date ==> ()
+	changeEventDate(evName, hName, dateType, value) == (
 		dcl ev: Event := events(evName);
 		cases dateType:
 			<begin> -> ev.setBeginDate(value),
@@ -214,31 +248,34 @@ operations
 			--others -> error
 			end
 	)
-	pre evName in set dom events and (dateType = <begin> or dateType = <ending>)
+	pre evName in set dom events and (dateType = <begin> or dateType = <ending>) and
+		hName in set dom users and events(evName).host = hName
 	post if(dateType = <begin>) then events(evName).begin = value
 		else events(evName).ending = value;
 
 --Change event privacy condition
-	public changeEventPrivacy: Utils`String * bool ==> ()
-	changeEventPrivacy(evName, value) == (
+	public changeEventPrivacy: Utils`String * Utils`String * bool ==> ()
+	changeEventPrivacy(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setPrivacy(value)
 	)
-	pre evName in set dom events
+	pre evName in set dom events and
+		hName in set dom users and events(evName).host = hName
 	post events(evName).privacy = value;
 
 --Change event type
-	public changeEventType: Utils`String * Event`EventType ==> ()
-	changeEventType(evName, value) == (
+	public changeEventType: Utils`String * Utils`String * Event`EventType ==> ()
+	changeEventType(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setType(value)
 	)
-	pre evName in set dom events
+	pre evName in set dom events and
+		hName in set dom users and events(evName).host = hName
 	post events(evName).type = value;
 
 --Change where event will occur
-	public changeEventInstallation: Utils`String * Utils`String ==> ()
-	changeEventInstallation(evName, instName) == (
+	public changeEventInstallation: Utils`String * Utils`String * Utils`String ==> ()
+	changeEventInstallation(evName, hName, instName) == (
 		dcl ev: Event := events(evName);
 		ev.changeInstallation(installations(instName))
 	)
@@ -246,20 +283,23 @@ operations
 		let b = events(evName).begin, e = events(evName).ending in (
 			forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
 			instName <> ev.installation.id
-		)
+		) and
+		hName in set dom users and events(evName).host = hName
 	post events(evName).installation.id = instName;
 
 --Add service to event
-	public addServiceToEvent: Utils`String * Service`ServiceType ==> ()
-	addServiceToEvent(evName, servType) == events(evName).addService(servType)
-	pre evName in set dom events and servType in set dom services
+	public addServiceToEvent: Utils`String * Utils`String * Service`ServiceType ==> ()
+	addServiceToEvent(evName, hName, servType) == events(evName).addService(servType)
+	pre evName in set dom events and servType in set dom services and
+		hName in set dom users and events(evName).host = hName
 	post servType in set elems events(evName).services;
 
 --Remove service from event
-	public removeServiceFromEvent: Utils`String * Service`ServiceType ==> ()
-	removeServiceFromEvent(evName, servType) == events(evName).removeService(servType)
+	public removeServiceFromEvent: Utils`String * Utils`String * Service`ServiceType ==> ()
+	removeServiceFromEvent(evName, hName, servType) == events(evName).removeService(servType)
 	pre evName in set dom events and servType in set dom services and
-		servType in set elems events(evName).services
+		servType in set elems events(evName).services and
+		hName in set dom users and events(evName).host = hName
 	post servType not in set elems events(evName).services;
 	
 --USER FUNCTIONS
@@ -321,6 +361,7 @@ functions
 		if(Utils`before(b2, b1)) then Utils`before(b1, e2)
 		else Utils`before(b2, e1)
 	)
-	pre Utils`before(ev.begin, ev.ending) and Utils`before(b2, e2);
+	pre (Utils`before(ev.begin, ev.ending) or ev.begin = ev.ending) 
+		and (Utils`before(b2, e2) or b2 = e2);
 	
 end Center
