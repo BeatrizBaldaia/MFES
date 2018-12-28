@@ -12,28 +12,28 @@ instance variables
 	public type: [EventType] := nil;
 	inv begin = ending or Utils`before(begin, ending);
 	public installation: Installation;
+	inv installation <> undefined;
 	public services: [seq of Service`ServiceType] := [];
 	public attendees: [set of Utils`String] := {};
 	inv card attendees <= totalTickets;
 	public staff: [set of Utils`String] := {};
 	public host: Utils`String := "undefined";
-	inv host not in set attendees and host not in set staff;
+	inv host not in set attendees and host not in set staff and host <> "undefined";
 	inv forall attendee in set attendees & attendee not in set staff;
 	public guests: [set of Utils`String] := {};
 	inv if(not privacy) then guests = {} else true;
 operations
 
 --Constructor
-	public Event: Utils`String * nat * real * Utils`Date * Utils`Date * bool * EventType * Installation * User ==> Event
+	public Event: Utils`String * nat * real * Utils`Date * Utils`Date * bool * EventType * Installation * Utils`String ==> Event
 	Event(n, tTickets, tPrice, b, e, p, t, inst, h) == (
+		atomic(installation := inst; host := h);
 		name := n;
 		totalTickets := tTickets;
 		ticketPrice := tPrice;
 		atomic(begin := b; ending := e);
 		privacy := p;
 		type := t;
-		installation := inst;
-		host := h.name
 	)
 	pre tTickets > 0 and Utils`before(b,e);
 
@@ -44,7 +44,7 @@ operations
 --Set event number of tickets
 	public setTotalTickets: nat ==> ()
 	setTotalTickets(tTickets) == totalTickets := tTickets
-	pre tTickets > 0
+	pre tTickets > 0 and tTickets >= card attendees
 	post totalTickets = tTickets;
 --Set event price of tickets
 	public setTicketPrice: nat ==> ()
@@ -63,7 +63,10 @@ operations
 	post ending = e;
 --Set event privacy condition
 	public setPrivacy: bool ==> ()
-	setPrivacy(p) == privacy := p
+	setPrivacy(p) == (
+		privacy := p;
+		if(p) then guests := attendees
+	)
 	post privacy = p;
 --Set event type
 	public setType: EventType ==> ()
@@ -74,6 +77,7 @@ operations
 --Changes the installation where the event will occur
 	public changeInstallation: Installation ==> ()
 	changeInstallation(inst) == installation := inst
+	pre inst <> installation
 	post installation = inst;
 	
 --Add one service to services sequence
