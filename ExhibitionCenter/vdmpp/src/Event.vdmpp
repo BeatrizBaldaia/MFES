@@ -1,6 +1,6 @@
 class Event
 types
-	public EventType=<Conferences> | <TradeFair> | <Party> | <Musical> | <TeamBuilding>;
+	public EventType=<Conference> | <TradeFair> | <Party> | <Musical> | <TeamBuilding>;
 instance variables
 	public name: Utils`String := "untitled";
 	public totalTickets: nat := 1;
@@ -16,7 +16,7 @@ instance variables
 	public attendees: [set of Utils`String] := {};
 	inv card attendees <= totalTickets;
 	public staff: [set of Utils`String] := {};
-	public host: Utils`String := undefined;
+	public host: Utils`String := "undefined";
 	inv host not in set attendees and host not in set staff;
 	inv forall attendee in set attendees & attendee not in set staff;
 	public guests: [set of Utils`String] := {};
@@ -139,12 +139,6 @@ operations
 	 removeStaff(user) == staff := staff \ {user}
 	 pre user in set staff
 	 post user not in set staff;
-
---Remove user from host
-	public unsetHost: Utils`String ==> ()
-	 unsetHost(user) == host := undefined
-	 pre user = host
-	 post not user = host;
 
 --Invite user to private event
 	public inviteUser: Utils`String * Utils`String ==> ()

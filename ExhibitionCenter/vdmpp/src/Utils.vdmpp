@@ -4,9 +4,12 @@ types
 									month: nat
 									day : nat
 				inv d == d.month <= 12 and d.day <= DaysOfMonth(d.year, d.month);
-	public String = seq of char;
+	public String = seq of char
+	ord a < b == a = b;
 values
 functions
+
+
 	public DaysOfMonth: nat * nat -> nat 
 	DaysOfMonth(y, m) ==
 				if (m = 2)
@@ -48,7 +51,7 @@ functions
 				else fMap[@keyType, @returnType, @valueType] (f)(tl keys, m)
 			)
 			elseif(is_(res, @valueType)) then {key|->res} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
-			else {|->} -- case of error. ask teacher how to use trap error with exit in (...)
+			else {|->} -- TODO case of error. ask teacher how to use trap error with exit in (...)
 		)
 	)
 	pre elems keys = dom m
