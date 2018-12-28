@@ -40,9 +40,8 @@ operations
 	 assertTrue(not inst_0.hasInstallation(room));
 	 assertTrue(inst_0.hasInstallation(inst_1));
 	 
-	 assertTrue(not inst_0.hasInstallation(room)); -- TODO cant have rooms
+	 assertTrue(not inst_0.hasInstallation(room));
 	 assertTrue(inst_0.hasInstallation(inst_1));
-	 -- c.removeInstallationFromInstallation(inst_0.id, room);  -- TODO cant have rooms
 	 c.removeInstallationFromInstallation(inst_0.id, inst_1);
 	 assertTrue(not inst_0.hasInstallation(room));
 	 assertTrue(not inst_0.hasInstallation(inst_1)); 
@@ -60,21 +59,26 @@ operations
 	 assertTrue(inst_2.hasInstallation(inst_1));
 	 
 	 
-	 assertTrue(inst_2.hasInstallation(room));
-	 assertTrue(inst_2.hasInstallation(inst_1));
-	 c.removeInstallationFromInstallation(inst_2.id, room);
-	 c.removeInstallationFromInstallation(inst_2.id, inst_1);
-	 assertTrue(not c.associatedInstallations(inst_2, room));
-	 assertTrue(not c.associatedInstallations(room,inst_2));
-	 assertTrue(not inst_2.hasInstallation(room));
-	 assertTrue(not inst_2.hasInstallation(inst_1)); 
-	 
-	 assertTrue(c.installations("Foyer") = inst_1);
-	 assertTrue(c.installations("Test") = room);
-		c.removeInstallation("Foyer"); -- TODO post condition fail(error), errado
-	-- c.removeInstallation("Test");
-	-- assertTrue(not c.installations("Foyer") = inst_1);
-	-- assertTrue(c.installations("Test") = room);
-	
+		assertTrue(inst_2.hasInstallation(room));
+		assertTrue(inst_2.hasInstallation(inst_1));
+		c.removeInstallationFromInstallation(inst_2.id, room);
+		c.removeInstallationFromInstallation(inst_2.id, inst_1);
+		assertTrue(not c.associatedInstallations(inst_2, room));
+		assertTrue(not c.associatedInstallations(room,inst_2));
+		assertTrue(not inst_2.hasInstallation(room));
+		assertTrue(not inst_2.hasInstallation(inst_1)); 
+		
+		assertTrue(c.installations("Foyer") = inst_1);
+		assertTrue(c.installations("Test") = room);
+		c.removeInstallation("Foyer");
+		c.removeInstallation("Test");
+		assertTrue("Foyer" not in set dom c.installations);
+		assertTrue("Test" not in set dom c.installations);
+		
+		
+		c.addInstallationToInstallation(inst_0.id, inst_1);
+		c.removeInstallation("Foyer");
+		assertTrue("Foyer" not in set dom c.installations);
+		assertTrue(not inst_0.hasInstallation(inst_1)); 
 	);
 end InstallationTest
