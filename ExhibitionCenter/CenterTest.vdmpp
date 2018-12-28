@@ -45,8 +45,12 @@ private testInstallations: () ==> ()
  
  assertTrue(not inst_2.hasInstallation(room));
  assertTrue(not inst_2.hasInstallation(inst_1));
+ assertTrue(not c.associatedInstallations(inst_2, room));
+ assertTrue(not c.associatedInstallations(room,inst_2));
  c.addInstallationToInstallation(inst_2.id, room);
  c.addInstallationToInstallation(inst_2.id, inst_1);
+ assertTrue(c.associatedInstallations(inst_2, room));
+-- assertTrue(c.associatedInstallations(room,inst_2)); -- TODO should return true
  assertTrue(inst_2.hasInstallation(room));
  assertTrue(inst_2.hasInstallation(inst_1));
  
@@ -55,6 +59,8 @@ private testInstallations: () ==> ()
  assertTrue(inst_2.hasInstallation(inst_1));
  c.removeInstallationFromInstallation(inst_2.id, room);
  c.removeInstallationFromInstallation(inst_2.id, inst_1);
+ assertTrue(not c.associatedInstallations(inst_2, room));
+ assertTrue(not c.associatedInstallations(room,inst_2));
  assertTrue(not inst_2.hasInstallation(room));
  assertTrue(not inst_2.hasInstallation(inst_1)); 
  
