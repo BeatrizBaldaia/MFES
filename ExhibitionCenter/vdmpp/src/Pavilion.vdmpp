@@ -26,26 +26,6 @@ operations
 		Pavilion() == return self
 		pre false;
 
---Change installation measures
-	public setMeasures: nat * real * real * real ==> ()
-			setMeasures(c, h, w, l) == (
-				atomic(
-					capacity := c;
-					heigth := h;
-					width := w;
-					lenght := l;
-					area := width * lenght;
-				)
-			)
-			pre c > 0 and h > 0 and w > 0 and l > 0
-			post capacity = c and heigth = h and width = w and lenght = l;
-
---Change Installation price per day	
-	public setPrice: real ==> ()
-		setPrice(pr) == price := pr
-		pre pr > 0
-		post price = pr;
-
 --Change installation's conditions	
 	public setConditions: bool * bool * bool * bool * bool * bool * bool * bool ==> ()
 		setConditions(airC, natL, ceilL, blackC, -, compN, -, -) == (

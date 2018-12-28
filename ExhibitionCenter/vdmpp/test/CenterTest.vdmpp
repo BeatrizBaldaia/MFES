@@ -34,13 +34,13 @@ operations
  public static main: () ==> ()
   main() ==
  (
- dcl c : CenterTest := new CenterTest();
- c.testUser();
+ --dcl c : CenterTest := new CenterTest();
+ --c.testUser();
  
- UtilsTest`main();
- InstallationTest`main();
- new EventTest().testAll();
- new ServiceTest().testAll();
+ --UtilsTest`main();
+ new InstallationTest().testAll();
+ --new EventTest().testAll();
+ --new ServiceTest().testAll();
  );
 functions
 -- TODO Define functiones here
