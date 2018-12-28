@@ -22,15 +22,16 @@ instance variables
 operations
 
 --Constructor
-	public Event: Utils`String * nat * real * Utils`Date * Utils`Date * bool * EventType * Installation ==> Event
-	Event(n, tTickets, tPrice, b, e, p, t, inst) == (
+	public Event: Utils`String * nat * real * Utils`Date * Utils`Date * bool * EventType * Installation * User ==> Event
+	Event(n, tTickets, tPrice, b, e, p, t, inst, h) == (
 		name := n;
 		totalTickets := tTickets;
 		ticketPrice := tPrice;
 		atomic(begin := b; ending := e);
 		privacy := p;
 		type := t;
-		installation := inst
+		installation := inst;
+		host := h.name
 	)
 	pre tTickets > 0 and Utils`before(b,e);
 
