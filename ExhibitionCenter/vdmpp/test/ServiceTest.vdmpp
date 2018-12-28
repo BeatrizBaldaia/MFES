@@ -1,14 +1,34 @@
 class ServiceTest  is subclass of Test
-types
--- TODO Define types here
-values
--- TODO Define values here
-instance variables
--- TODO Define instance variables here
 operations
--- TODO Define operations here
-functions
--- TODO Define functiones here
-traces
--- TODO Define Combinatorial Test Traces here
+	public testAll: () ==> ()
+		testAll() == (
+		testaddService();
+		testCreateService();
+		testchangeService();
+	);
+	
+	private testaddService: () ==> ()
+	testaddService() == (
+		dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 100, 20, 20, 20, true, true, true, true, true);
+		dcl center : Center := new Center("Super Center", pavilion1);
+		dcl service : Service := new Service(1, <IT>);
+		center.addService(service);
+		assertTrue(center.services(<IT>) = service);
+	);
+	private testchangeService: () ==> ()
+	testchangeService() == (
+		dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 100, 20, 20, 20, true, true, true, true, true);
+		dcl center : Center := new Center("Super Center", pavilion1);
+		dcl service : Service := new Service(1, <IT>);
+		center.addService(service);
+		center.changeServicePrice(<IT>, 20);
+		assertTrue(center.services(<IT>).price = 20);
+	);
+	private testCreateService: () ==> ()
+	testCreateService() == (
+		dcl service : Service := new Service(10, <IT>);
+		assertTrue(service.price = 10);
+		assertTrue(service.type = <IT>);
+ );
+	
 end ServiceTest

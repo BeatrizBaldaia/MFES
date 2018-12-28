@@ -37,6 +37,7 @@ operations
  UtilsTest`main();
  InstallationTest`main();
  new EventTest().testAll();
+ new ServiceTest().testAll();
  );
 functions
 -- TODO Define functiones here
