@@ -94,6 +94,7 @@ operations
 		dcl inst_0 : Auditorium := new Auditorium("Aud", 1,1,1,1, true, true, true, true, true, true);
 		dcl inst_1 : Foyer := new Foyer("Foyer",1,1,1,1,true,true,true,true);
 		dcl inst_2 : Room := new Room("R",1,1,1,1,true,true,true,true,true,true,true,true);
+		c.addInstallations(inst_0);
 		c.addInstallations(inst_1);
 		c.addInstallations(inst_2);
 		
