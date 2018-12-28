@@ -20,6 +20,10 @@ operations
 		)
 		pre c > 0 and h > 0 and w > 0 and l > 0
 		post not (telephones or movingWalls);
+		--Impossible to create a installation with out parameters
+		public Auditorium: () ==> Auditorium
+		Auditorium() == return self
+		pre false;
 		
 -- Add foyer to foyers set
 	public addFoyer : Foyer ==> ()
