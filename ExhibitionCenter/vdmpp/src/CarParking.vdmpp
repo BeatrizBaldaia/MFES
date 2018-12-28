@@ -14,7 +14,10 @@ operations
 		post not (airCondition or naturalLigth or ceilingLighting or 
 		blackOutCurtains or telephones or computerNetwork or 
 		soundproofWalls or movingWalls);
-		
+	--Impossible to create a installation with out parameters
+		public CarParking: () ==> CarParking
+		CarParking() == return self
+		pre false;
 	public addFoyer : Foyer ==> ()
 		addFoyer(-) == return
 		pre false;
@@ -30,5 +33,5 @@ operations
 --Verify if has installation
 	public hasInstallation: Installation ==> bool
 		hasInstallation(inst) == return false
-		pre false and inst <> self;
+		pre inst <> self;
 end CarParking

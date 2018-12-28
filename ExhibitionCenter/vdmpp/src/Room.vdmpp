@@ -20,7 +20,10 @@ operations
 			movingWalls := movW;
 		)
 		pre c > 0 and h > 0 and w > 0 and l > 0;
-		
+	--Impossible to create a installation with out parameters
+		public Room: () ==> Room
+		Room() == return self
+		pre false;
 	public addFoyer : Foyer ==> ()
 		addFoyer(-) == return
 		pre false;
