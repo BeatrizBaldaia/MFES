@@ -1,6 +1,6 @@
 class Event
 types
-	public EventType=<Conferences> | <TradeFair> | <Party> | <Musical> | <TeamBuilding>;
+	public EventType=<Conference> | <TradeFair> | <Party> | <Musical> | <TeamBuilding>;
 instance variables
 	public name: Utils`String := "untitled";
 	public totalTickets: nat := 1;
