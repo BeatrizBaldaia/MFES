@@ -1,4 +1,4 @@
-class ServiceTest
+class ServiceTest  is subclass of Test
 types
 -- TODO Define types here
 values

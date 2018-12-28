@@ -1,8 +1,5 @@
-class UtilsTest
+class UtilsTest  is subclass of Test
 operations
-private assertTrue: bool ==> ()
- assertTrue(cond) == return
- pre cond;
 public static main: () ==> ()
   main() ==
  (
