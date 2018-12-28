@@ -35,7 +35,7 @@ operations
 		privacy := p;
 		type := t;
 	)
-	pre tTickets > 0 and Utils`before(b,e);
+	pre tTickets > 0 and (b = e or Utils`before(b, e));
 
 --Set event name
 	public setName: Utils`String ==> ()
