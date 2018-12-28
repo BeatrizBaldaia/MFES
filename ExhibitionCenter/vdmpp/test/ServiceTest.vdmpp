@@ -5,6 +5,7 @@ operations
 		testaddService();
 		testCreateService();
 		testchangeService();
+		testRemoveService();
 	);
 	
 	private testaddService: () ==> ()
@@ -14,6 +15,15 @@ operations
 		dcl service : Service := new Service(1, <IT>);
 		center.addService(service);
 		assertTrue(center.services(<IT>) = service);
+	);
+	private testRemoveService: () ==> ()
+	testRemoveService() == (
+		dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 100, 20, 20, 20, true, true, true, true, true);
+		dcl center : Center := new Center("Super Center", pavilion1);
+		dcl service : Service := new Service(1, <IT>);
+		center.addService(service);
+		center.removeService(<IT>);
+		assertTrue(<IT> not in set dom center.services);
 	);
 	private testchangeService: () ==> ()
 	testchangeService() == (
