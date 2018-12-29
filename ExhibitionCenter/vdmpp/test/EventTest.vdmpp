@@ -3,13 +3,6 @@ operations
 
 /***** USE CASE SCENARIOS ******/
 
---Create an event
-	public createEvent: Utils`String * nat * real * Utils`Date * Utils`Date * bool * Event`EventType * Installation * Utils`String ==> Event
-	createEvent(n, tTickets, tPrice, b, e, p, t, inst, h) == (
-		dcl event: Event := new Event(n, tTickets, tPrice, b, e, p, t, inst, h);
-		return event
-	);
-	
 --Add services to the event
 	public addServices: Event * [seq of Service`ServiceType] ==> ()
 	addServices(event, services) == (
@@ -103,9 +96,13 @@ operations
 		changeEventUsers(event, "guests", {"Ana", "Tiago"}, "Beatriz", true);
 		changeEventUsers(event, "attendees", {"Ana", "Tiago"}, "Beatriz", true);
 		changeEventUsers(event, "attendees", {"Tiago"}, "Beatriz", false);
-		changeEventUsers(event, "staff", {"eduardo"}, "Beatriz", true);
+		changeEventUsers(event, "staff", {"Eduardo"}, "Beatriz", true);
 		changeEventUsers(event, "host", {"Tiago"}, "Beatriz", true);
-		changeEventUsers(event, "guests", {"Beatriz"}, "Tiago", true);
+		changeEventUsers(event, "host", {"Eduardo"}, "Tiago", true);
+		changeEventUsers(event, "host", {"Ana"}, "Eduardo", true);
+		changeEventUsers(event, "staff", {"Eduardo"}, "Ana", true);
+		changeEventUsers(event, "staff", {"Eduardo"}, "Ana", false);
+		changeEventUsers(event, "guests", {"Beatriz"}, "Ana", true);
 		showEventDetails(event)
  	);
  /***** TEST CASES WITH INVALID INPUTS (EXECUTE ONE AT A TIME) ******/

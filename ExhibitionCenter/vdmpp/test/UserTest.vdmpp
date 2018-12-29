@@ -1,0 +1,5 @@
+class UserTest  is subclass of Test
+
+operations
+
+end UserTest

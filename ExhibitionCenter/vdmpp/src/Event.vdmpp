@@ -132,7 +132,7 @@ operations
 	public setHost: Utils`String ==> ()
 	setHost(user) == (
 		if(user in set attendees) then attendees := attendees \ {user}
-		elseif(user in set attendees) then staff := staff \ {user};
+		elseif(user in set staff) then staff := staff \ {user};
 		host := user
 	)
 	post host = user;
