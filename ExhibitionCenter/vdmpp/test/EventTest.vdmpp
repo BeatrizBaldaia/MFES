@@ -51,6 +51,28 @@ operations
 		assertEqual(event.remainingTickets, remaining)
 	)
 	pre earned >= 0 and remaining >= 0;
+	
+--Change event users
+	public changeEventUsers: Event * Utils`String * set of Utils`String *  bool ==> ()
+	changeEventUsers(event, type, users, add) == (
+		cases type:
+			("attendees") -> (
+				if(add) then (let user in set users in event.addAttendee(user); assertTrue(users subset event.attendees))
+				else (let user in set users in event.removeAttendee(user); assertTrue(not users subset event.attendees));
+			),
+			("staff") -> (
+				if(add) then (let user in set users in event.addStaff(user); assertTrue(users subset event.staff))
+				else (let user in set users in event.removeStaff(user); assertTrue(not users subset event.staff));
+			),
+			("host") -> (
+				let user in set users in event.setHost(user);
+				assertTrue(event.host in set users);
+				assertTrue(users inter event.attendees = {});
+				assertTrue(users inter event.staff = {})
+			)
+		end
+	)
+	pre type in set {"attendees", "staff", "host"};
  /***** TEST CASES WITH VALID INPUTS ******/
  
  --Run all tests with valid inputa
