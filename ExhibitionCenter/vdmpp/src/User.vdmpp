@@ -42,10 +42,10 @@ operations
 	
 --Converts set of events to string
 	public eventsSetToString: [set of Utils`String] ==> Utils`String
-	eventsSetToString(events) == (
+	eventsSetToString(events_var) == (
 		dcl res: Utils`String := "";
-		if(card events = 0) then return "";
-		for all event in set events do res := res ^ event ^ ", ";
+		if(card events_var = 0) then return "";
+		for all event in set events_var do res := res ^ event ^ ", ";
 		res := res(1, ..., len res - 2);
 		return res
 	);
