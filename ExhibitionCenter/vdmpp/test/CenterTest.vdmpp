@@ -2,49 +2,12 @@ class CenterTest  is subclass of Test
 -- TODO not possible new Room(), teste failing
  --TODO addFoyer/ Room ; pre = false
 operations
- private testUser: () ==> ()
- testUser() ==
- (
-	dcl user1 : User := new User("eduardo", "123");
-	dcl host : User := new User("host", "123");
-	-- dcl user2 : User := new User("anabela", "");
-	dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 500, 100, 20, 20, 20, true, true, true, true, true);
-	dcl center : Center := new Center("Super Center", pavilion1);
-	dcl admin: User := new User("admin", "admin1234");
-	center.addUser(admin);
-	assertTrue(center.users = {|->});
-	center.addUser(host);
-	assertTrue({|->} = center.events);
-
-	center.createEvent("Coffee Break", 3, 0, mk_Utils`Date(2018, 12, 27), mk_Utils`Date(2018, 12, 28), false, <Party>, pavilion1, host.name);
-	center.addUser(user1);
-	assertTrue(center.users(user1.name) = user1);
-	assertTrue(center.users(user1.name).events = {});
-	center.addUserToEvent("Coffee Break", "eduardo", <attendee>);
-	assertTrue(center.events("Coffee Break").attendees = {"eduardo"});
-	assertTrue(center.users(user1.name).events = {"Coffee Break"});
-	assertTrue(center.users(user1.name).attendEvent("Coffee Break"));
-	assertTrue( not center.users(user1.name).attendEvent("Tezst"));
-	center.removeUserFromEvent("Coffee Break", "eduardo", <attendee>);
-	assertTrue(center.events("Coffee Break").attendees = {});
-	assertTrue(center.users(user1.name).events = {});
-	
- );
-
 	public static main: () ==> ()
-	main() ==
- (
- --dcl c : CenterTest := new CenterTest();
- --c.testUser();
- 
- --UtilsTest`main();
+	main() == (
+		new UtilsTest().testAll();
 		new InstallationTest().testAll();
- 		new EventTest().testAll();
+		new EventTest().testAll();
 		new ServiceTest().testAll();
 		new UserTest().testAll();
- );
-functions
--- TODO Define functiones here
-traces
--- TODO Define Combinatorial Test Traces here
+	);
 end CenterTest
