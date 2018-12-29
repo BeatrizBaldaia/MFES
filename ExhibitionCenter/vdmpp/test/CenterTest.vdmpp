@@ -41,6 +41,7 @@ operations
 		new InstallationTest().testAll();
  		new EventTest().testAll();
 		new ServiceTest().testAll();
+		new UserTest().testAll();
  );
 functions
 -- TODO Define functiones here
