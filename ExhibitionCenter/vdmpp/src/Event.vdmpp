@@ -135,7 +135,6 @@ operations
 		elseif(user in set attendees) then staff := staff \ {user};
 		host := user
 	)
-	pre user not in set attendees and user not in set staff
 	post host = user;
 	
 --Add attendee to the event
@@ -177,7 +176,7 @@ operations
 	servicesToString() == (
 		dcl res: Utils`String := "";
 		if(len services = 0) then return "";
-		let service in seq services in res := res ^ Service`typeToString(service) ^ ", ";
+		for all service in set elems services do res := res ^ Service`typeToString(service) ^ ", ";
 		res := res(1, ..., len res - 2);
 		return res
 	);
@@ -187,7 +186,7 @@ operations
 	usersSetToString(users) == (
 		dcl res: Utils`String := "";
 		if(card users = 0) then return "";
-		let user in set users in res := res ^ user ^ ", ";
+		for all user in set users do res := res ^ user ^ ", ";
 		res := res(1, ..., len res - 2);
 		return res
 	);

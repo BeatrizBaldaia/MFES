@@ -39,7 +39,7 @@ operations
  
  --UtilsTest`main();
 		new InstallationTest().testAll();
- --new EventTest().testAll();
+ 		new EventTest().testAll();
 		new ServiceTest().testAll();
  );
 functions

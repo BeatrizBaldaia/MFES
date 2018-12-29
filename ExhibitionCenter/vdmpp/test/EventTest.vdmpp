@@ -14,7 +14,6 @@ operations
 	public addServices: Event * [seq of Service`ServiceType] ==> ()
 	addServices(event, services) == (
 		dcl oldServicesSet: seq of Service`ServiceType := event.services;
-		--let s in seq services in event.addService(s);
 		for all s in set elems services do (event.addService(s));
 		assertEqual(event.services, oldServicesSet ^ services)
 	)
@@ -24,7 +23,6 @@ operations
 --Remove services from event
 	public removeServices: Event * [seq of Service`ServiceType] ==> ()
 	removeServices(event, services) == (
-		--let s in seq services in event.removeService(s);
 		for all s in set elems services do (event.removeService(s));
 		assertTrue(forall service in seq event.services & service not in set elems services)
 	)
@@ -47,32 +45,46 @@ operations
 --Analise the event properties and gains
 	public analiseEvent: Event * real * nat ==> ()
 	analiseEvent(event, earned, remaining) == (
-		assertEqual(event.earnedMoney, earned);
-		assertEqual(event.remainingTickets, remaining)
+		assertEqual(event.earnedMoney(), earned);
+		assertEqual(event.remainingTickets(), remaining)
 	)
 	pre earned >= 0 and remaining >= 0;
 	
 --Change event users
-	public changeEventUsers: Event * Utils`String * set of Utils`String *  bool ==> ()
-	changeEventUsers(event, type, users, add) == (
+	public changeEventUsers: Event * Utils`String * set of Utils`String * Utils`String *  bool ==> ()
+	changeEventUsers(event, type, users, host, add) == (
 		cases type:
 			("attendees") -> (
-				if(add) then (let user in set users in event.addAttendee(user); assertTrue(users subset event.attendees))
-				else (let user in set users in event.removeAttendee(user); assertTrue(not users subset event.attendees));
+				if(add) then (for all user in set users do event.addAttendee(user); assertTrue(users subset event.attendees))
+				else (for all user in set users do event.removeAttendee(user); assertTrue(not users subset event.attendees));
 			),
 			("staff") -> (
-				if(add) then (let user in set users in event.addStaff(user); assertTrue(users subset event.staff))
-				else (let user in set users in event.removeStaff(user); assertTrue(not users subset event.staff));
+				if(add) then (for all user in set users do event.addStaff(user); assertTrue(users subset event.staff))
+				else (for all user in set users do event.removeStaff(user); assertTrue(not users subset event.staff));
 			),
 			("host") -> (
-				let user in set users in event.setHost(user);
+				for all user in set users do event.setHost(user);
 				assertTrue(event.host in set users);
 				assertTrue(users inter event.attendees = {});
-				assertTrue(users inter event.staff = {})
+				assertTrue(users inter event.staff = {});
+			),
+			("guests") -> (
+				for all user in set users do event.inviteUser(host, user);
+				assertTrue(users subset event.guests)
 			)
 		end
 	)
-	pre type in set {"attendees", "staff", "host"};
+	pre type in set {"attendees", "staff", "host", "guests"} and host = event.host;
+	
+--Display event information
+	public showEventDetails: Event ==> ()
+	showEventDetails(event) == (
+		dcl res: map Utils`String to Utils`String := event.showDetails();
+		if(event.privacy) then assertEqual(card dom res, 14)
+		else assertEqual(card dom res, 13)
+	);
+	
+
  /***** TEST CASES WITH VALID INPUTS ******/
  
  --Run all tests with valid inputa
@@ -87,7 +99,14 @@ operations
 		addServices(event, [<AudioVisual>, <Catering>, <IT>]);
 		removeServices(event, [<AudioVisual>, <IT>]);
 		changeInstallation(event, [room2, pavilion1, room1, pavilion1]);
-		analiseEvent(event, 0, 5)
+		analiseEvent(event, 0, 5);
+		changeEventUsers(event, "guests", {"Ana", "Tiago"}, "Beatriz", true);
+		changeEventUsers(event, "attendees", {"Ana", "Tiago"}, "Beatriz", true);
+		changeEventUsers(event, "attendees", {"Tiago"}, "Beatriz", false);
+		changeEventUsers(event, "staff", {"eduardo"}, "Beatriz", true);
+		changeEventUsers(event, "host", {"Tiago"}, "Beatriz", true);
+		changeEventUsers(event, "guests", {"Beatriz"}, "Tiago", true);
+		showEventDetails(event)
  	);
  /***** TEST CASES WITH INVALID INPUTS (EXECUTE ONE AT A TIME) ******/
  

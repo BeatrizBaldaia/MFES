@@ -35,7 +35,7 @@ operations
 	public showInstallationsDetails: () ==> set of (map Utils`String to Utils`String)
 	showInstallationsDetails() == (
 	dcl res: set of (map Utils`String to Utils`String) := {};
-	let inst in set dom installations in res := res union {showInstallationDetails(inst)};
+	for all inst in set dom installations do res := res union {showInstallationDetails(inst)};
 	return res
 	)
 	post card RESULT = card dom installations;
@@ -94,7 +94,7 @@ operations
 --Remove installation from installations map
 	public removeInstallation: Utils`String * Utils`String ==> ()
 	removeInstallation(uName, instID) == (
-		let inst in set rng installations \ {installations(instID)} in
+		for all inst in set rng installations \ {installations(instID)} do
 			if(hasInstallation(installations(instID), inst)) then removeInstallationFromInstallation(uName, inst.id, installations(instID));
 		installations := {instID} <-: installations
 	)
@@ -127,13 +127,13 @@ operations
 		dcl tmpUsedInsts: set of Installation := {};
 		dcl usedInsts: set of Installation := {};
 		dcl tmpFreeInsts: map Utils`String to Installation := {|->};
-		let ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) in (
+		for all ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) do (
 			tmpUsedInsts :=  tmpUsedInsts union {ev.installation}
 		);
 		tmpFreeInsts := installations :-> usedInsts;
 		usedInsts := tmpUsedInsts;
-		let inst1 in set rng tmpFreeInsts in (
-			let inst2 in set tmpUsedInsts in (
+		for all inst1 in set rng tmpFreeInsts do (
+			for all inst2 in set tmpUsedInsts do (
 				if(inst1.hasInstallation(inst2)) then usedInsts :=  usedInsts union {inst1}
 			)
 		);
@@ -153,12 +153,12 @@ operations
 	)
 	pre {inst1, inst2} subset rng installations;
 
---SERVICE OPERATIONS
+/** SERVICE OPERATIONS **/
 --Show all services information
 	public showServicesDetails: () ==> set of (map Utils`String to Utils`String)
 	showServicesDetails() == (
 	dcl res: set of (map Utils`String to Utils`String) := {};
-	let service in set rng services in res := res union {service.showDetails()};
+	for all service in set rng services do res := res union {service.showDetails()};
 	return res
 	)
 	post card RESULT = card dom services;
@@ -174,8 +174,6 @@ operations
 --Remove service from services map
 	public removeService: Utils`String * Service`ServiceType ==> ()
 		removeService(uName, service) == (
-			--let e in set {x | x in set rng events & service in set elems x.services} in
-				--e.removeService(service);
 			for all e in set rng events do (if(service in set elems e.services) then e.removeService(service));
 			services := {service} <-: services
 		)
@@ -192,7 +190,7 @@ operations
 		price > 0 and serviceType in set dom services
 	post services(serviceType).price = price;
 
---EVENT OPERATIONS
+/** EVENT OPERATIONS **/
 --Create an event	and add it to the events map
 	public createEvent:  Utils`String * nat * real * Utils`Date * Utils`Date * bool * Event`EventType * Installation * Utils`String ==> ()
 	createEvent(n, tTickets, tPrice, b, e, p, t, inst, h) == (
@@ -218,8 +216,8 @@ operations
 	moneySpentWithServices(uName, evName) == (
 		dcl ev: Event := events(evName);
 		dcl res: real := 0;
-		let service in seq ev.services in res := res + services(service).price;
-		return res;
+		for all service in set elems ev.services do res := res + services(service).price;
+		return res
 	)
 	pre uName in set dom users and (uName = events(evName).host or uName = adminName) and
 	 evName in set dom events;
@@ -232,6 +230,7 @@ operations
 	)
 	pre uName in set dom users and (uName = events(evName).host or uName = adminName) and
 	 evName in set dom events;
+	 
 --In case of a private event, host can invite users (so they will be
 -- the only ones capable of seeing and buying a ticket to the event)
 	public inviteToEvent: Utils`String * Utils`String * Utils`String ==> ()
@@ -245,7 +244,7 @@ operations
 	public showAvailableEvents: Utils`String ==> [set of Event]
 	showAvailableEvents(uName) == (
 		dcl res: set of Event := {};
-		let e in set rng events in (
+		for all e in set rng events do (
 			if(card e.attendees = e.totalTickets) then skip;
 			if(e.privacy and uName in set e.guests) then res := res union {e};
 			if(not e.privacy) then res := res union {e}
@@ -259,7 +258,7 @@ operations
 	public showAvailableEventsBetweenDates: Utils`String * Utils`Date * Utils`Date ==> [set of Event]
 	showAvailableEventsBetweenDates(uName, b, e) == (
 		dcl res: set of Event := {};
-		let ev in set rng events in 
+		for all ev in set rng events do 
 			if(hasDatesConflict(ev, b, e)) then (
 				if(card ev.attendees = ev.totalTickets) then skip;
 				if(ev.privacy and uName in set ev.guests) then res := res union {ev};
@@ -271,7 +270,7 @@ operations
 	post RESULT subset rng events and
 		forall event in set RESULT & hasDatesConflict(event, b, e);
 		
---OPERATIONS TO CHANGE EVENTS ATTRIBUTES	
+/** OPERATIONS TO CHANGE EVENTS ATTRIBUTES **/
 --Change event name
 	public changeEventName: Utils`String * Utils`String * Utils`String ==> ()
 	changeEventName(evName, hName, value) == (
@@ -369,13 +368,13 @@ operations
 		hName in set dom users and events(evName).host = hName
 	post servType not in set elems events(evName).services;
 	
---USER FUNCTIONS
+/** USER FUNCTIONS **/
 --Show one user information
 	public showUserDetails: Utils`String * Utils`String ==> map Utils`String to Utils`String
 	showUserDetails(uName1, uName2) == (
 		dcl res: map Utils`String to Utils`String := users(uName2).showDetails();
 		dcl money: real := 0;
-		let evName in set users(uName2).events in money := money + events(evName).ticketPrice;
+		for all evName in set users(uName2).events do if(uName2 in set events(evName).attendees) then money := money + events(evName).ticketPrice;
 		res := res ++ {"Money spent"|->Utils`toString[real](money)};
 		return res
 	)
@@ -387,7 +386,7 @@ operations
 	public showUsersDetails: Utils`String ==> set of (map Utils`String to Utils`String)
 	showUsersDetails(uName) == (
 		dcl res: set of (map Utils`String to Utils`String) := {};
-		let user in set dom users in res := res union {showUserDetails(uName, user)};
+		for all user in set dom users do res := res union {showUserDetails(uName, user)};
 		return res
 	)
 	pre uName in set dom users and uName = adminName

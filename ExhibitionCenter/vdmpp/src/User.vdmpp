@@ -45,7 +45,7 @@ operations
 	eventsSetToString(events) == (
 		dcl res: Utils`String := "";
 		if(card events = 0) then return "";
-		let event in set events in res := res ^ event ^ ", ";
+		for all event in set events do res := res ^ event ^ ", ";
 		res := res(1, ..., len res - 2);
 		return res
 	);
