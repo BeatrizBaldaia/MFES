@@ -1,4 +1,4 @@
-class Utils
+class Utils_vdm
 types
 	public Date :: 	year : nat
 									month: nat
@@ -65,10 +65,10 @@ functions
 	else let key = hd keys in (
 		let res = f(m(key)) in (
 			if(is_bool(res)) then (
-				if(res) then {key|->m(key)} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
+				if(res) then {m(hd keys)|->m(m(hd keys))} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
 				else fMap[@keyType, @returnType, @valueType] (f)(tl keys, m)
 			)
-			elseif(is_(res, @valueType)) then {key|->res} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
+			elseif(is_(res, @valueType)) then {m(hd keys)|->res} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
 			else {|->} -- TODO case of error. ask teacher how to use trap error with exit in (...)
 		)
 	)
@@ -93,28 +93,49 @@ functions
 	msetTOseq(tmpSet) == card tmpSet;
 	
 -- converts an element to string
-	public toString[@elem]: @elem -> String
-	toString(value) == (
-		cases true:
-			(is_String(value)) -> value,
-			(is_Date(value)) -> dateToString(value),
-			(is_nat(value)) -> natToString(value),
-			(is_real(value)) -> natToString(value) ^ [',', ' '] ^ natToString(getRemainder(value, 0)),
-			(is_bool(value)) -> boolToString(value)
-		end
+--	public toStringVDM[@elem]: @elem -> String
+--	toStringVDM(value) == (
+--		cases true:
+--			(is_String(value)) -> value,
+--			(is_Date(value)) -> datetoStringVDM(value),
+--			(is_nat(value)) -> nattoStringVDM(value),
+--			(is_real(value)) -> nattoStringVDM(value) ^ [',', ' '] ^ nattoStringVDM(getRemainder(value, 0)),
+--			(is_bool(value)) -> booltoStringVDM(value)
+--		end
+--	)
+--	measure 1;
+-- converts an element to string
+	public toStringVDM: String -> String
+	toStringVDM(value) == (
+		value
+	)
+	measure 1;
+	public toStringVDM: bool -> String
+	toStringVDM(value) == (
+		booltoStringVDM(value)
+	)
+	measure 1;
+	public toStringVDM: Date -> String
+	toStringVDM(value) == (
+		datetoStringVDM(value)
+	)
+	measure 1;
+	public toStringVDM: real -> String
+	toStringVDM(value) == (
+		nattoStringVDM(value) ^ [',', ' '] ^ nattoStringVDM(getRemainder(value, 0))
 	)
 	measure 1;
 	
-	public boolToString: bool -> String
-	boolToString(value) == if(value) then "yes" else "no";
+	public booltoStringVDM: bool -> String
+	booltoStringVDM(value) == if(value) then "yes" else "no";
 	
-	public dateToString: Date -> String
-	dateToString(value) == natToString(value.day) ^ ['/'] ^ natToString(value.month) ^ ['/'] ^ natToString(value.year);
+	public datetoStringVDM: Date -> String
+	datetoStringVDM(value) == nattoStringVDM(value.day) ^ ['/'] ^ nattoStringVDM(value.month) ^ ['/'] ^ nattoStringVDM(value.year);
 
-	public natToString: real -> String
-	natToString(value) == (
+	public nattoStringVDM: real -> String
+	nattoStringVDM(value) == (
 		if(floor(value) < 10) then mapNat(floor(value))
-		else natToString(floor(value) div 10) ^ mapNat(floor(value) rem 10)
+		else nattoStringVDM(floor(value) div 10) ^ mapNat(floor(value) rem 10)
 	);
 	
 	public getRemainder: real * int -> int
@@ -140,4 +161,4 @@ functions
 	);
 
 
-end Utils
+end Utils_vdm

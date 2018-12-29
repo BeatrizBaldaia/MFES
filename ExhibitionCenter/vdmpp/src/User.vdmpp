@@ -1,12 +1,12 @@
 class User
 instance variables
-	public name: Utils`String := "default_name";
-	public password: Utils`String := "pass1234";
-	public events: [set of Utils`String] := {};
+	public name: Utils_vdm`String := "default_name";
+	public password: Utils_vdm`String := "pass1234";
+	public events: [set of Utils_vdm`String] := {};
 
 operations
 --Constructor
-	public User: Utils`String * Utils`String ==> User
+	public User: Utils_vdm`String * Utils_vdm`String ==> User
 	User(n, p) == (
 		name := n;
 		password := p
@@ -15,37 +15,37 @@ operations
 	post name = n and password = p;
 	
 --Shows all user information
-	public showDetails: () ==> map Utils`String to Utils`String
+	public showDetails: () ==> map Utils_vdm`String to Utils_vdm`String
 	showDetails() == (
-		dcl res: map Utils`String to Utils`String := {|->};
+		dcl res: map Utils_vdm`String to Utils_vdm`String := {|->};
 		res := res ++ {
-				"Name" |-> name, "Tickets bought" |-> eventsSetToString(events)
+				"Name" |-> name, "Tickets bought" |-> eventsSettoStringVDM(events)
 		};
 		return res
 	);
 	
 --Add event
-	public addEvent: Utils`String ==> ()
+	public addEvent: Utils_vdm`String ==> ()
 	addEvent(evName) == events := events union {evName}
 	pre evName not in set events
 	post evName in set events;
 	
 --Remove event
-	public removeEvent: Utils`String ==> ()
+	public removeEvent: Utils_vdm`String ==> ()
 	removeEvent(evName) == events := events \ {evName}
 	pre evName in set events
 	post evName not in set events;
 	
 --Checks if this user attend the event
-	public attendEvent: Utils`String ==> bool
+	public attendEvent: Utils_vdm`String ==> bool
 	attendEvent(evName) == return evName in set events;
 	
 --Converts set of events to string
-	public eventsSetToString: [set of Utils`String] ==> Utils`String
-	eventsSetToString(events) == (
-		dcl res: Utils`String := "";
-		if(card events = 0) then return "";
-		for all event in set events do res := res ^ event ^ ", ";
+	public eventsSettoStringVDM: [set of Utils_vdm`String] ==> Utils_vdm`String
+	eventsSettoStringVDM(events_var) == (
+		dcl res: Utils_vdm`String := "";
+		if(card events_var = 0) then return "";
+		for all event in set events_var do res := res ^ event ^ ", ";
 		res := res(1, ..., len res - 2);
 		return res
 	);

@@ -6,7 +6,7 @@ operations
  /***** USE CASE SCENARIOS ******/
  
  --Center Init
- 	public createCenter: Utils`String * Installation ==> Center
+ 	public createCenter: Utils_vdm`String * Installation ==> Center
  	createCenter(name, inst) == (
  		dcl res: Center := new Center(name, inst);
  		res.addUser(new User("admin", "admin1234"));
@@ -109,11 +109,11 @@ operations
 	
 	public testEvent: Center ==> ()
 	testEvent(center) == (
-		dcl event1: Event := center.createEvent("Event1", 3, 10, mk_Utils`Date(2018, 12, 1), mk_Utils`Date(2018, 12, 3), true, <Conference>, center.installations("Room1"), "User1");
+		dcl event1: Event := center.createEvent("Event1", 3, 10, mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3), true, <Conference>, center.installations("Room1"), "User1");
 		dcl user1: User := center.users("User1");
 		dcl user2: User := center.users("User2");
 		
-		assertTrue("Room1" not in set dom center.getAvailableInstallations(mk_Utils`Date(2018, 12, 1), mk_Utils`Date(2018, 12, 3)));
+		assertTrue("Room1" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)));
 		assertEqual(center.showAvailableEvents("User2"), {});
 		center.inviteToEvent("Event1", "User1", "User2");
 		assertEqual(center.showAvailableEvents("User2"), {event1})
@@ -132,12 +132,11 @@ operations
 		centerTest.testServices(center);
 		centerTest.testUsers(center);
 		centerTest.testEvent(center);
+
 		new InstallationTest().testAll();
- 		new EventTest().testAll();
+		new EventTest().testAll();
 		new ServiceTest().testAll();
- );
-functions
--- TODO Define functiones here
-traces
--- TODO Define Combinatorial Test Traces here
+		new UserTest().testAll();
+		
+	);
 end CenterTest

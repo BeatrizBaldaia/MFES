@@ -2,30 +2,30 @@ class Event
 types
 	public EventType=<Conference> | <TradeFair> | <Party> | <Musical> | <TeamBuilding>;
 instance variables
-	public name: Utils`String := "untitled";
+	public name: Utils_vdm`String := "untitled";
 	public totalTickets: nat := 1;
 	inv totalTickets > 0;
 	public ticketPrice: real := 0;
-	public begin: Utils`Date := mk_Utils`Date(2018, 1, 1);
-	public ending: Utils`Date := mk_Utils`Date(2018, 1, 2);
+	public begin: Utils_vdm`Date := mk_Utils_vdm`Date(2018, 1, 1);
+	public ending: Utils_vdm`Date := mk_Utils_vdm`Date(2018, 1, 2);
 	public privacy: bool := false;
 	public type: [EventType] := nil;
-	inv begin = ending or Utils`before(begin, ending);
+	inv begin = ending or Utils_vdm`before(begin, ending);
 	public installation: Installation;
 	inv installation <> undefined;
 	public services: [seq of Service`ServiceType] := [];
-	public attendees: [set of Utils`String] := {};
+	public attendees: [set of Utils_vdm`String] := {};
 	inv card attendees <= totalTickets;
-	public staff: [set of Utils`String] := {};
-	public host: Utils`String := "undefined";
+	public staff: [set of Utils_vdm`String] := {};
+	public host: Utils_vdm`String := "undefined";
 	inv host not in set attendees and host not in set staff and host <> "undefined";
 	inv forall attendee in set attendees & attendee not in set staff;
-	public guests: [set of Utils`String] := {};
+	public guests: [set of Utils_vdm`String] := {};
 	inv if(not privacy) then guests = {} else true;
 operations
 
 --Constructor
-	public Event: Utils`String * nat * real * Utils`Date * Utils`Date * bool * EventType * Installation * Utils`String ==> Event
+	public Event: Utils_vdm`String * nat * real * Utils_vdm`Date * Utils_vdm`Date * bool * EventType * Installation * Utils_vdm`String ==> Event
 	Event(n, tTickets, tPrice, b, e, p, t, inst, h) == (
 		atomic(installation := inst; host := h);
 		name := n;
@@ -35,10 +35,10 @@ operations
 		privacy := p;
 		type := t;
 	)
-	pre tTickets > 0 and (b = e or Utils`before(b, e));
+	pre tTickets > 0 and (b = e or Utils_vdm`before(b, e));
 
 --Set event name
-	public setName: Utils`String ==> ()
+	public setName: Utils_vdm`String ==> ()
 	setName(n) == name := n
 	post name = n;
 --Set event number of tickets
@@ -52,14 +52,14 @@ operations
 	pre tPrice >= 0
 	post ticketPrice = tPrice;
 --Set event begin date
-	public setBeginDate: Utils`Date ==> ()
+	public setBeginDate: Utils_vdm`Date ==> ()
 	setBeginDate(b) == begin := b
-	pre Utils`before(b, ending)
+	pre Utils_vdm`before(b, ending)
 	post begin = b;
 --Set event ending date
-	public setEndingDate: Utils`Date ==> ()
+	public setEndingDate: Utils_vdm`Date ==> ()
 	setEndingDate(e) == ending := e
-	pre Utils`before(begin, e)
+	pre Utils_vdm`before(begin, e)
 	post ending = e;
 --Set event privacy condition
 	public setPrivacy: bool ==> ()
@@ -75,21 +75,21 @@ operations
 	post type = t;
 	
 --Shows all event information
-	public showDetails: () ==> map Utils`String to Utils`String
+	public showDetails: () ==> map Utils_vdm`String to Utils_vdm`String
 	showDetails() == (
-		dcl res: map Utils`String to Utils`String := {|->};
+		dcl res: map Utils_vdm`String to Utils_vdm`String := {|->};
 		res := res ++ {
-				"Name" |-> name, "Total number of tickets" |-> Utils`toString[nat](totalTickets), "Sold tickets" |-> Utils`toString[real](totalTickets - card attendees),
-				"Ticket's price" |-> Utils`toString[real](ticketPrice), "Is private" |-> Utils`toString[bool](privacy), 
-				"Starting date" |-> Utils`toString[Utils`Date](begin), "Ending date" |-> Utils`toString[Utils`Date](ending), 
+				"Name" |-> name, "Total number of tickets" |-> Utils_vdm`toStringVDM(totalTickets), "Sold tickets" |-> Utils_vdm`toStringVDM(totalTickets - card attendees),
+				"Ticket's price" |-> Utils_vdm`toStringVDM(ticketPrice), "Is private" |-> Utils_vdm`toStringVDM(privacy), 
+				"Starting date" |-> Utils_vdm`toStringVDM(begin), "Ending date" |-> Utils_vdm`toStringVDM(ending), 
 				"Installation" |-> installation.id, 
-				"Event type" |-> typeToString(type),
-				"Services" |-> servicesToString(),
-				"Attendees" |-> usersSetToString(attendees),
-				"Staff" |-> usersSetToString(staff),
+				"Event type" |-> typetoStringVDM(type),
+				"Services" |-> servicestoStringVDM(),
+				"Attendees" |-> usersSettoStringVDM(attendees),
+				"Staff" |-> usersSettoStringVDM(staff),
 				"Host" |-> host
 		};
-		if(privacy) then res := res ++ {"Guests" |-> usersSetToString(guests)};
+		if(privacy) then res := res ++ {"Guests" |-> usersSettoStringVDM(guests)};
 		return res
 	);
 	
@@ -129,7 +129,7 @@ operations
 	post RESULT = totalTickets - card attendees;
 	
 --Change event's host
-	public setHost: Utils`String ==> ()
+	public setHost: Utils_vdm`String ==> ()
 	setHost(user) == (
 		if(user in set attendees) then attendees := attendees \ {user}
 		elseif(user in set staff) then staff := staff \ {user};
@@ -138,33 +138,33 @@ operations
 	post host = user;
 	
 --Add attendee to the event
-	public addAttendee: Utils`String ==> ()
+	public addAttendee: Utils_vdm`String ==> ()
 	addAttendee(user) == attendees := attendees union {user}
 	pre user not in set attendees and card attendees < totalTickets and
 		user not in set staff and user <> host
 	post user in set attendees;
 	
 --Add user to staff set 
-	public addStaff: Utils`String ==> ()
+	public addStaff: Utils_vdm`String ==> ()
 	addStaff(user) == staff := staff union {user}
 	pre user not in set staff and
 		user not in set attendees and user <> host
 	post user in set staff;
 	
 --Remove attendee
-	public removeAttendee: Utils`String ==> ()
+	public removeAttendee: Utils_vdm`String ==> ()
 	 removeAttendee(user) == attendees := attendees \ {user}
 	 pre user in set attendees
 	 post user not in set attendees;
 	 
 --Remove user from staff set
-	public removeStaff: Utils`String ==> ()
+	public removeStaff: Utils_vdm`String ==> ()
 	 removeStaff(user) == staff := staff \ {user}
 	 pre user in set staff
 	 post user not in set staff;
 
 --Invite user to private event
-	public inviteUser: Utils`String * Utils`String ==> ()
+	public inviteUser: Utils_vdm`String * Utils_vdm`String ==> ()
 	inviteUser(h, user) == guests := guests union {user}
 	pre h = host and user <> host and 
 		privacy and user not in set staff and
@@ -172,19 +172,19 @@ operations
 	post user in set guests;
 	
 --Converts service set to string
-	public servicesToString: () ==> Utils`String
-	servicesToString() == (
-		dcl res: Utils`String := "";
+	public servicestoStringVDM: () ==> Utils_vdm`String
+	servicestoStringVDM() == (
+		dcl res: Utils_vdm`String := "";
 		if(len services = 0) then return "";
-		for all service in set elems services do res := res ^ Service`typeToString(service) ^ ", ";
+		for all service in set elems services do res := res ^ Service`typetoStringVDM(service) ^ ", ";
 		res := res(1, ..., len res - 2);
 		return res
 	);
 
 --Converts set of users to string
-	public usersSetToString: [set of Utils`String] ==> Utils`String
-	usersSetToString(users) == (
-		dcl res: Utils`String := "";
+	public usersSettoStringVDM: [set of Utils_vdm`String] ==> Utils_vdm`String
+	usersSettoStringVDM(users) == (
+		dcl res: Utils_vdm`String := "";
 		if(card users = 0) then return "";
 		for all user in set users do res := res ^ user ^ ", ";
 		res := res(1, ..., len res - 2);
@@ -194,8 +194,8 @@ operations
 functions
 
 --Converts event type to string
-	public typeToString: EventType -> Utils`String
-	typeToString(t) == (
+	public typetoStringVDM: EventType -> Utils_vdm`String
+	typetoStringVDM(t) == (
 		cases t:
 			<Conference> -> "Conference",
 			<TradeFair> -> "Trade Fair",

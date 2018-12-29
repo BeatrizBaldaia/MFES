@@ -2,4 +2,24 @@ class UserTest  is subclass of Test
 
 operations
 
+	public testAddEvent: User * Event ==> ()
+	testAddEvent(u, e) == (
+		u.addEvent(e.name);
+		assertTrue(u.attendEvent(e.name));
+	);
+	public testRemoveEvent: User * Event ==> ()
+	testRemoveEvent(u, e) == (
+		u.removeEvent(e.name);
+		assertTrue(not u.attendEvent(e.name));
+	);
+
+	public testAll: () ==> ()
+	testAll() == (
+		dcl user1 : User := new User("anabela", "1234");
+		dcl room1 : Room := new Room("Room1", 15, 10, 7, 20, 20, false, true, true, true, false, false, true, false);
+		dcl event1 : Event := new Event("New Years", 100, 1000, mk_Utils_vdm`Date(2018,12,31),mk_Utils_vdm`Date(2019,1,1),true,<Party>, room1, user1.name);
+
+		testAddEvent(user1, event1);
+		testRemoveEvent(user1, event1);
+	);
 end UserTest

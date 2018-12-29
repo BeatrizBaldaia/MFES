@@ -31,6 +31,12 @@ operations
 		inst.setPrice(pr);
 		assertTrue(inst.price = pr);
 	);
+	-- HasInstallation
+	public testHasInstallation: Installation * Installation ==> ()
+	testHasInstallation(inst1, inst2) == (
+		dcl a : bool := inst1.hasInstallation(inst2);
+		assertTrue(a = inst1.hasInstallation(inst2));
+	);
 -- Set Measures
 	public testSetMeasures: Installation * nat * real* real * real ==> ()
 	testSetMeasures(inst, c, h, w, l) == (
@@ -59,6 +65,7 @@ operations
 		dcl pavilion1: Installation := new Pavilion("Pavilion1", 150, 50, 10, 50, 70, false, false, true, false, false);
 		dcl foyer1: Installation := new Foyer("Foyer1", 10, 15, 4, 6, 6, false, true, false, true);
 		dcl auditorium1: Auditorium := new Auditorium("Auditorium1", 10, 15, 4, 6, 6, false, true, false, true, true, true);
+		dcl carParking1: CarParking := new CarParking("CarParking1", 10, 15, 4, 6, 6);
 		
 		testAddFoyer(pavilion1,foyer1);
 		testAddRoom(pavilion1, room1);
@@ -75,8 +82,12 @@ operations
 		testSetConditions(pavilion1,true,true,true,true,false,true,false,false);
 		testSetConditions(foyer1,false,false,false,false,false,false,false,false);
 		testSetConditions(foyer1,true,true,true,false,false,true,false,false);
-		-- TODO testSetConditions auditorion
-		-- TODO testHasInstallation ...
+		testSetConditions(auditorium1,false,false,false,false,false,false,false,false);
+		testSetConditions(auditorium1,true,true,true,true,false,true,true,false);
+		
+		testHasInstallation(carParking1, room1);
+		testHasInstallation(foyer1, room1);
+		testHasInstallation(room1, foyer1);
 	);
 	
 	-- TODO TEST WITH INVALID INPUTS

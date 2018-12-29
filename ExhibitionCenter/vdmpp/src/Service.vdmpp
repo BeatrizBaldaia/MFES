@@ -25,11 +25,11 @@ operations
 	post price = p;
 
 --Shows all service information
-	public showDetails: () ==> map Utils`String to Utils`String
+	public showDetails: () ==> map Utils_vdm`String to Utils_vdm`String
 	showDetails() == (
-		dcl res: map Utils`String to Utils`String := {|->};
+		dcl res: map Utils_vdm`String to Utils_vdm`String := {|->};
 		res := res ++ {
-				"Type" |-> typeToString(type), "Price (per day)" |-> Utils`toString[real](price)
+				"Type" |-> typetoStringVDM(type), "Price (per day)" |-> Utils_vdm`toStringVDM(price)
 		};
 		return res
 	);
@@ -37,8 +37,8 @@ operations
 functions
 
 --Converys event type to string
-	public typeToString: ServiceType -> Utils`String
-	typeToString(t) == (
+	public typetoStringVDM: ServiceType -> Utils_vdm`String
+	typetoStringVDM(t) == (
 		cases t:
 			<AudioVisual> -> "Audio Visual",
 			<Catering> -> "Catering",
