@@ -74,6 +74,25 @@ operations
 	pre t in set {<Conferences>, <TradeFair>, <Party>, <Musical>, <TeamBuilding>}
 	post type = t;
 	
+--Shows all event information
+	public showDetails: () ==> map Utils`String to Utils`String
+	showDetails() == (
+		dcl res: map Utils`String to Utils`String := {|->};
+		res := res ++ {
+				"Name" |-> name, "Total number of tickets" |-> Utils`toString[nat](totalTickets), "Sold tickets" |-> Utils`toString[real](totalTickets - card attendees),
+				"Ticket's price" |-> Utils`toString[real](ticketPrice), "Is private" |-> Utils`toString[bool](privacy), 
+				"Starting date" |-> Utils`toString[Utils`Date](begin), "Ending date" |-> Utils`toString[Utils`Date](ending), 
+				"Installation" |-> installation.id, 
+				"Event type" |-> typeToString(type),
+				"Services" |-> servicesToString(),
+				"Attendees" |-> usersSetToString(attendees),
+				"Staff" |-> usersSetToString(staff),
+				"Host" |-> host
+		};
+		if(privacy) then res := res ++ {"Guests" |-> usersSetToString(guests)};
+		return res
+	);
+	
 --Changes the installation where the event will occur
 	public changeInstallation: Installation ==> ()
 	changeInstallation(inst) == installation := inst
@@ -152,4 +171,40 @@ operations
 		privacy and user not in set staff and
 		card guests < totalTickets
 	post user in set guests;
+	
+--Converts service set to string
+	public servicesToString: () ==> Utils`String
+	servicesToString() == (
+		dcl res: Utils`String := "";
+		if(len services = 0) then return "";
+		let service in seq services in res := res ^ Service`typeToString(service) ^ ", ";
+		res := res(1, ..., len res - 2);
+		return res
+	);
+
+--Converts set of users to string
+	public usersSetToString: [set of Utils`String] ==> Utils`String
+	usersSetToString(users) == (
+		dcl res: Utils`String := "";
+		if(card users = 0) then return "";
+		let user in set users in res := res ^ user ^ ", ";
+		res := res(1, ..., len res - 2);
+		return res
+	);
+	
+functions
+
+--Converts event type to string
+	public typeToString: EventType -> Utils`String
+	typeToString(t) == (
+		cases t:
+			<Conference> -> "Conference",
+			<TradeFair> -> "Trade Fair",
+			<Party> -> "Party",
+			<Musical> -> "Musical",
+			<TeamBuilding> -> "Team Building"
+		end
+	)
+	pre t in set {<Conference>, <TradeFair>, <Party>, <Musical>, <TeamBuilding>};
+	
 end Event

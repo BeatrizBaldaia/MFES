@@ -26,11 +26,25 @@ operations
 		post card dom installations = 1 and name = n;
 
 --INSTALLATION OPERATIONS
+--Show one installation information
+	public showInstallationDetails: Utils`String ==> map Utils`String to Utils`String
+	showInstallationDetails(inst) == return installations(inst).showDetails()
+	pre inst in set dom installations;
+	
+--Show all intallations information
+	public showInstallationsDetails: () ==> set of (map Utils`String to Utils`String)
+	showInstallationsDetails() == (
+	dcl res: set of (map Utils`String to Utils`String) := {};
+	let inst in set dom installations in res := res union {showInstallationDetails(inst)};
+	return res
+	)
+	post card RESULT = card dom installations;
+
 -- Add one installation to installations set		
 	public addInstallations: Utils`String * Installation ==> ()
 		addInstallations(uName, inst) == let instID = inst.getID() in 
 		installations := installations ++ {instID |-> inst}
-		pre uName in set dom users and uName = "admin" and
+		pre uName in set dom users and uName = adminName and
 			inst not in set rng installations and isofbaseclass(Installation, inst)
 		post card dom installations = card dom installations~ + 1 and inst in set rng installations;
 	
@@ -44,7 +58,7 @@ operations
 			--TODO: else error 
 		)
 	)
-	pre uName in set dom users and uName = "admin" and
+	pre uName in set dom users and uName = adminName and
 		instID in set dom installations and
 		(isofclass(Foyer, inst1) or isofclass(Room, inst1)) and
 		not exists inst in set rng installations & (
@@ -66,7 +80,7 @@ operations
 			--TODO: else error 
 		)
 	)
-	pre uName in set dom users and uName = "admin" and
+	pre uName in set dom users and uName = adminName and
 		instID in set dom installations and
 		inst1 in set rng installations and
 		(isofclass(Foyer, inst1) or isofclass(Room, inst1)) and
@@ -84,10 +98,28 @@ operations
 			if(hasInstallation(installations(instID), inst)) then removeInstallationFromInstallation(uName, inst.id, installations(instID));
 		installations := {instID} <-: installations
 	)
-	pre uName in set dom users and uName = "admin" and
+	pre uName in set dom users and uName = adminName and
 		instID in set dom installations
 	post instID not in set dom installations and
 	not exists inst in set rng installations & hasInstallation(installations~(instID), inst);
+
+--Edit installation measures
+	public changeInstallationMeasures: Utils`String * Utils`String * nat * real * real * real ==> ()
+	changeInstallationMeasures(uName, inst, c, h, w, l) == installations(inst).setMeasures(c, h, w, l)
+	pre uName in set dom users and uName = adminName and
+		inst in set dom installations;
+		
+--Edit installation price per day
+	public changeInstallationRent: Utils`String * Utils`String * real ==> ()
+	changeInstallationRent(uName, inst, pr) == installations(inst).setPrice(pr)
+	pre uName in set dom users and uName = adminName and
+		inst in set dom installations;
+		
+--Edit installation's conditions
+	public changeInstallationConditions: Utils`String * Utils`String * bool * bool * bool * bool * bool * bool * bool * bool ==> ()
+	changeInstallationConditions(uName, inst, airC, natL, ceilL, blackC, tele, compN, soundW, movW) == installations(inst).setConditions(airC, natL, ceilL, blackC, tele, compN, soundW, movW)
+	pre uName in set dom users and uName = adminName and
+		inst in set dom installations;
 
 --Gets all the installations available in the given period
 	public getAvailableInstallations: Utils`Date * Utils`Date ==> map Utils`String to Installation
@@ -122,11 +154,20 @@ operations
 	pre {inst1, inst2} subset rng installations;
 
 --SERVICE OPERATIONS
+--Show all services information
+	public showServicesDetails: () ==> set of (map Utils`String to Utils`String)
+	showServicesDetails() == (
+	dcl res: set of (map Utils`String to Utils`String) := {};
+	let service in set rng services in res := res union {service.showDetails()};
+	return res
+	)
+	post card RESULT = card dom services;
+	
 -- Add one service to services set
 	public addService: Utils`String * Service ==> ()
 		addService(uName, serv) == let type = serv.type in
 		services := services ++ {type |-> serv}
-		pre uName in set dom users and uName = "admin" and
+		pre uName in set dom users and uName = adminName and
 			serv not in set rng services
 		post card dom services = card dom services~ + 1 and serv in set rng services;
 
@@ -138,7 +179,7 @@ operations
 			for all e in set rng events do (if(service in set elems e.services) then e.removeService(service));
 			services := {service} <-: services
 		)
-		pre uName in set dom users and uName = "admin" and
+		pre uName in set dom users and uName = adminName and
 			service in set dom services
 		post service not in set dom services and
 			forall e in set rng events & service not in set elems e.services;
@@ -147,7 +188,7 @@ operations
 	public changeServicePrice: Utils`String * Service`ServiceType * real ==> ()
 	changeServicePrice(uName, serviceType, price) == def service = services(serviceType) in
 	service.setPrice(price)
-	pre uName in set dom users and uName = "admin" and
+	pre uName in set dom users and uName = adminName and
 		price > 0 and serviceType in set dom services
 	post services(serviceType).price = price;
 
@@ -163,6 +204,14 @@ operations
 		forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
 			ev.installation <> inst
 	post n in set dom events;
+
+--Show event information
+	public showEventDetails: Utils`String * Utils`String ==> map Utils`String to Utils`String
+	showEventDetails(uName, evName) == return events(evName).showDetails()
+	pre uName in set dom users and 
+	(if(events(evName).privacy) then (uName = adminName or uName in set 
+		events(evName).guests union events(evName).staff union {events(evName).host})
+		else true);
 	
 --Return how much an event spent in services
 	public moneySpentWithServices: Utils`String * Utils`String ==> real
@@ -172,16 +221,16 @@ operations
 		let service in seq ev.services in res := res + services(service).price;
 		return res;
 	)
-	pre uName in set dom users and (uName = events(evName).host or uName = "admin") and
+	pre uName in set dom users and (uName = events(evName).host or uName = adminName) and
 	 evName in set dom events;
 	
---TODO: Return how much an event spent with installation rent
+--Return how much an event spent with installation rent
 	public moneySpentWithInstallation: Utils`String * Utils`String ==> real
 	moneySpentWithInstallation(uName, evName) == (
 		dcl days: int := Utils`getDatesDifference(events(evName).begin, events(evName).ending);
 		return days * events(evName).ticketPrice
 	)
-	pre uName in set dom users and (uName = events(evName).host or uName = "admin") and
+	pre uName in set dom users and (uName = events(evName).host or uName = adminName) and
 	 evName in set dom events;
 --In case of a private event, host can invite users (so they will be
 -- the only ones capable of seeing and buying a ticket to the event)
@@ -321,6 +370,29 @@ operations
 	post servType not in set elems events(evName).services;
 	
 --USER FUNCTIONS
+--Show one user information
+	public showUserDetails: Utils`String * Utils`String ==> map Utils`String to Utils`String
+	showUserDetails(uName1, uName2) == (
+		dcl res: map Utils`String to Utils`String := users(uName2).showDetails();
+		dcl money: real := 0;
+		let evName in set users(uName2).events in money := money + events(evName).ticketPrice;
+		res := res ++ {"Money spent"|->Utils`toString[real](money)};
+		return res
+	)
+	pre uName1 in set dom users and uName2 in set dom users and
+		(uName1 = adminName or uName1 = uName2)
+	post  card dom RESULT = 3;
+	
+--Show all users information
+	public showUsersDetails: Utils`String ==> set of (map Utils`String to Utils`String)
+	showUsersDetails(uName) == (
+		dcl res: set of (map Utils`String to Utils`String) := {};
+		let user in set dom users in res := res union {showUserDetails(uName, user)};
+		return res
+	)
+	pre uName in set dom users and uName = adminName
+	post  card RESULT = card dom users;
+
 --Add user to our center
 	public addUser: User ==> ()
 	addUser(user) == users := users ++ {user.name |-> user}

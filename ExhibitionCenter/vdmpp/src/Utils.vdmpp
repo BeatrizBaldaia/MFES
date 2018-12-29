@@ -97,6 +97,7 @@ functions
 	toString(value) == (
 		cases true:
 			(is_String(value)) -> value,
+			(is_Date(value)) -> dateToString(value),
 			(is_nat(value)) -> natToString(value),
 			(is_real(value)) -> natToString(value) ^ [',', ' '] ^ natToString(getRemainder(value, 0)),
 			(is_bool(value)) -> boolToString(value)
@@ -106,6 +107,9 @@ functions
 	
 	public boolToString: bool -> String
 	boolToString(value) == if(value) then "yes" else "no";
+	
+	public dateToString: Date -> String
+	dateToString(value) == natToString(value.day) ^ ['/'] ^ natToString(value.month) ^ ['/'] ^ natToString(value.year);
 
 	public natToString: real -> String
 	natToString(value) == (

@@ -14,6 +14,16 @@ operations
 	pre n <> "" and p <> ""
 	post name = n and password = p;
 	
+--Shows all user information
+	public showDetails: () ==> map Utils`String to Utils`String
+	showDetails() == (
+		dcl res: map Utils`String to Utils`String := {|->};
+		res := res ++ {
+				"Name" |-> name, "Tickets bought" |-> eventsSetToString(events)
+		};
+		return res
+	);
+	
 --Add event
 	public addEvent: Utils`String ==> ()
 	addEvent(evName) == events := events union {evName}
@@ -29,4 +39,14 @@ operations
 --Checks if this user attend the event
 	public attendEvent: Utils`String ==> bool
 	attendEvent(evName) == return evName in set events;
+	
+--Converts set of events to string
+	public eventsSetToString: [set of Utils`String] ==> Utils`String
+	eventsSetToString(events) == (
+		dcl res: Utils`String := "";
+		if(card events = 0) then return "";
+		let event in set events in res := res ^ event ^ ", ";
+		res := res(1, ..., len res - 2);
+		return res
+	);
 end User

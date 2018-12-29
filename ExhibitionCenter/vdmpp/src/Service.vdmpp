@@ -24,4 +24,31 @@ operations
 	pre p > 0
 	post price = p;
 
+--Shows all service information
+	public showDetails: () ==> map Utils`String to Utils`String
+	showDetails() == (
+		dcl res: map Utils`String to Utils`String := {|->};
+		res := res ++ {
+				"Type" |-> typeToString(type), "Price (per day)" |-> Utils`toString[real](price)
+		};
+		return res
+	);
+	
+functions
+
+--Converys event type to string
+	public typeToString: ServiceType -> Utils`String
+	typeToString(t) == (
+		cases t:
+			<AudioVisual> -> "Audio Visual",
+			<Catering> -> "Catering",
+			<IT> -> "IT",
+			<Cleaning> -> "Cleaning",
+			<Security> -> "Security",
+			<Decoration> -> "Decoration"
+		end
+	)
+	pre t in set {<AudioVisual>, <Catering>, <IT>, <Cleaning>, <Security>, <Decoration>};
+
+
 end Service
