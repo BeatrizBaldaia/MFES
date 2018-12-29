@@ -4,18 +4,18 @@ class CenterTest  is subclass of Test
 operations
 	public static main: () ==> ()
 	main() == (
-		dcl room1: Installation := new Room("Room1", 15, 10, 7, 20, 20, false, true, true, true, false, false, true, false);
-		dcl pavilion1: Installation := new Pavilion("Pavilion1", 150, 50, 10, 50, 70, false, false, true, false, false);
-		dcl foyer1: Installation := new Foyer("Foyer1", 10, 15, 4, 6, 6, false, true, false, true);
-		dcl auditorium1: Auditorium := new Auditorium("Auditorium1", 10, 15, 4, 6, 6, false, true, false, true, true, true);
-		dcl carParking1: CarParking := new CarParking("CarParking1", 10, 15, 4, 6, 6);
-		dcl u : User := new User("admin", "admin1234");
-		dcl c : Center := new Center("JAVA", foyer1);
-		c.addUser(u);
-		c.addInstallations("admin", room1);
-		c.createEvent("aa", 1, 1, mk_Utils_vdm`Date(2018,2,12),mk_Utils_vdm`Date(2018,2,12), true, <Party>, foyer1, u.name);
-		new CenterTest().assertTrue((c.getAvailableInstallations(mk_Utils_vdm`Date(2018,2,12),mk_Utils_vdm`Date(2018,2,12))(room1.id)) = room1);
-		
+-- dcl room1: Installation := new Room("Room1", 15, 10, 7, 20, 20, false, true, true, true, false, false, true, false);
+-- dcl pavilion1: Installation := new Pavilion("Pavilion1", 150, 50, 10, 50, 70, false, false, true, false, false);
+-- dcl foyer1: Installation := new Foyer("Foyer1", 10, 15, 4, 6, 6, false, true, false, true);
+-- dcl auditorium1: Auditorium := new Auditorium("Auditorium1", 10, 15, 4, 6, 6, false, true, false, true, true, true);
+-- dcl carParking1: CarParking := new CarParking("CarParking1", 10, 15, 4, 6, 6);
+-- dcl u : User := new User("admin", "admin1234");
+-- dcl c : Center := new Center("JAVA", foyer1);
+-- c.addUser(u);
+-- c.addInstallations("admin", room1);
+-- c.createEvent("aa", 1, 1, mk_Utils_vdm`Date(2018,2,12),mk_Utils_vdm`Date(2018,2,12), true, <Party>, foyer1, u.name);
+-- new CenterTest().assertTrue((c.getAvailableInstallations(mk_Utils_vdm`Date(2018,2,12),mk_Utils_vdm`Date(2018,2,12))(room1.id)) = room1);
+-- 
 		new Utils_vdmTest().testAll();
 		new InstallationTest().testAll();
 		new EventTest().testAll();
