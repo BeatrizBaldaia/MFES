@@ -31,16 +31,16 @@ operations
 	
  );
 
- public static main: () ==> ()
-  main() ==
+	public static main: () ==> ()
+	main() ==
  (
  --dcl c : CenterTest := new CenterTest();
  --c.testUser();
  
  --UtilsTest`main();
- new InstallationTest().testAll();
+		new InstallationTest().testAll();
  --new EventTest().testAll();
- --new ServiceTest().testAll();
+		new ServiceTest().testAll();
  );
 functions
 -- TODO Define functiones here
