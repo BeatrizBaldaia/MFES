@@ -1,50 +1,14 @@
 class ServiceTest  is subclass of Test
 operations
 	public testAll: () ==> ()
-		testAll() == (
-		testaddService();
-		testCreateService();
-		testchangeService();
-		testRemoveService();
+	testAll() == (
+		dcl service : Service := new Service(10,<IT>);
+		testSetPrice(service, 20)
 	);
-	
-	private testaddService: () ==> ()
-	testaddService() == (
-		dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 500, 100, 20, 20, 20, true, true, true, true, true);
-		dcl center : Center := new Center("Super Center", pavilion1);
-		dcl service : Service := new Service(1, <IT>);
-		dcl admin: User := new User("admin", "admin1234");
-		center.addUser(admin);
-		center.addService("admin", service);
-		assertTrue(center.services(<IT>) = service);
+	-- Set Conditions
+	public testSetPrice: Service * real ==> ()
+	testSetPrice(s, pr) == (
+		s.setPrice(pr);
+		assertTrue(s.price = pr);
 	);
-	private testRemoveService: () ==> ()
-	testRemoveService() == (
-		dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 500, 100, 20, 20, 20, true, true, true, true, true);
-		dcl center : Center := new Center("Super Center", pavilion1);
-		dcl service : Service := new Service(1, <IT>);
-		dcl admin: User := new User("admin", "admin1234");
-		center.addUser(admin);
-		center.addService("admin", service);
-		center.removeService("admin", <IT>);
-		assertTrue(<IT> not in set dom center.services);
-	);
-	private testchangeService: () ==> ()
-	testchangeService() == (
-		dcl pavilion1 : Pavilion := new Pavilion("Great Pavilion", 500, 100, 20, 20, 20, true, true, true, true, true);
-		dcl center : Center := new Center("Super Center", pavilion1);
-		dcl service : Service := new Service(1, <IT>);
-		dcl admin: User := new User("admin", "admin1234");
-		center.addUser(admin);
-		center.addService("admin", service);
-		center.changeServicePrice("admin", <IT>, 20);
-		assertTrue(center.services(<IT>).price = 20);
-	);
-	private testCreateService: () ==> ()
-	testCreateService() == (
-		dcl service : Service := new Service(10, <IT>);
-		assertTrue(service.price = 10);
-		assertTrue(service.type = <IT>);
- );
-	
 end ServiceTest
