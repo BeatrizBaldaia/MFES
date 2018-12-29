@@ -65,10 +65,10 @@ functions
 	else let key = hd keys in (
 		let res = f(m(key)) in (
 			if(is_bool(res)) then (
-				if(res) then {m(hd keys)|->m(m(hd keys))} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
+				if(res) then {key|->m(key)} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
 				else fMap[@keyType, @returnType, @valueType] (f)(tl keys, m)
 			)
-			elseif(is_(res, @valueType)) then {m(hd keys)|->res} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
+			elseif(is_(res, @valueType)) then {key|->res} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
 			else {|->} -- TODO case of error. ask teacher how to use trap error with exit in (...)
 		)
 	)
