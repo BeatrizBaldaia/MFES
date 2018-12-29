@@ -24,7 +24,8 @@ operations
 	public setConditions: bool * bool * bool * bool * bool * bool * bool * bool ==> ()
 		setConditions(-, -, -, -, -, -, -, -) == (
 			skip;
-		);
+		)
+		pre false;
 		
 --Shows all installation information
 	public showDetails: () ==> map Utils`String to Utils`String
