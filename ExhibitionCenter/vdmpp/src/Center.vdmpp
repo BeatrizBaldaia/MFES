@@ -3,21 +3,21 @@ types
 	public DateType = <begin> | <ending>;
 	public UserPosition = <attendee> | <staff> | <host>;
 values
- private adminName: Utils`String = "admin";
- private adminPass: Utils`String = "admin1234";
+ private adminName: Utils_vdm`String = "admin";
+ private adminPass: Utils_vdm`String = "admin1234";
  
 instance variables
-	public name: Utils`String;
-	public installations: map Utils`String to Installation;
+	public name: Utils_vdm`String;
+	public installations: map Utils_vdm`String to Installation;
 	inv card dom installations > 0 and 
 		forall id in set dom installations &  installations(id).id = id;
 	public services: map Service`ServiceType to Service := {|->};
 	inv forall type in set dom services & services(type).type = type;
-	public events: map Utils`String to Event := {|->};
-	public users: map Utils`String to User := {|->};
+	public events: map Utils_vdm`String to Event := {|->};
+	public users: map Utils_vdm`String to User := {|->};
 	
 operations
-	public Center:  Utils`String * Installation ==> Center
+	public Center:  Utils_vdm`String * Installation ==> Center
 		Center(n, inst) == (
 			let instID = inst.getID() in
 			installations := {instID |-> inst};
@@ -27,21 +27,21 @@ operations
 
 --INSTALLATION OPERATIONS
 --Show one installation information
-	public showInstallationDetails: Utils`String ==> map Utils`String to Utils`String
+	public showInstallationDetails: Utils_vdm`String ==> map Utils_vdm`String to Utils_vdm`String
 	showInstallationDetails(inst) == return installations(inst).showDetails()
 	pre inst in set dom installations;
 	
 --Show all intallations information
-	public showInstallationsDetails: () ==> set of (map Utils`String to Utils`String)
+	public showInstallationsDetails: () ==> set of (map Utils_vdm`String to Utils_vdm`String)
 	showInstallationsDetails() == (
-	dcl res: set of (map Utils`String to Utils`String) := {};
+	dcl res: set of (map Utils_vdm`String to Utils_vdm`String) := {};
 	for all inst in set dom installations do res := res union {showInstallationDetails(inst)};
 	return res
 	)
 	post card RESULT = card dom installations;
 
 -- Add one installation to installations set		
-	public addInstallations: Utils`String * Installation ==> ()
+	public addInstallations: Utils_vdm`String * Installation ==> ()
 		addInstallations(uName, inst) == let instID = inst.getID() in 
 		installations := installations ++ {instID |-> inst}
 		pre uName in set dom users and uName = adminName and
@@ -49,7 +49,7 @@ operations
 		post card dom installations = card dom installations~ + 1 and inst in set rng installations;
 	
 -- Add installation, foyer or room, to other installation, auditorium or pavilion\
-	public addInstallationToInstallation: Utils`String * Utils`String * Installation ==> ()
+	public addInstallationToInstallation: Utils_vdm`String * Utils_vdm`String * Installation ==> ()
 	addInstallationToInstallation(uName, instID, inst1) == (
 		installations := installations ++ {inst1.id |-> inst1};
 		def inst2 = installations(instID) in (
@@ -72,7 +72,7 @@ operations
 		and hasInstallation(inst1,installations(instID));
 	
 -- Remove installation, foyer or room, from other installation, auditorium or pavilion\
-	public removeInstallationFromInstallation: Utils`String * Utils`String * Installation ==> ()
+	public removeInstallationFromInstallation: Utils_vdm`String * Utils_vdm`String * Installation ==> ()
 	removeInstallationFromInstallation(uName, instID, inst1) == (
 		def inst2 = installations(instID) in (
 			if(isofclass(Foyer, inst1)) then def foyer = narrow_(inst1, Foyer) in inst2.removeFoyer(foyer)
@@ -92,7 +92,7 @@ operations
 	not hasInstallation(inst1, installations(instID));
 	
 --Remove installation from installations map
-	public removeInstallation: Utils`String * Utils`String ==> ()
+	public removeInstallation: Utils_vdm`String * Utils_vdm`String ==> ()
 	removeInstallation(uName, instID) == (
 		for all inst in set rng installations \ {installations(instID)} do
 			if(hasInstallation(installations(instID), inst)) then removeInstallationFromInstallation(uName, inst.id, installations(instID));
@@ -104,30 +104,30 @@ operations
 	not exists inst in set rng installations & hasInstallation(installations~(instID), inst);
 
 --Edit installation measures
-	public changeInstallationMeasures: Utils`String * Utils`String * nat * real * real * real ==> ()
+	public changeInstallationMeasures: Utils_vdm`String * Utils_vdm`String * nat * real * real * real ==> ()
 	changeInstallationMeasures(uName, inst, c, h, w, l) == installations(inst).setMeasures(c, h, w, l)
 	pre uName in set dom users and uName = adminName and
 		inst in set dom installations;
 		
 --Edit installation price per day
-	public changeInstallationRent: Utils`String * Utils`String * real ==> ()
+	public changeInstallationRent: Utils_vdm`String * Utils_vdm`String * real ==> ()
 	changeInstallationRent(uName, inst, pr) == installations(inst).setPrice(pr)
 	pre uName in set dom users and uName = adminName and
 		inst in set dom installations;
 		
 --Edit installation's conditions
-	public changeInstallationConditions: Utils`String * Utils`String * bool * bool * bool * bool * bool * bool * bool * bool ==> ()
+	public changeInstallationConditions: Utils_vdm`String * Utils_vdm`String * bool * bool * bool * bool * bool * bool * bool * bool ==> ()
 	changeInstallationConditions(uName, inst, airC, natL, ceilL, blackC, tele, compN, soundW, movW) == installations(inst).setConditions(airC, natL, ceilL, blackC, tele, compN, soundW, movW)
 	pre uName in set dom users and uName = adminName and
 		inst in set dom installations;
 
 --Gets all the installations available in the given period
-	public getAvailableInstallations: Utils`Date * Utils`Date ==> map Utils`String to Installation
+	public getAvailableInstallations: Utils_vdm`Date * Utils_vdm`Date ==> map Utils_vdm`String to Installation
 	getAvailableInstallations(b, e) == (
 		dcl tmpUsedInsts: set of Installation := {};
 		dcl usedInsts: set of Installation := {};
-		dcl tmpFreeInsts: map Utils`String to Installation := {|->};
-		for all ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) do (
+		dcl tmpFreeInsts: map Utils_vdm`String to Installation := {|->};
+		for all ev in set rng Utils_vdm`fMap[Utils_vdm`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils_vdm`setTOseq[Utils_vdm`String](dom events), events) do (
 			tmpUsedInsts :=  tmpUsedInsts union {ev.installation}
 		);
 		tmpFreeInsts := installations :-> usedInsts;
@@ -139,9 +139,9 @@ operations
 		);
 		return tmpFreeInsts :-> usedInsts;
 	)
-	pre Utils`before(b, e) or b = e
+	pre Utils_vdm`before(b, e) or b = e
 	post rng RESULT subset rng installations and
-	forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
+	forall ev in set rng Utils_vdm`fMap[Utils_vdm`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils_vdm`setTOseq[Utils_vdm`String](dom events), events) &
 	ev.installation not in set rng RESULT;
 	
 --Checks if this two installations are the same or associated
@@ -155,16 +155,16 @@ operations
 
 /** SERVICE OPERATIONS **/
 --Show all services information
-	public showServicesDetails: () ==> set of (map Utils`String to Utils`String)
+	public showServicesDetails: () ==> set of (map Utils_vdm`String to Utils_vdm`String)
 	showServicesDetails() == (
-	dcl res: set of (map Utils`String to Utils`String) := {};
+	dcl res: set of (map Utils_vdm`String to Utils_vdm`String) := {};
 	for all service in set rng services do res := res union {service.showDetails()};
 	return res
 	)
 	post card RESULT = card dom services;
 	
 -- Add one service to services set
-	public addService: Utils`String * Service ==> ()
+	public addService: Utils_vdm`String * Service ==> ()
 		addService(uName, serv) == let type = serv.type in
 		services := services ++ {type |-> serv}
 		pre uName in set dom users and uName = adminName and
@@ -172,7 +172,7 @@ operations
 		post card dom services = card dom services~ + 1 and serv in set rng services;
 
 --Remove service from services map
-	public removeService: Utils`String * Service`ServiceType ==> ()
+	public removeService: Utils_vdm`String * Service`ServiceType ==> ()
 		removeService(uName, service) == (
 			for all e in set rng events do (if(service in set elems e.services) then e.removeService(service));
 			services := {service} <-: services
@@ -183,7 +183,7 @@ operations
 			forall e in set rng events & service not in set elems e.services;
 		
 -- Changes a service price
-	public changeServicePrice: Utils`String * Service`ServiceType * real ==> ()
+	public changeServicePrice: Utils_vdm`String * Service`ServiceType * real ==> ()
 	changeServicePrice(uName, serviceType, price) == def service = services(serviceType) in
 	service.setPrice(price)
 	pre uName in set dom users and uName = adminName and
@@ -192,19 +192,19 @@ operations
 
 /** EVENT OPERATIONS **/
 --Create an event	and add it to the events map
-	public createEvent:  Utils`String * nat * real * Utils`Date * Utils`Date * bool * Event`EventType * Installation * Utils`String ==> ()
+	public createEvent:  Utils_vdm`String * nat * real * Utils_vdm`Date * Utils_vdm`Date * bool * Event`EventType * Installation * Utils_vdm`String ==> ()
 	createEvent(n, tTickets, tPrice, b, e, p, t, inst, h) == (
 		dcl event: Event := new Event(n, tTickets, tPrice, b, e, p, t, inst, h);
 		events := events ++ {n |-> event}
 	)
 	pre h in set dom users and n not in set dom events and 
-		(Utils`before(b, e) or b = e) and
-		forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
+		(Utils_vdm`before(b, e) or b = e) and
+		forall ev in set rng Utils_vdm`fMap[Utils_vdm`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils_vdm`setTOseq[Utils_vdm`String](dom events), events) &
 			ev.installation <> inst
 	post n in set dom events;
 
 --Show event information
-	public showEventDetails: Utils`String * Utils`String ==> map Utils`String to Utils`String
+	public showEventDetails: Utils_vdm`String * Utils_vdm`String ==> map Utils_vdm`String to Utils_vdm`String
 	showEventDetails(uName, evName) == return events(evName).showDetails()
 	pre uName in set dom users and 
 	(if(events(evName).privacy) then (uName = adminName or uName in set 
@@ -212,7 +212,7 @@ operations
 		else true);
 	
 --Return how much an event spent in services
-	public moneySpentWithServices: Utils`String * Utils`String ==> real
+	public moneySpentWithServices: Utils_vdm`String * Utils_vdm`String ==> real
 	moneySpentWithServices(uName, evName) == (
 		dcl ev: Event := events(evName);
 		dcl res: real := 0;
@@ -223,9 +223,9 @@ operations
 	 evName in set dom events;
 	
 --Return how much an event spent with installation rent
-	public moneySpentWithInstallation: Utils`String * Utils`String ==> real
+	public moneySpentWithInstallation: Utils_vdm`String * Utils_vdm`String ==> real
 	moneySpentWithInstallation(uName, evName) == (
-		dcl days: int := Utils`getDatesDifference(events(evName).begin, events(evName).ending);
+		dcl days: int := Utils_vdm`getDatesDifference(events(evName).begin, events(evName).ending);
 		return days * events(evName).ticketPrice
 	)
 	pre uName in set dom users and (uName = events(evName).host or uName = adminName) and
@@ -233,7 +233,7 @@ operations
 	 
 --In case of a private event, host can invite users (so they will be
 -- the only ones capable of seeing and buying a ticket to the event)
-	public inviteToEvent: Utils`String * Utils`String * Utils`String ==> ()
+	public inviteToEvent: Utils_vdm`String * Utils_vdm`String * Utils_vdm`String ==> ()
 	inviteToEvent(evName, hName, uName) == events(evName).inviteUser(hName, uName)
 	pre evName in set dom events and uName in set dom users and
 		hName in set dom users and hName <> uName and
@@ -241,7 +241,7 @@ operations
 	post uName in set events(evName).guests;
 
 --Shows all the available events
-	public showAvailableEvents: Utils`String ==> [set of Event]
+	public showAvailableEvents: Utils_vdm`String ==> [set of Event]
 	showAvailableEvents(uName) == (
 		dcl res: set of Event := {};
 		for all e in set rng events do (
@@ -255,7 +255,7 @@ operations
 	post RESULT subset rng events;
 
 --Shows all the available events in a period
-	public showAvailableEventsBetweenDates: Utils`String * Utils`Date * Utils`Date ==> [set of Event]
+	public showAvailableEventsBetweenDates: Utils_vdm`String * Utils_vdm`Date * Utils_vdm`Date ==> [set of Event]
 	showAvailableEventsBetweenDates(uName, b, e) == (
 		dcl res: set of Event := {};
 		for all ev in set rng events do 
@@ -266,13 +266,13 @@ operations
 			);
 		return res	
 	)
-	pre uName in set dom users and (Utils`before(b, e) or b = e)
+	pre uName in set dom users and (Utils_vdm`before(b, e) or b = e)
 	post RESULT subset rng events and
 		forall event in set RESULT & hasDatesConflict(event, b, e);
 		
 /** OPERATIONS TO CHANGE EVENTS ATTRIBUTES **/
 --Change event name
-	public changeEventName: Utils`String * Utils`String * Utils`String ==> ()
+	public changeEventName: Utils_vdm`String * Utils_vdm`String * Utils_vdm`String ==> ()
 	changeEventName(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setName(value);
@@ -283,7 +283,7 @@ operations
 	post evName not in set dom events and value in set dom events;
 
 --Change event number of tickets
-	public changeEventTotalTickets: Utils`String * Utils`String * nat ==> ()
+	public changeEventTotalTickets: Utils_vdm`String * Utils_vdm`String * nat ==> ()
 	changeEventTotalTickets(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setTotalTickets(value)
@@ -294,7 +294,7 @@ operations
 	post events(evName).totalTickets = value;
 
 --Change event ticket price
-	public changeEventTicketPrice: Utils`String * Utils`String * real ==> ()
+	public changeEventTicketPrice: Utils_vdm`String * Utils_vdm`String * real ==> ()
 	changeEventTicketPrice(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setTicketPrice(value)
@@ -305,7 +305,7 @@ operations
 	post events(evName).ticketPrice = value;
 
 --Change event date (begin or ending)
-	public changeEventDate: Utils`String * Utils`String * DateType * Utils`Date ==> ()
+	public changeEventDate: Utils_vdm`String * Utils_vdm`String * DateType * Utils_vdm`Date ==> ()
 	changeEventDate(evName, hName, dateType, value) == (
 		dcl ev: Event := events(evName);
 		cases dateType:
@@ -320,7 +320,7 @@ operations
 		else events(evName).ending = value;
 
 --Change event privacy condition
-	public changeEventPrivacy: Utils`String * Utils`String * bool ==> ()
+	public changeEventPrivacy: Utils_vdm`String * Utils_vdm`String * bool ==> ()
 	changeEventPrivacy(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setPrivacy(value)
@@ -330,7 +330,7 @@ operations
 	post events(evName).privacy = value;
 
 --Change event type
-	public changeEventType: Utils`String * Utils`String * Event`EventType ==> ()
+	public changeEventType: Utils_vdm`String * Utils_vdm`String * Event`EventType ==> ()
 	changeEventType(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setType(value)
@@ -340,28 +340,28 @@ operations
 	post events(evName).type = value;
 
 --Change where event will occur
-	public changeEventInstallation: Utils`String * Utils`String * Utils`String ==> ()
+	public changeEventInstallation: Utils_vdm`String * Utils_vdm`String * Utils_vdm`String ==> ()
 	changeEventInstallation(evName, hName, instName) == (
 		dcl ev: Event := events(evName);
 		ev.changeInstallation(installations(instName))
 	)
 	pre evName in set dom events and
 		let b = events(evName).begin, e = events(evName).ending in (
-			forall ev in set rng Utils`fMap[Utils`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils`setTOseq[Utils`String](dom events), events) &
+			forall ev in set rng Utils_vdm`fMap[Utils_vdm`String, bool, Event](lambda x: Event & hasDatesConflict(x, b, e))(Utils_vdm`setTOseq[Utils_vdm`String](dom events), events) &
 			instName <> ev.installation.id
 		) and
 		hName in set dom users and events(evName).host = hName
 	post events(evName).installation.id = instName;
 
 --Add service to event
-	public addServiceToEvent: Utils`String * Utils`String * Service`ServiceType ==> ()
+	public addServiceToEvent: Utils_vdm`String * Utils_vdm`String * Service`ServiceType ==> ()
 	addServiceToEvent(evName, hName, servType) == events(evName).addService(servType)
 	pre evName in set dom events and servType in set dom services and
 		hName in set dom users and events(evName).host = hName
 	post servType in set elems events(evName).services;
 
 --Remove service from event
-	public removeServiceFromEvent: Utils`String * Utils`String * Service`ServiceType ==> ()
+	public removeServiceFromEvent: Utils_vdm`String * Utils_vdm`String * Service`ServiceType ==> ()
 	removeServiceFromEvent(evName, hName, servType) == events(evName).removeService(servType)
 	pre evName in set dom events and servType in set dom services and
 		servType in set elems events(evName).services and
@@ -370,12 +370,12 @@ operations
 	
 /** USER FUNCTIONS **/
 --Show one user information
-	public showUserDetails: Utils`String * Utils`String ==> map Utils`String to Utils`String
+	public showUserDetails: Utils_vdm`String * Utils_vdm`String ==> map Utils_vdm`String to Utils_vdm`String
 	showUserDetails(uName1, uName2) == (
-		dcl res: map Utils`String to Utils`String := users(uName2).showDetails();
+		dcl res: map Utils_vdm`String to Utils_vdm`String := users(uName2).showDetails();
 		dcl money: real := 0;
 		for all evName in set users(uName2).events do if(uName2 in set events(evName).attendees) then money := money + events(evName).ticketPrice;
-		res := res ++ {"Money spent"|->Utils`toString[real](money)};
+		res := res ++ {"Money spent"|->Utils_vdm`toStringVDM(money)};
 		return res
 	)
 	pre uName1 in set dom users and uName2 in set dom users and
@@ -383,9 +383,9 @@ operations
 	post  card dom RESULT = 3;
 	
 --Show all users information
-	public showUsersDetails: Utils`String ==> set of (map Utils`String to Utils`String)
+	public showUsersDetails: Utils_vdm`String ==> set of (map Utils_vdm`String to Utils_vdm`String)
 	showUsersDetails(uName) == (
-		dcl res: set of (map Utils`String to Utils`String) := {};
+		dcl res: set of (map Utils_vdm`String to Utils_vdm`String) := {};
 		for all user in set dom users do res := res union {showUserDetails(uName, user)};
 		return res
 	)
@@ -399,7 +399,7 @@ operations
 	post user in set rng users;
 	
 --Add user to event
-	public addUserToEvent: Utils`String * Utils`String * UserPosition ==> ()
+	public addUserToEvent: Utils_vdm`String * Utils_vdm`String * UserPosition ==> ()
 	addUserToEvent(evName, uName, uPos) == (
 		dcl ev: Event := events(evName);
 		dcl user: User := users(uName);
@@ -413,7 +413,7 @@ operations
 		uPos in set {<attendee>, <staff>, <host>}
 	post evName in set users(uName).events;
 	--Remove user from event
-	public removeUserFromEvent: Utils`String * Utils`String * UserPosition ==> ()
+	public removeUserFromEvent: Utils_vdm`String * Utils_vdm`String * UserPosition ==> ()
 	removeUserFromEvent(evName, uName, uPos) == (
 		dcl ev: Event := events(evName);
 		dcl user: User := users(uName);
@@ -446,13 +446,13 @@ functions
 	--(isofclass(Auditorium, inst2) or isofclass(Pavilion, inst2));
 	
 --Checks if this event has conflicts with the period given in the arguments
-	public hasDatesConflict: Event * Utils`Date * Utils`Date -> bool
+	public hasDatesConflict: Event * Utils_vdm`Date * Utils_vdm`Date -> bool
 	hasDatesConflict(ev, b2, e2) == (
 		def b1 = ev.begin; e1 = ev.ending in
-		if(Utils`before(b2, b1)) then Utils`before(b1, e2)
-		else Utils`before(b2, e1)
+		(if(Utils_vdm`before(b2, b1)) then Utils_vdm`before(b1, e2)
+		else Utils_vdm`before(b2, e1))
 	)
-	pre (Utils`before(ev.begin, ev.ending) or ev.begin = ev.ending) 
-		and (Utils`before(b2, e2) or b2 = e2);
+	pre (Utils_vdm`before(ev.begin, ev.ending) or ev.begin = ev.ending) 
+		and (Utils_vdm`before(b2, e2) or b2 = e2);
 	
 end Center

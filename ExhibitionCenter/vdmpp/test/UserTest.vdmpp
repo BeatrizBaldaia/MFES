@@ -17,7 +17,7 @@ operations
 	testAll() == (
 		dcl user1 : User := new User("anabela", "1234");
 		dcl room1 : Room := new Room("Room1", 15, 10, 7, 20, 20, false, true, true, true, false, false, true, false);
-		dcl event1 : Event := new Event("New Years", 100, 1000, mk_Utils`Date(2018,12,31),mk_Utils`Date(2019,1,1),true,<Party>, room1, user1.name);
+		dcl event1 : Event := new Event("New Years", 100, 1000, mk_Utils_vdm`Date(2018,12,31),mk_Utils_vdm`Date(2019,1,1),true,<Party>, room1, user1.name);
 
 		testAddEvent(user1, event1);
 		testRemoveEvent(user1, event1);

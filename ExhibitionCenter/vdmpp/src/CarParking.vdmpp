@@ -2,7 +2,7 @@ class CarParking is subclass of Installation
 
 operations
 -- Constructor (must have all conditions always false)
-	public CarParking: Utils`String * real * nat * real * real * real ==> CarParking
+	public CarParking: Utils_vdm`String * real * nat * real * real * real ==> CarParking
 		CarParking(i, pr, c, h, w, l) == (
 			--Measures
 			id := i;
@@ -28,13 +28,13 @@ operations
 		pre false;
 		
 --Shows all installation information
-	public showDetails: () ==> map Utils`String to Utils`String
+	public showDetails: () ==> map Utils_vdm`String to Utils_vdm`String
 	showDetails() == (
-		dcl res: map Utils`String to Utils`String := {|->};
+		dcl res: map Utils_vdm`String to Utils_vdm`String := {|->};
 		res := res ++ {
-				"ID" |-> id, "Price" |-> Utils`toString[real](price), "Capacity" |-> Utils`toString[nat](capacity),
-				"Area" |-> Utils`toString[real](area), "Heigth" |-> Utils`toString[real](heigth), 
-				"Width" |-> Utils`toString[real](width), "Lenght" |-> Utils`toString[real](lenght)
+				"ID" |-> id, "Price" |-> Utils_vdm`toStringVDM(price), "Capacity" |-> Utils_vdm`toStringVDM(capacity),
+				"Area" |-> Utils_vdm`toStringVDM(area), "Heigth" |-> Utils_vdm`toStringVDM(heigth), 
+				"Width" |-> Utils_vdm`toStringVDM(width), "Lenght" |-> Utils_vdm`toStringVDM(lenght)
 		};
 		return res
 	);

@@ -1,7 +1,7 @@
 class Installation
 instance variables
 -- Measures
-	public id: Utils`String := "untitled";
+	public id: Utils_vdm`String := "untitled";
 	public price: real := 0;
 	public capacity: nat := 0;
 	public area: real := 0;
@@ -20,7 +20,7 @@ instance variables
 	public movingWalls: bool := false;
 operations
 -- Return installation id
-	public getID: () ==> Utils`String
+	public getID: () ==> Utils_vdm`String
 		getID() == return id;
 		
 	public addFoyer : Foyer ==> ()
@@ -36,7 +36,7 @@ operations
 	public setConditions: bool * bool * bool * bool * bool * bool * bool * bool ==> ()
 		setConditions(airC, natL, ceilL, blackC, tele, compN, soundW, movW) == 
 			is subclass responsibility;
-	public showDetails: () ==> map Utils`String to Utils`String
+	public showDetails: () ==> map Utils_vdm`String to Utils_vdm`String
 		showDetails() == is subclass responsibility;
 --Change Installation price per day	
 	public setPrice: real ==> ()

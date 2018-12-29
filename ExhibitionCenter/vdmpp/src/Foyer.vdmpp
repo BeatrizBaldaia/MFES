@@ -1,7 +1,7 @@
 class Foyer is subclass of Installation
 operations
 -- Constructor (must have blackOutCurtains, telephones, soundproofWalls and movingWalls always false)
-	public Foyer: Utils`String * real * nat * real * real * real * bool * bool * bool * bool ==> Foyer
+	public Foyer: Utils_vdm`String * real * nat * real * real * real * bool * bool * bool * bool ==> Foyer
 		Foyer(i, pr, c, h, w, l, airC, natL, ceilL, compN) == (
 			--Measures
 			id := i;
@@ -34,17 +34,17 @@ operations
 		post not (blackOutCurtains or telephones or soundproofWalls or movingWalls);
 		
 --Shows all installation information
-	public showDetails: () ==> map Utils`String to Utils`String
+	public showDetails: () ==> map Utils_vdm`String to Utils_vdm`String
 	showDetails() == (
-		dcl res: map Utils`String to Utils`String := {|->};
+		dcl res: map Utils_vdm`String to Utils_vdm`String := {|->};
 		res := res ++ {
-				"ID" |-> id, "Price" |-> Utils`toString[real](price), "Capacity" |-> Utils`toString[nat](capacity),
-				"Area" |-> Utils`toString[real](area), "Heigth" |-> Utils`toString[real](heigth), 
-				"Width" |-> Utils`toString[real](width), "Lenght" |-> Utils`toString[real](lenght), 
-				"Air Condition" |-> Utils`toString[bool](airCondition), 
-				"Natural Ligth" |-> Utils`toString[bool](naturalLigth),
-				"Ceiling Lighting" |-> Utils`toString[bool](ceilingLighting),
-				"Computer Network" |-> Utils`toString[bool](computerNetwork)
+				"ID" |-> id, "Price" |-> Utils_vdm`toStringVDM(price), "Capacity" |-> Utils_vdm`toStringVDM(capacity),
+				"Area" |-> Utils_vdm`toStringVDM(area), "Heigth" |-> Utils_vdm`toStringVDM(heigth), 
+				"Width" |-> Utils_vdm`toStringVDM(width), "Lenght" |-> Utils_vdm`toStringVDM(lenght), 
+				"Air Condition" |-> Utils_vdm`toStringVDM(airCondition), 
+				"Natural Ligth" |-> Utils_vdm`toStringVDM(naturalLigth),
+				"Ceiling Lighting" |-> Utils_vdm`toStringVDM(ceilingLighting),
+				"Computer Network" |-> Utils_vdm`toStringVDM(computerNetwork)
 		};
 		return res
 	);

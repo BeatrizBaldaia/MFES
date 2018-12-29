@@ -4,7 +4,7 @@ class CenterTest  is subclass of Test
 operations
 	public static main: () ==> ()
 	main() == (
-		new UtilsTest().testAll();
+		new Utils_vdmTest().testAll();
 		new InstallationTest().testAll();
 		new EventTest().testAll();
 		new ServiceTest().testAll();
