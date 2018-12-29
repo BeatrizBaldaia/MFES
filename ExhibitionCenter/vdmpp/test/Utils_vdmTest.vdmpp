@@ -1,4 +1,4 @@
-class Utils_vdmTest  is subclass of Test
+class Utils_vdmTest  is subclass of Test_vdm
 
 operations
 

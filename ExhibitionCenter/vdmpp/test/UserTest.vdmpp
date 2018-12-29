@@ -1,4 +1,4 @@
-class UserTest  is subclass of Test
+class UserTest  is subclass of Test_vdm
 
 operations
 

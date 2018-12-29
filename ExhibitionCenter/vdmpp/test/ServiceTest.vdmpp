@@ -1,4 +1,4 @@
-class ServiceTest  is subclass of Test
+class ServiceTest  is subclass of Test_vdm
 operations
 	public testAll: () ==> ()
 	testAll() == (

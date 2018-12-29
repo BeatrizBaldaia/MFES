@@ -1,4 +1,4 @@
-class Test
+class Test_vdm
 /*
 Superclass for test classes, simpler but more practical than VDMUnit`TestCase.
 For proper use, you have to do: New -> Add VDM Library -> IO.
@@ -16,4 +16,4 @@ protected assertEqual: ? * ? ==> ()
 assertEqual(expected, actual) == if expected <> actual then ( IO`print("Actual value ("); IO`print(actual); IO`print(") different from expected ("); IO`print(expected); IO`println(")\n")
 ) post expected = actual
 
-end Test
+end Test_vdm

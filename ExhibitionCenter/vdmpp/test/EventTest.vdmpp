@@ -1,4 +1,4 @@
-class EventTest is subclass of Test
+class EventTest is subclass of Test_vdm
 operations
 
 /***** USE CASE SCENARIOS ******/

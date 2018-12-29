@@ -1,4 +1,4 @@
-class InstallationTest is subclass of Test
+class InstallationTest is subclass of Test_vdm
 operations
 
 /******* USE CASE SCENARIOS *******/
@@ -61,9 +61,9 @@ operations
 	);
 	public testAll: () ==> ()
 	testAll() == (
-		dcl room1: Installation := new Room("Room1", 15, 10, 7, 20, 20, false, true, true, true, false, false, true, false);
-		dcl pavilion1: Installation := new Pavilion("Pavilion1", 150, 50, 10, 50, 70, false, false, true, false, false);
-		dcl foyer1: Installation := new Foyer("Foyer1", 10, 15, 4, 6, 6, false, true, false, true);
+		dcl room1: Room := new Room("Room1", 15, 10, 7, 20, 20, false, true, true, true, false, false, true, false);
+		dcl pavilion1: Pavilion := new Pavilion("Pavilion1", 150, 50, 10, 50, 70, false, false, true, false, false);
+		dcl foyer1: Foyer := new Foyer("Foyer1", 10, 15, 4, 6, 6, false, true, false, true);
 		dcl auditorium1: Auditorium := new Auditorium("Auditorium1", 10, 15, 4, 6, 6, false, true, false, true, true, true);
 		dcl carParking1: CarParking := new CarParking("CarParking1", 10, 15, 4, 6, 6);
 		
