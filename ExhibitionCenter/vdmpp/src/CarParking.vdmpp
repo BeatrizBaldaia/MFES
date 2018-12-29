@@ -52,6 +52,5 @@ operations
 		pre false;
 --Verify if has installation
 	public hasInstallation: Installation ==> bool
-		hasInstallation(inst) == return false
-		pre inst <> self;
+		hasInstallation(-) == return false;
 end CarParking

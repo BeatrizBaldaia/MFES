@@ -52,9 +52,9 @@ operations
 	public addInstallationToInstallation: Utils`String * Utils`String * Installation ==> ()
 	addInstallationToInstallation(uName, instID, inst1) == (
 		installations := installations ++ {inst1.id |-> inst1};
-		def inst2 = installations(instID) in (
-			if(isofclass(Foyer, inst1)) then def foyer = narrow_(inst1, Foyer) in inst2.addFoyer(foyer)
-			elseif(isofclass(Room, inst1)) then def room = narrow_(inst1, Room) in inst2.addRoom(room)
+		let inst2 = installations(instID) in (
+			if(isofclass(Foyer, inst1)) then let foyer = narrow_(inst1, Foyer) in inst2.addFoyer(foyer)
+			elseif(isofclass(Room, inst1)) then let room = narrow_(inst1, Room) in inst2.addRoom(room)
 			--TODO: else error 
 		)
 	)
@@ -74,9 +74,9 @@ operations
 -- Remove installation, foyer or room, from other installation, auditorium or pavilion\
 	public removeInstallationFromInstallation: Utils`String * Utils`String * Installation ==> ()
 	removeInstallationFromInstallation(uName, instID, inst1) == (
-		def inst2 = installations(instID) in (
-			if(isofclass(Foyer, inst1)) then def foyer = narrow_(inst1, Foyer) in inst2.removeFoyer(foyer)
-			elseif(isofclass(Room, inst1)) then def room = narrow_(inst1, Room) in inst2.removeRoom(room)
+		let inst2 = installations(instID) in (
+			if(isofclass(Foyer, inst1)) then let foyer = narrow_(inst1, Foyer) in inst2.removeFoyer(foyer)
+			elseif(isofclass(Room, inst1)) then let room = narrow_(inst1, Room) in inst2.removeRoom(room)
 			--TODO: else error 
 		)
 	)
@@ -94,9 +94,10 @@ operations
 --Remove installation from installations map
 	public removeInstallation: Utils`String * Utils`String ==> ()
 	removeInstallation(uName, instID) == (
+		dcl instToRemove: set of Utils`String := {instID}; 
 		for all inst in set rng installations \ {installations(instID)} do
-			if(hasInstallation(installations(instID), inst)) then removeInstallationFromInstallation(uName, inst.id, installations(instID));
-		installations := {instID} <-: installations
+			if(hasInstallation(inst, installations(instID))) then (instToRemove := instToRemove union {inst.id});
+		installations := instToRemove <-: installations
 	)
 	pre uName in set dom users and uName = adminName and
 		instID in set dom installations
@@ -184,7 +185,7 @@ operations
 		
 -- Changes a service price
 	public changeServicePrice: Utils`String * Service`ServiceType * real ==> ()
-	changeServicePrice(uName, serviceType, price) == def service = services(serviceType) in
+	changeServicePrice(uName, serviceType, price) == let service = services(serviceType) in
 	service.setPrice(price)
 	pre uName in set dom users and uName = adminName and
 		price > 0 and serviceType in set dom services
@@ -192,10 +193,11 @@ operations
 
 /** EVENT OPERATIONS **/
 --Create an event	and add it to the events map
-	public createEvent:  Utils`String * nat * real * Utils`Date * Utils`Date * bool * Event`EventType * Installation * Utils`String ==> ()
+	public createEvent:  Utils`String * nat * real * Utils`Date * Utils`Date * bool * Event`EventType * Installation * Utils`String ==> Event
 	createEvent(n, tTickets, tPrice, b, e, p, t, inst, h) == (
 		dcl event: Event := new Event(n, tTickets, tPrice, b, e, p, t, inst, h);
-		events := events ++ {n |-> event}
+		events := events ++ {n |-> event};
+		return event
 	)
 	pre h in set dom users and n not in set dom events and 
 		(Utils`before(b, e) or b = e) and
@@ -448,7 +450,7 @@ functions
 --Checks if this event has conflicts with the period given in the arguments
 	public hasDatesConflict: Event * Utils`Date * Utils`Date -> bool
 	hasDatesConflict(ev, b2, e2) == (
-		def b1 = ev.begin; e1 = ev.ending in
+		let b1 = ev.begin, e1 = ev.ending in
 		if(Utils`before(b2, b1)) then Utils`before(b1, e2)
 		else Utils`before(b2, e1)
 	)

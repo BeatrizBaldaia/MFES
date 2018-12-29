@@ -24,13 +24,12 @@ operations
 
 --Change installation's conditions	
 	public setConditions: bool * bool * bool * bool * bool * bool * bool * bool ==> ()
-		setConditions(airC, natL, ceilL, b, t, compN, s, m) == (
+		setConditions(airC, natL, ceilL, -, -, compN, -, -) == (
 			airCondition := airC;
 			naturalLigth := natL;
 			ceilingLighting := ceilL;
 			computerNetwork := compN
 		)
-		pre not (b or t or s or m)
 		post not (blackOutCurtains or telephones or soundproofWalls or movingWalls);
 		
 --Shows all installation information
@@ -63,6 +62,5 @@ operations
 		pre false;
 --Verify if has installation
 	public hasInstallation: Installation ==> bool
-		hasInstallation(inst) == return false
-		pre inst <> self;
+		hasInstallation(-) == return false;
 end Foyer

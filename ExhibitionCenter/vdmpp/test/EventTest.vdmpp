@@ -47,21 +47,21 @@ operations
 	public changeEventUsers: Event * Utils`String * set of Utils`String * Utils`String *  bool ==> ()
 	changeEventUsers(event, type, users, host, add) == (
 		cases type:
-			("attendees") -> (
+			"attendees" -> (
 				if(add) then (for all user in set users do event.addAttendee(user); assertTrue(users subset event.attendees))
 				else (for all user in set users do event.removeAttendee(user); assertTrue(not users subset event.attendees));
 			),
-			("staff") -> (
+			"staff" -> (
 				if(add) then (for all user in set users do event.addStaff(user); assertTrue(users subset event.staff))
 				else (for all user in set users do event.removeStaff(user); assertTrue(not users subset event.staff));
 			),
-			("host") -> (
+			"host" -> (
 				for all user in set users do event.setHost(user);
 				assertTrue(event.host in set users);
 				assertTrue(users inter event.attendees = {});
 				assertTrue(users inter event.staff = {});
 			),
-			("guests") -> (
+			"guests" -> (
 				for all user in set users do event.inviteUser(host, user);
 				assertTrue(users subset event.guests)
 			)
@@ -105,6 +105,7 @@ operations
 		changeEventUsers(event, "guests", {"Beatriz"}, "Ana", true);
 		showEventDetails(event)
  	);
+ 	
  /***** TEST CASES WITH INVALID INPUTS (EXECUTE ONE AT A TIME) ******/
  
  

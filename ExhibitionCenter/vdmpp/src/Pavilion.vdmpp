@@ -28,14 +28,13 @@ operations
 
 --Change installation's conditions	
 	public setConditions: bool * bool * bool * bool * bool * bool * bool * bool ==> ()
-		setConditions(airC, natL, ceilL, blackC, t, compN, s, e) == (
+		setConditions(airC, natL, ceilL, blackC, -, compN, -, -) == (
 			airCondition := airC;
 			naturalLigth := natL;
 			ceilingLighting := ceilL;
 			blackOutCurtains := blackC;
 			computerNetwork := compN
 		)
-		pre not (t or s or e)
 		post not (telephones or soundproofWalls or movingWalls);
 --Shows all installation information
 	public showDetails: () ==> map Utils`String to Utils`String
@@ -84,7 +83,6 @@ operations
 			if(isofclass(Foyer, inst)) then return (let f = narrow_(inst, Foyer) in f in set foyers)
 			elseif(isofclass(Room, inst)) then return (let r = narrow_(inst, Room) in r in set rooms)
 			else return false
-		)
-		pre inst <> self;
+		);
 
 end Pavilion
