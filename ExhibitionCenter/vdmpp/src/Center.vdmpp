@@ -448,9 +448,8 @@ functions
 --Checks if this event has conflicts with the period given in the arguments
 	public hasDatesConflict: Event * Utils_vdm`Date * Utils_vdm`Date -> bool
 	hasDatesConflict(ev, b2, e2) == (
-		def b1 = ev.begin; e1 = ev.ending in
-		(if(Utils_vdm`before(b2, b1)) then Utils_vdm`before(b1, e2)
-		else Utils_vdm`before(b2, e1))
+		if(Utils_vdm`before(b2, ev.begin)) then Utils_vdm`before(ev.begin, e2)
+		else Utils_vdm`before(b2, ev.ending)
 	)
 	pre (Utils_vdm`before(ev.begin, ev.ending) or ev.begin = ev.ending) 
 		and (Utils_vdm`before(b2, e2) or b2 = e2);
