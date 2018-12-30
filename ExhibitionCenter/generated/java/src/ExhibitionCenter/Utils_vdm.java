@@ -143,18 +143,10 @@ public class Utils_vdm {
               ternaryIfExp_5 = Utils.copy(ternaryIfExp_6);
 
             } else {
-              VDMMap ternaryIfExp_7 = null;
-
-              if (Utils.is_(res, valueType.class)) {
-                ternaryIfExp_7 =
-                    MapUtil.override(
-                        MapUtil.map(new Maplet(key, res)),
-                        fMap(f).eval(SeqUtil.tail(Utils.copy(keys)), Utils.copy(m)));
-              } else {
-                ternaryIfExp_7 = MapUtil.map();
-              }
-
-              ternaryIfExp_5 = Utils.copy(ternaryIfExp_7);
+              ternaryIfExp_5 =
+                  MapUtil.override(
+                      MapUtil.map(new Maplet(key, res)),
+                      fMap(f).eval(SeqUtil.tail(Utils.copy(keys)), Utils.copy(m)));
             }
 
             ternaryIfExp_4 = Utils.copy(ternaryIfExp_5);

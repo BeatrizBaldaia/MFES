@@ -68,8 +68,7 @@ functions
 				if(res = true) then {key|->m(key)} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
 				else fMap[@keyType, @returnType, @valueType] (f)(tl keys, m)
 			)
-			elseif(is_(res, @valueType)) then {key|->res} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
-			else {|->} -- TODO case of error. ask teacher how to use trap error with exit in (...)
+			else({key|->res} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m)))
 		)
 	)
 	pre elems keys subset dom m
