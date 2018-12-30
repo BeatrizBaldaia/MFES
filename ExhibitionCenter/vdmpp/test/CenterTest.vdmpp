@@ -1,4 +1,4 @@
-class CenterTest  is subclass of Test
+class CenterTest  is subclass of Test_vdm
 -- TODO not possible new Room(), teste failing
  --TODO addFoyer/ Room ; pre = false
 operations
