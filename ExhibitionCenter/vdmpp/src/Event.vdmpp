@@ -64,8 +64,9 @@ operations
 --Set event privacy condition
 	public setPrivacy: bool ==> ()
 	setPrivacy(p) == (
-		privacy := p;
 		if(p) then guests := attendees
+			else guests := {};
+		privacy := p
 	)
 	post privacy = p;
 --Set event type
@@ -79,7 +80,7 @@ operations
 	showDetails() == (
 		dcl res: map Utils_vdm`String to Utils_vdm`String := {|->};
 		res := res ++ {
-				"Name" |-> name, "Total number of tickets" |-> Utils_vdm`toStringVDM(totalTickets), "Sold tickets" |-> Utils_vdm`toStringVDM(totalTickets - card attendees),
+				"Name" |-> name, "Total number of tickets" |-> Utils_vdm`toStringVDM(totalTickets), "Sold tickets" |-> Utils_vdm`toStringVDM(card attendees),
 				"Ticket's price" |-> Utils_vdm`toStringVDM(ticketPrice), "Is private" |-> Utils_vdm`toStringVDM(privacy), 
 				"Starting date" |-> Utils_vdm`toStringVDM(begin), "Ending date" |-> Utils_vdm`toStringVDM(ending), 
 				"Installation" |-> installation.id, 

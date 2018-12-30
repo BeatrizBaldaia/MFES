@@ -102,23 +102,85 @@ operations
 		center.addUser(user3);center.addUser(user4);
 		assertEqual(card dom center.users, 5);
 		
-		assertEqual(card center.showUsersDetails("admin"), 5)
 	)
 	pre card dom center.users = 1
 	post card dom center.users = 5;
-	
+
+--Create an event and change its attributes (event details, services and installation)	
 	public testEvent: Center ==> ()
 	testEvent(center) == (
 		dcl event1: Event := center.createEvent("Event1", 3, 10, mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3), true, <Conference>, center.installations("Room1"), "User1");
-		dcl user1: User := center.users("User1");
-		dcl user2: User := center.users("User2");
-		
+		--Check event and its availability to the users
 		assertTrue("Room1" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)));
 		assertEqual(center.showAvailableEvents("User2"), {});
 		center.inviteToEvent("Event1", "User1", "User2");
-		assertEqual(center.showAvailableEvents("User2"), {event1})
+		assertEqual(center.showAvailableEvents("User2"), {event1});
+		assertEqual(center.showAvailableEventsBetweenDates("User3", mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)), {});
+		--Add and remove services from event
+		center.addServiceToEvent("Event1", "User1", <AudioVisual>);
+		assertTrue(len event1.services = 1);
+		center.removeServiceFromEvent("Event1", "User1", <AudioVisual>);
+		assertTrue(len event1.services = 0);
+		center.addServiceToEvent("Event1", "User1", <AudioVisual>);
+		center.changeEventInstallation("Event1", "User1", "Foyer1");
+		assertEqual(event1.installation.id, "Foyer1");
+		--Change event attributes
+		center.changeEventName("Event1", "User1", "New Event Name");
+		assertEqual(event1.name, "New Event Name");
+		center.changeEventTotalTickets("New Event Name", "User1", 6);
+		assertEqual(event1.totalTickets, 6);
+		center.changeEventTicketPrice("New Event Name", "User1", 5);
+		assertEqual(event1.ticketPrice, 5);
+		center.changeEventDate("New Event Name", "User1", <begin>, mk_Utils_vdm`Date(2018, 12, 2));
+		assertEqual(event1.begin, mk_Utils_vdm`Date(2018, 12, 2));
+		center.changeEventDate("New Event Name", "User1", <ending>, mk_Utils_vdm`Date(2018, 12, 5));
+		assertEqual(event1.ending, mk_Utils_vdm`Date(2018, 12, 5));
+		center.changeEventPrivacy("New Event Name", "User1", false);
+		assertEqual(event1.privacy, false);
+		assertEqual(center.showAvailableEventsBetweenDates("User3", mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)), {event1});
+		center.changeEventType("New Event Name", "User1", <Party>)
 	)
-	pre card dom center.events = 0;
+	pre card dom center.events = 0
+	post card dom center.events = 1;
+
+--By changing differente external factors, like services' price,
+-- installation's rent and number of attendees,
+-- we will analise the money earned and lost with the event	
+	public testEventProfit: Center ==> ()
+	testEventProfit(center) == (
+		dcl event1: Event := center.events("New Event Name");
+		--Add users to the event and change their position in it (host, attendee or staff)
+		center.addUserToEvent("New Event Name", "User2", <attendee>);
+		assertTrue("User2" in set event1.attendees);
+		center.addUserToEvent("New Event Name", "User3", <host>);
+		assertEqual(event1.host, "User3");
+		center.addUserToEvent("New Event Name", "User1", <staff>);
+		assertTrue("User1" in set event1.staff);
+		center.addUserToEvent("New Event Name", "User4", <attendee>);
+		assertEqual(event1.attendees, {"User2", "User4"});
+		center.addUserToEvent("New Event Name", "User4", <host>);
+		center.addUserToEvent("New Event Name", "User3", <attendee>);
+		assertEqual(event1.host, "User4");
+		assertEqual(event1.attendees, {"User2", "User3"});
+		center.removeUserFromEvent("New Event Name", "User3", <attendee>);
+		assertEqual(event1.attendees, {"User2"});
+		center.addUserToEvent("New Event Name", "User3", <attendee>);
+		assertEqual(event1.attendees, {"User2", "User3"});
+		assertEqual(center.showEventDetails("admin", "New Event Name")("Sold tickets"), "2, 0");
+		let usersDetails = center.showUsersDetails("admin") in (
+			for all userDetails in set usersDetails do (
+				if(userDetails("Name") in set event1.attendees) then assertEqual(userDetails("Money spent"), "5, 0")
+			)
+		);
+		--Check money spent with the event
+		assertEqual(center.moneySpentWithServices("User4", "New Event Name"), 40);--since service (<AudioVisual>) price is 10 and event days are 4
+		assertEqual(center.moneySpentWithInstallation("User4", "New Event Name"), 40);--since installation ("Foyer1") rent is 10 and event days are 4
+		center.changeServicePrice("admin", <AudioVisual>, 30);
+		assertEqual(center.services(<AudioVisual>).price, 30);
+		assertEqual(center.moneySpentWithServices("User4", "New Event Name"), 120)--since service (<AudioVisual>) price is 10 and event days are 4
+		
+	)
+	pre card dom center.events = 1;
  /***** TEST CASES WITH VALID INPUTS ******/
  
   /***** TEST CASES WITH INVALID INPUTS (EXECUTE ONE AT A TIME) ******/
@@ -132,11 +194,12 @@ operations
 		centerTest.testServices(center);
 		centerTest.testUsers(center);
 		centerTest.testEvent(center);
+		centerTest.testEventProfit(center);
 
-		new InstallationTest().testAll();
+		/**new InstallationTest().testAll();
 		new EventTest().testAll();
 		new ServiceTest().testAll();
-		new UserTest().testAll();
+		new UserTest().testAll();**/
 		
 	);
 end CenterTest

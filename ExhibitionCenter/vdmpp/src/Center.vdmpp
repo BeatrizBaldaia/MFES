@@ -217,8 +217,9 @@ operations
 	public moneySpentWithServices: Utils_vdm`String * Utils_vdm`String ==> real
 	moneySpentWithServices(uName, evName) == (
 		dcl ev: Event := events(evName);
+		dcl days: int := Utils_vdm`getDatesDifference(events(evName).begin, events(evName).ending) + 1;
 		dcl res: real := 0;
-		for all service in set elems ev.services do res := res + services(service).price;
+		for all service in set elems ev.services do res := res + services(service).price * days;
 		return res
 	)
 	pre uName in set dom users and (uName = events(evName).host or uName = adminName) and
@@ -227,8 +228,8 @@ operations
 --Return how much an event spent with installation rent
 	public moneySpentWithInstallation: Utils_vdm`String * Utils_vdm`String ==> real
 	moneySpentWithInstallation(uName, evName) == (
-		dcl days: int := Utils_vdm`getDatesDifference(events(evName).begin, events(evName).ending);
-		return days * events(evName).ticketPrice
+		dcl days: int := Utils_vdm`getDatesDifference(events(evName).begin, events(evName).ending) + 1;
+		return days * events(evName).installation.price
 	)
 	pre uName in set dom users and (uName = events(evName).host or uName = adminName) and
 	 evName in set dom events;
@@ -278,7 +279,8 @@ operations
 	changeEventName(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setName(value);
-		events := events ++ {value |-> ev}
+		
+		events := ({evName} <-: events) ++ {value |-> ev}
 	)
 	pre evName in set dom events and value not in set dom events and
 		hName in set dom users and events(evName).host = hName
@@ -317,7 +319,11 @@ operations
 			end
 	)
 	pre evName in set dom events and (dateType = <begin> or dateType = <ending>) and
-		hName in set dom users and events(evName).host = hName
+		hName in set dom users and events(evName).host = hName and
+		if(dateType = <begin>) then (forall e in set rng events \ {events(evName)} &
+			not (hasDatesConflict(e, value, events(evName).ending) and e.installation = events(evName).installation))
+		else (forall e in set rng events \ {events(evName)} &
+			not (hasDatesConflict(e, events(evName).begin, value) and e.installation = events(evName).installation))
 	post if(dateType = <begin>) then events(evName).begin = value
 		else events(evName).ending = value;
 

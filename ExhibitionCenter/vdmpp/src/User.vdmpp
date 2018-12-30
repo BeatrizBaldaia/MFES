@@ -19,7 +19,7 @@ operations
 	showDetails() == (
 		dcl res: map Utils_vdm`String to Utils_vdm`String := {|->};
 		res := res ++ {
-				"Name" |-> name, "Tickets bought" |-> eventsSettoStringVDM(events)
+				"Name" |-> name, "Events Attended" |-> eventsSettoStringVDM(events)
 		};
 		return res
 	);
@@ -27,7 +27,6 @@ operations
 --Add event
 	public addEvent: Utils_vdm`String ==> ()
 	addEvent(evName) == events := events union {evName}
-	pre evName not in set events
 	post evName in set events;
 	
 --Remove event
