@@ -22,32 +22,45 @@ operations
 	testInstallations(center) == (
 		dcl room1: Installation := new Room("Room1", 15, 10, 7, 20, 20, false, true, true, true, false, false, true, false);
 		dcl pavilion1: Installation := new Pavilion("Pavilion1", 150, 50, 10, 50, 70, false, false, true, false, false);
+		dcl pavilion2: Installation := new Pavilion("Pavilion2", 150, 50, 10, 50, 70, false, false, true, false, false);
+		dcl foyer1: Installation := new Foyer("Foyer1", 10, 15, 4, 6, 6, false, true, false, true);
 		dcl foyer2: Installation := new Foyer("Foyer2", 10, 15, 4, 6, 6, false, true, false, true);
+		dcl foyer3: Installation := new Foyer("Foyer3", 10, 15, 4, 6, 6, false, true, false, true);
 		dcl parking1: Installation := new CarParking("Car Parking1", 30, 50, 7, 50, 50);
 		dcl auditorium1: Installation := new Auditorium("Auditorium1", 50, 120, 10, 40, 40, true, false, true, false, true, false);
 		--Add installations
 		center.addInstallations("admin", room1);
 		center.addInstallations("admin", pavilion1);
+		center.addInstallations("admin", pavilion2);
 		assertTrue({room1, pavilion1} subset rng center.installations);
 		
+		center.addInstallations("admin", auditorium1);
+		center.addInstallationToInstallation("admin", "Auditorium1", foyer1);
+		assertTrue(center.associatedInstallations(auditorium1, foyer1));
 		center.addInstallationToInstallation("admin", "Pavilion1", room1);
 		assertTrue(center.associatedInstallations(pavilion1, pavilion1));
 		assertTrue(center.associatedInstallations(pavilion1, room1));
 		center.addInstallationToInstallation("admin", "Pavilion1",  foyer2);
+		center.addInstallationToInstallation("admin", "Pavilion2",  foyer3);
 		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).rooms, {room1});
 		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).foyers, {foyer2});
 		assertTrue(foyer2 in set rng center.installations);
 		--Remove installations
+		center.removeInstallationFromInstallation("admin", "Auditorium1", foyer1);
+		assertTrue(not auditorium1.hasInstallation(foyer1));
+		center.removeInstallationFromInstallation("admin", "Pavilion2", foyer3);
+		assertTrue(not pavilion2.hasInstallation(foyer3));
 		center.removeInstallationFromInstallation("admin", "Pavilion1", room1);
 		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).rooms, {});
 		assertTrue(room1 in set rng center.installations);
 		center.removeInstallation("admin", "Pavilion1");
+		center.removeInstallation("admin", "Pavilion2");
+		center.removeInstallation("admin", "Foyer3");
 		assertTrue(rng center.installations inter {pavilion1, foyer2} = {});
 		--Change installation attributes
 		center.addInstallations("admin", pavilion1);
 		center.addInstallations("admin", foyer2);
 		center.addInstallations("admin", parking1);
-		center.addInstallations("admin", auditorium1);
 		center.changeInstallationMeasures("admin", "Room1", 20, 10, 10, 25);
 		center.changeInstallationMeasures("admin", "Pavilion1", 20, 10, 10, 25);
 		center.changeInstallationMeasures("admin", "Foyer2", 20, 10, 10, 25);

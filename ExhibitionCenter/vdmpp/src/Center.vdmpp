@@ -445,7 +445,7 @@ functions
 		) elseif(isofclass(Pavilion, inst2)) then (
 			let inst = narrow_(inst2, Pavilion) in
 			if(isofclass(Foyer, inst1)) then let foyer = narrow_(inst1, Foyer) in foyer in set inst.foyers
-			else let room = narrow_(inst1, Room) in room in set inst.rooms
+			else(if(isofclass(Room, inst1)) then (let room = narrow_(inst1, Room) in room in set inst.rooms)else false)
 		) else (
 			false
 		)
