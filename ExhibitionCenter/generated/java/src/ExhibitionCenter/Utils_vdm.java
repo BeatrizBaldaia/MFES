@@ -131,7 +131,7 @@ public class Utils_vdm {
             if (Utils.is_bool(res)) {
               VDMMap ternaryIfExp_6 = null;
 
-              if (res) {
+              if (Utils.equals(res, true)) {
                 ternaryIfExp_6 =
                     MapUtil.override(
                         MapUtil.map(new Maplet(key, ((valueType) Utils.get(m, key)))),

@@ -65,7 +65,7 @@ functions
 	else let key = hd keys in (
 		let res = f(m(key)) in (
 			if(is_bool(res)) then (
-				if(res) then {key|->m(key)} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
+				if(res = true) then {key|->m(key)} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
 				else fMap[@keyType, @returnType, @valueType] (f)(tl keys, m)
 			)
 			elseif(is_(res, @valueType)) then {key|->res} ++ (fMap[@keyType, @returnType, @valueType] (f)(tl keys, m))
