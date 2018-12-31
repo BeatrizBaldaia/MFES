@@ -56,7 +56,7 @@ operations
 -- Add room to rooms set		
 	public addRoom : Room ==> ()
 		addRoom(r) == rooms := rooms union {r}
-		pre r not in set rooms
+		pre r not in set rooms and r.area <= (area - sumElems(Utils_vdm`setTOseq[real]({x.area| x in set rooms})))
 		post	card rooms = card rooms~ + 1 and r in set rooms; 
 		
 -- Add foyer to foyers set
@@ -84,5 +84,15 @@ operations
 			elseif(isofclass(Room, inst)) then return (let r = narrow_(inst, Room) in r in set rooms)
 			else return false
 		);
+		
+functions
+
+--sum the elements of a seq
+	public sumElems: seq of real -> real
+	sumElems(list) == (
+		if(len list = 1) then hd list
+		else hd list + sumElems(tl list)
+	)
+	measure len list;
 
 end Pavilion

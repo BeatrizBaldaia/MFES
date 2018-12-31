@@ -212,7 +212,34 @@ operations
 	(if(events(evName).privacy) then (uName = adminName or uName in set 
 		events(evName).guests union events(evName).staff union {events(evName).host})
 		else true);
+		
+--Show the name of all events, but not the private events if uName is not a guest, staff or host
+	public listEvents: Utils_vdm`String ==> set of Event
+	listEvents(uName) == (
+		dcl res: set of Event := {};
+		for all event in set rng events do (
+			if(event.privacy and uName in set (event.guests union {event.host} union event.staff))
+				then res := res union {event}
+			elseif(not event.privacy) then res := res union {event}
+		);
+		return res
+	)
+	pre uName in set dom users
+	post RESULT subset rng events and forall e in set RESULT &
+		not (e.privacy and uName not in set (e.guests union {e.host} union e.staff));
+		
+--Return the services used in one event
+	public listEventServices: Utils_vdm`String ==> set of Service
+	listEventServices(evName) == return rng (elems events(evName).services <: services)
+	pre evName in set dom events
+	post forall s in set RESULT & s.type in set dom services and s.type in set elems events(evName).services;
 	
+--Return the services available to add to the event
+	public availableServicesForEvent: Utils_vdm`String ==> set of Service
+	availableServicesForEvent(evName) == return rng (elems events(evName).services <-: services)
+	pre evName in set dom events
+	post forall s in set RESULT & s.type in set dom services and s.type not in set elems events(evName).services;
+
 --Return how much an event spent in services
 	public moneySpentWithServices: Utils_vdm`String * Utils_vdm`String ==> real
 	moneySpentWithServices(uName, evName) == (
