@@ -61,7 +61,7 @@ public class CommandLineInterface {
 	 * @return
 	 */
 	private int getUserInput(int bottomBound, int upperBound) {
-		
+
 		int option = -1;
 		while(option == -1) {
 			try{
@@ -143,7 +143,12 @@ public class CommandLineInterface {
 		String name = reader.nextLine();
 		System.out.print("Password: ");
 		String password = reader.nextLine();
-		center.addUser(new User(name, password));
+		try{
+			center.addUser(new User(name, password));
+		} catch(IllegalArgumentException e) {
+			System.out.println("Invalid input");
+			reader.nextLine();
+		}
 		printEmptyLines(EMPTY_LINES);
 	}
 
@@ -214,7 +219,7 @@ public class CommandLineInterface {
 				return null;
 			}));
 			loggedInMenuEntries.add(new SimpleEntry<>("Installations", () -> {
-				//installationsMenu();
+				installationsMenu();
 				return null;
 			}));
 			loggedInMenuEntries.add(new SimpleEntry<>("Services", () -> {
@@ -350,7 +355,7 @@ public class CommandLineInterface {
 			showEventsMenu("between");
 			return null;
 		}));
-		
+
 		eventsMenuEntries.add(new SimpleEntry<>("Create Event", () -> {
 			createEvent();
 			return null;
@@ -477,9 +482,11 @@ public class CommandLineInterface {
 		}
 		if(userName.compareTo(event.host) == 0 || userName.compareTo("admin") == 0) {
 			selectedEventMenuEntries.add(new SimpleEntry<>("Show Money Spent", () -> {
+				showMoneySpent(eventName);
 				return null;
 			}));
 			selectedEventMenuEntries.add(new SimpleEntry<>("Show Participants", () -> {
+				showEventParticipants(eventName);
 				return null;
 			}));
 		}
@@ -519,7 +526,11 @@ public class CommandLineInterface {
 		reader.nextLine();
 	}
 
-
+	/**
+	 * Menu with all actions to change one event properties
+	 * and participants
+	 * @param eventName
+	 */
 	private void editEventMenu(String eventName) {
 		String name = eventName;
 
@@ -543,7 +554,12 @@ public class CommandLineInterface {
 			}
 		}
 	}
-	
+
+	/**
+	 * All entries of Edit Event menu are added
+	 * @param editEventMenuEntries
+	 * @param eventName
+	 */
 	private void addEditEventEntries(ArrayList<SimpleEntry<String, Callable<Object>>> editEventMenuEntries, String eventName) {
 		Event event = (Event) center.events.get(eventName);
 
@@ -600,9 +616,9 @@ public class CommandLineInterface {
 			return event;
 		}));
 	}
-	
+
 	private void removeParticipantMenu(String eventName) {
-		
+
 		ArrayList<SimpleEntry<String, Callable<Object>>> removeParticipantMenuEntries = new ArrayList<>();
 		while (true) {
 			removeParticipantMenuEntries.clear();
@@ -619,7 +635,7 @@ public class CommandLineInterface {
 			}
 		}
 	}
-	
+
 	private void addRemoveParticipantMenuEntries(ArrayList<SimpleEntry<String, Callable<Object>>> removeParticipantMenuEntries, String eventName) {
 		removeParticipantMenuEntries.add(new SimpleEntry<>("Attendee", () -> {
 			removeAttendeeFromEvent(eventName);
@@ -634,11 +650,11 @@ public class CommandLineInterface {
 			return null;
 		}));
 	}
-	
+
 	private void createEvent() {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
-		
+
 		System.out.print("\nEvent Name: ");
 		String eventName = reader.nextLine();
 		System.out.print("\nNumber of Tickets: ");
@@ -661,15 +677,15 @@ public class CommandLineInterface {
 			return;
 		}
 		Installation inst = (Installation)center.installations.get(instName);
-		
+
 		center.createEvent(eventName, totalTickets, ticketPrice, bDate, eDate, privacy, type, inst, userName);
-		
+
 	}
-	
+
 	private String selectInstallationBetweenDates(Utils_vdm.Date b, Utils_vdm.Date e) {
 		System.out.println("\nAll the available installations in the given dates");
 		System.out.println();
-		
+
 		VDMMap availableInstallations = center.getAvailableInstallations(b, e);
 		if(availableInstallations.size() == 0) {
 			System.out.println("There are no available installations\n");
@@ -681,7 +697,7 @@ public class CommandLineInterface {
 			String inst = (String) it.next();
 			System.out.println(inst);
 		}
-		
+
 		System.out.print("\nChoose one installation: ");
 		String selectedInst = reader.nextLine();
 		if(!MapUtil.dom(availableInstallations).contains(selectedInst)) {
@@ -708,7 +724,14 @@ public class CommandLineInterface {
 		printLine();
 
 		System.out.print("New number of tickets: ");
-		Integer newTotalTickets = Integer.parseInt(reader.nextLine());
+		Integer newTotalTickets = 0;
+		try{
+			newTotalTickets = Integer.parseInt(reader.nextLine());
+		} catch(NumberFormatException e) {
+			System.out.println("Invalid input");
+			reader.nextLine();
+			return (Event)center.events.get(eventName);
+		}
 		center.changeEventTotalTickets(eventName, userName, newTotalTickets);
 
 		return (Event)center.events.get(eventName);
@@ -719,7 +742,14 @@ public class CommandLineInterface {
 		printLine();
 
 		System.out.print("New ticket price: ");
-		Float newTicketPrice = Float.parseFloat(reader.nextLine());
+		Float newTicketPrice = 0f;
+		try{
+			newTicketPrice = Float.parseFloat(reader.nextLine());
+		} catch(NumberFormatException e) {
+			System.out.println("Invalid input");
+			reader.nextLine();
+			return (Event)center.events.get(eventName);
+		}
 		center.changeEventTicketPrice(eventName, userName, newTicketPrice);
 
 		return (Event)center.events.get(eventName);
@@ -750,7 +780,7 @@ public class CommandLineInterface {
 
 		return (Event)center.events.get(eventName);
 	}
-	
+
 	private Object getEventType() {
 		System.out.print("\nEvent Types\n\n");
 		System.out.println("1- Conference");
@@ -837,7 +867,7 @@ public class CommandLineInterface {
 			reader.nextLine();
 			return null;
 		}
-		
+
 		Iterator<String> it = event.attendees.iterator();
 		System.out.println("Attendees:\n");
 		while(it.hasNext()) {
@@ -859,7 +889,7 @@ public class CommandLineInterface {
 			reader.nextLine();
 			return null;
 		}
-		
+
 		Iterator<String> it = event.staff.iterator();
 		System.out.println("Staff members:\n");
 		while(it.hasNext()) {
@@ -875,7 +905,7 @@ public class CommandLineInterface {
 		}
 		return (Event)center.events.get(eventName);
 	}
-	
+
 	private Event addStaff(String eventName) {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
@@ -888,7 +918,7 @@ public class CommandLineInterface {
 			System.out.println("There is no such user called " + staff);
 			reader.nextLine();
 		}
-		
+
 		return (Event)center.events.get(eventName);
 	}
 
@@ -906,7 +936,7 @@ public class CommandLineInterface {
 		}
 		return (Event)center.events.get(eventName);
 	}
-	
+
 	private Event changeEventInstallation(String eventName) {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
@@ -914,7 +944,7 @@ public class CommandLineInterface {
 		System.out.println("All the available installations");
 		System.out.println("in " + eventName + " dates");
 		System.out.println();
-		
+
 		VDMMap availableInstallations = center.getAvailableInstallations(event.begin, event.ending);
 		if(availableInstallations.size() == 0) {
 			System.out.println("There are no available installations\n");
@@ -926,7 +956,7 @@ public class CommandLineInterface {
 			String inst = (String) it.next();
 			System.out.println(inst);
 		}
-		
+
 		System.out.print("\nChoose one installation: ");
 		String selectedInst = reader.nextLine();
 		if(!MapUtil.dom(availableInstallations).contains(selectedInst)) {
@@ -937,7 +967,46 @@ public class CommandLineInterface {
 		}
 		return event;
 	}
-	
+
+	private void showMoneySpent(String eventName) {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		Float moneyServices = (center.moneySpentWithServices(userName, eventName)).floatValue();
+		Float moneyInstallation = (center.moneySpentWithInstallation(userName, eventName)).floatValue();
+		System.out.println(eventName + " spent");
+		System.out.println("  " + moneyServices + "€ in services");
+		System.out.println("  " + moneyInstallation + "€ in installation rent");
+		reader.nextLine();
+	}
+
+	private void showEventParticipants(String eventName) {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		Event event = (Event)center.events.get(eventName);
+		System.out.println("Host: " + event.host);
+		System.out.print("Attendees: ");
+		if(event.attendees.size() == 0) {
+			System.out.println("none");
+		} else {
+			System.out.println();
+			Iterator<String> attendeesIt = event.attendees.iterator();
+			while(attendeesIt.hasNext()) {
+				String attendee = attendeesIt.next();
+				System.out.println("  " + attendee);
+			}
+		}
+		System.out.print("Staff: ");
+		if(event.staff.size() == 0) {
+			System.out.println("none");
+		} else {
+			Iterator<String> staffIt = event.staff.iterator();
+			while(staffIt.hasNext()) {
+				String staff = staffIt.next();
+				System.out.println("  " + staff);
+			}
+		}
+		reader.nextLine();
+	}
 	private Utils_vdm.Date getDate() {
 		System.out.print("  Day: ");
 		Float day = Float.parseFloat(reader.nextLine());
@@ -946,7 +1015,301 @@ public class CommandLineInterface {
 		System.out.print("  Year: ");
 		Float year = Float.parseFloat(reader.nextLine());
 		Utils_vdm.Date date = new Utils_vdm.Date(year, month, day);
-		
+
 		return date;
+	}
+
+	private void installationsMenu() {
+		ArrayList<SimpleEntry<String, Callable<Object>>> installationsMenuEntries = new ArrayList<>();
+		while (true) {
+			printEmptyLines(EMPTY_LINES);
+			printLine();
+			installationsMenuEntries.clear();
+			addInstallationsMenuEntries(installationsMenuEntries);
+			printMenuEntries(installationsMenuEntries);
+			int option = getUserInput(1, installationsMenuEntries.size());
+
+			try {
+				installationsMenuEntries.get(option).getValue().call();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void addInstallationsMenuEntries(ArrayList<SimpleEntry<String, Callable<Object>>> installationsMenuEntries) {
+		installationsMenuEntries.add(new SimpleEntry<>("Show All Installations", () -> {
+			showInstallationsMenu("all");
+			return null;
+		}));
+		installationsMenuEntries.add(new SimpleEntry<>("Show Available Installations Between Dates", () -> {
+			showInstallationsMenu("between");
+			return null;
+		}));
+		installationsMenuEntries.add(new SimpleEntry<>("Add Installation", () -> {
+			return null;
+		}));
+		installationsMenuEntries.add(new SimpleEntry<>("Remove Installation", () -> {
+			return null;
+		}));
+		installationsMenuEntries.add(new SimpleEntry<>("Aggregate Installations", () -> {
+			return null;
+		}));
+		installationsMenuEntries.add(new SimpleEntry<>("Separate Installations", () -> {
+			return null;
+		}));
+	}
+
+	/**
+	 * Menu where installations are listed, according to a specific condition,
+	 * and is given the option to select one installation or go back
+	 * to Main Menu
+	 * @param range
+	 */
+	private void showInstallationsMenu(String range) {
+		VDMSet installations = null;
+		if(range.compareTo("all") == 0) {
+			installations = MapUtil.dom(center.installations);
+		} else {
+			System.out.println("\nStarting Date");
+			Utils_vdm.Date s = getDate();
+			System.out.println("\nEnding Date");
+			Utils_vdm.Date e = getDate();
+			installations = MapUtil.dom(center.getAvailableInstallations(s, e));
+		}
+		ArrayList<SimpleEntry<String, Callable<Object>>> showInstallationsMenuEntries = new ArrayList<>();
+		while (true) {
+			printEmptyLines(EMPTY_LINES);
+			printLine();
+
+			if(installations.size() == 0) {
+				System.out.println("There are no installations yet");
+				System.out.println();
+			} else {
+				System.out.println("All Installations\n");
+				Iterator<String> it = installations.iterator();
+				while(it.hasNext()) {
+					String installation = (String) it.next();
+					System.out.println(installation);
+				}
+				System.out.println();
+			}
+			showInstallationsMenuEntries.clear();
+			final VDMSet installationsToSelect = installations;
+			showInstallationsMenuEntries.add(new SimpleEntry<>("Select Installation", () -> {
+				selectInstallationMenu(installationsToSelect);
+				return null;
+			}));
+			showInstallationsMenuEntries.add(new SimpleEntry<>("Main Menu", () -> {
+				loggedInMenu();
+				return null;
+			}));
+			printMenuEntries(showInstallationsMenuEntries);
+			int option = getUserInput(1, showInstallationsMenuEntries.size());
+
+			try {
+				showInstallationsMenuEntries.get(option).getValue().call();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Time for the user to insert the name of the installation
+	 * he wants to select and then more entries are added to this menu
+	 * @param installations
+	 */
+	private void selectInstallationMenu(VDMSet installations) {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+
+		System.out.print("Installation name: ");
+		String installationName = reader.nextLine();
+		Installation installation = (Installation) center.installations.get(installationName);
+		System.out.println("Inst = "+installation);
+		if(installation == null || !installations.contains(installation.id)) {
+			System.out.println("There is no installation " + installationName + ". Try again...");
+			System.out.println();
+			reader.nextLine();
+			return;
+		}
+
+		ArrayList<SimpleEntry<String, Callable<Object>>> selectedInstallationMenuEntries = new ArrayList<>();
+		while (true) {
+			selectedInstallationMenuEntries.clear();
+			addSelectedInstallationMenuEntries(selectedInstallationMenuEntries, installationName);
+			printEmptyLines(EMPTY_LINES);
+			printLine();
+			printMenuEntries(selectedInstallationMenuEntries);
+			int option = getUserInput(1, selectedInstallationMenuEntries.size());
+
+			try {
+				selectedInstallationMenuEntries.get(option).getValue().call();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Add entries to Selected Installation Menu
+	 * @param selectedEventMenuEntries
+	 * @param installationName
+	 */
+	private void addSelectedInstallationMenuEntries(ArrayList<SimpleEntry<String, Callable<Object>>> selectedEventMenuEntries, String installationName) {
+
+		selectedEventMenuEntries.add(new SimpleEntry<>("Show Installation Details", () -> {
+			viewInstallationDetails(installationName);
+			return null;
+		}));
+		if(userName.compareTo("admin") == 0) {
+			selectedEventMenuEntries.add(new SimpleEntry<>("Edit Installation", () -> {
+				editInstallationMenu(installationName);
+				return null;
+			}));
+		}
+
+		selectedEventMenuEntries.add(new SimpleEntry<>("Main Menu", () -> {
+			loggedInMenu();
+			return null;
+		}));
+	}
+
+	/**
+	 * Action of showing all installation's details
+	 * @param installationName
+	 */
+	private void viewInstallationDetails(String installationName) {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+
+		try {
+			VDMMap installationDetails = center.showInstallationDetails(installationName);
+			Iterator it = installationDetails.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry pair = (Map.Entry)it.next();
+				System.out.println("  " + pair.getKey() + ": " + pair.getValue());
+				it.remove(); // avoids a ConcurrentModificationException
+			}
+		} catch (IllegalArgumentException e) {
+			System.out.println("There is no event " + installationName + ". Try again...");
+			reader.nextLine();
+		}
+		reader.nextLine();
+	}
+
+	private void editInstallationMenu(String installationName) {
+
+		ArrayList<SimpleEntry<String, Callable<Object>>> editInstallationMenuEntries = new ArrayList<>();
+		while (true) {
+			editInstallationMenuEntries.clear();
+			addEditInstallationEntries(editInstallationMenuEntries, installationName);
+			printEmptyLines(EMPTY_LINES);
+			printLine();
+			printMenuEntries(editInstallationMenuEntries);
+			int option = getUserInput(1, editInstallationMenuEntries.size());
+
+			try {
+				editInstallationMenuEntries.get(option).getValue().call();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void addEditInstallationEntries(ArrayList<SimpleEntry<String, Callable<Object>>> editInstallationMenuEntries, String installationName) {
+
+		editInstallationMenuEntries.add(new SimpleEntry<>("Change Measures", () -> {
+			changeMeasures(installationName);
+			return null;
+		}));
+		if(userName.compareTo("admin") == 0) {
+			editInstallationMenuEntries.add(new SimpleEntry<>("Change Conditions", () -> {
+				changeConditions(installationName);
+				return null;
+			}));
+		}
+		editInstallationMenuEntries.add(new SimpleEntry<>("Change Rent", () -> {
+			changeRent(installationName);
+			return null;
+		}));
+
+		editInstallationMenuEntries.add(new SimpleEntry<>("Main Menu", () -> {
+			loggedInMenu();
+			return null;
+		}));
+	}
+	
+	private void changeMeasures(String installationName) {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		System.out.print("Capacity: ");
+		Float capacity = Float.parseFloat(reader.nextLine());
+		System.out.print("Heigth: ");
+		Float heigth = Float.parseFloat(reader.nextLine());
+		System.out.print("Width: ");
+		Float width = Float.parseFloat(reader.nextLine());
+		System.out.print("Lenght: ");
+		Float lenght = Float.parseFloat(reader.nextLine());
+		center.changeInstallationMeasures(userName, installationName, capacity, heigth, width, lenght);
+		
+	}
+	
+	private void changeConditions(String installationName) {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		boolean airC = false, natL = false, ceilL = false, blackC = false, tele = false, compN = false, soundW = false, movW = false;
+		String input = "";
+		System.out.print("Air Condition (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			airC = true;
+		}
+		System.out.print("Natural Light (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			natL = true;
+		}
+		System.out.print("Ceiling Ligth (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			ceilL = true;
+		}
+		System.out.print("Blackout Curtains (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			blackC = true;
+		}
+		System.out.print("Telephones (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			tele = true;
+		}
+		System.out.print("Computer Network (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			compN = true;
+		}
+		System.out.print("Soundproof Walls (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			soundW = true;
+		}
+		System.out.print("Moving Walls (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			movW = true;
+		}
+		center.changeInstallationConditions(userName, installationName, airC, natL, ceilL, blackC, tele, compN, soundW, movW);
+	}
+	
+	private void changeRent(String installationName) {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		System.out.print("New Rent Price (€ per day): ");
+		Float rent = Float.parseFloat(reader.nextLine());
+		
+		center.changeInstallationRent(userName, installationName, rent);
 	}
 }
