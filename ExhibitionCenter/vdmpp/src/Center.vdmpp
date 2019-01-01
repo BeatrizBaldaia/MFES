@@ -218,7 +218,7 @@ operations
 	listEvents(uName) == (
 		dcl res: set of Event := {};
 		for all event in set rng events do (
-			if(event.privacy and uName in set (event.guests union {event.host} union event.staff))
+			if(event.privacy and uName in set (event.guests union {event.host, adminName} union event.staff))
 				then res := res union {event}
 			elseif(not event.privacy) then res := res union {event}
 		);
@@ -275,9 +275,11 @@ operations
 	showAvailableEvents(uName) == (
 		dcl res: set of Event := {};
 		for all e in set rng events do (
-			if(card e.attendees = e.totalTickets) then skip;
-			if(e.privacy and uName in set e.guests) then res := res union {e};
-			if(not e.privacy) then res := res union {e}
+			if(card e.attendees = e.totalTickets) then skip
+			else (
+				if(e.privacy and uName in set e.guests union e.staff union {e.host, adminName}) then res := res union {e};
+				if(not e.privacy) then res := res union {e}
+			)
 		);
 		return res
 	)
@@ -291,7 +293,7 @@ operations
 		for all ev in set rng events do 
 			if(hasDatesConflict(ev, b, e)) then (
 				if(card ev.attendees = ev.totalTickets) then skip;
-				if(ev.privacy and uName in set ev.guests) then res := res union {ev};
+				if(ev.privacy and uName in set ev.guests union e.staff union {e.host, adminName}) then res := res union {ev};
 				if(not ev.privacy) then res := res union {ev}
 			);
 		return res	
