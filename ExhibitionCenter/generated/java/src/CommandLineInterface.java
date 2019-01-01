@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -60,14 +61,20 @@ public class CommandLineInterface {
 	 * @return
 	 */
 	private int getUserInput(int bottomBound, int upperBound) {
-		System.out.print("Choose an option: ");
-		int option = Integer.parseInt(reader.nextLine());
+		
+		int option = -1;
+		while(option == -1) {
+			try{
+				System.out.print("Choose an option: ");
+				option = Integer.parseInt(reader.nextLine());
+			}catch(NumberFormatException e) {
+				System.out.println("Invalid input. You have to insert one number from " + bottomBound + " to " + upperBound);
+			}
 
-		if (option < bottomBound && option > upperBound) {
-			System.out.println("Invalid option");
-			option = getUserInput(bottomBound, upperBound);
+			if (option < bottomBound || option > upperBound) {
+				option = -1;
+			}
 		}
-
 		return option - 1;
 	}
 
@@ -87,7 +94,7 @@ public class CommandLineInterface {
 			mainMenuEntries.clear();
 			addMainMenuEntries(mainMenuEntries);
 			printMenuEntries(mainMenuEntries);
-			int option = getUserInput(1, mainMenuEntries.size() - 1);
+			int option = getUserInput(1, mainMenuEntries.size());
 
 			try {
 				mainMenuEntries.get(option).getValue().call();
@@ -173,7 +180,7 @@ public class CommandLineInterface {
 			printEmptyLines(EMPTY_LINES);
 			printLine();
 			printMenuEntries(loggedInMenuEntries);
-			int option = getUserInput(1, loggedInMenuEntries.size() - 1);
+			int option = getUserInput(1, loggedInMenuEntries.size());
 
 			try {
 				loggedInMenuEntries.get(option).getValue().call();
@@ -256,7 +263,7 @@ public class CommandLineInterface {
 				}));
 
 				printMenuEntries(usersMenuEntries);
-				int option = getUserInput(1, usersMenuEntries.size() - 1);
+				int option = getUserInput(1, usersMenuEntries.size());
 
 				try {
 					usersMenuEntries.get(option).getValue().call();
@@ -312,7 +319,7 @@ public class CommandLineInterface {
 			eventsMenuEntries.clear();
 			addEventsMenuEntries(eventsMenuEntries);
 			printMenuEntries(eventsMenuEntries);
-			int option = getUserInput(1, eventsMenuEntries.size() - 1);
+			int option = getUserInput(1, eventsMenuEntries.size());
 
 			try {
 				eventsMenuEntries.get(option).getValue().call();
@@ -401,7 +408,7 @@ public class CommandLineInterface {
 				return null;
 			}));
 			printMenuEntries(showEventsMenuEntries);
-			int option = getUserInput(1, showEventsMenuEntries.size() - 1);
+			int option = getUserInput(1, showEventsMenuEntries.size());
 
 			try {
 				showEventsMenuEntries.get(option).getValue().call();
@@ -427,6 +434,7 @@ public class CommandLineInterface {
 		if(event == null || !events.contains(event)) {
 			System.out.println("There is no event " + eventName + ". Try again...");
 			System.out.println();
+			reader.nextLine();
 			return;
 		}
 
@@ -437,7 +445,7 @@ public class CommandLineInterface {
 			printEmptyLines(EMPTY_LINES);
 			printLine();
 			printMenuEntries(selectedEventMenuEntries);
-			int option = getUserInput(1, selectedEventMenuEntries.size() - 1);
+			int option = getUserInput(1, selectedEventMenuEntries.size());
 
 			try {
 				selectedEventMenuEntries.get(option).getValue().call();
@@ -460,8 +468,10 @@ public class CommandLineInterface {
 			viewEventDetails(eventName);
 			return null;
 		}));
-		if(!event.attendees.contains(userName)) {
+		if(!event.attendees.contains(userName) && !event.staff.contains(userName) &&
+				userName.compareTo(event.host) != 0 && userName.compareTo("admin") != 0) {
 			selectedEventMenuEntries.add(new SimpleEntry<>("Buy Ticket", () -> {
+				center.addUserToEvent(eventName, userName, new attendeeQuote());
 				return null;
 			}));
 		}
@@ -504,6 +514,7 @@ public class CommandLineInterface {
 			}
 		} catch (IllegalArgumentException e) {
 			System.out.println("There is no event " + event + ". Try again...");
+			reader.nextLine();
 		}
 		reader.nextLine();
 	}
@@ -521,7 +532,7 @@ public class CommandLineInterface {
 			printEmptyLines(EMPTY_LINES);
 			printLine();
 			printMenuEntries(editEventMenuEntries);
-			int option = getUserInput(1, editEventMenuEntries.size() - 1);
+			int option = getUserInput(1, editEventMenuEntries.size());
 
 			try {
 				Future<Object> result = executor.submit(editEventMenuEntries.get(option).getValue());
@@ -576,6 +587,9 @@ public class CommandLineInterface {
 			removeParticipantMenu(eventName);
 			return event;
 		}));
+		editEventMenuEntries.add(new SimpleEntry<>("Add Staff Member", () -> {
+			return addStaff(eventName);
+		}));
 		if(event.privacy) {
 			editEventMenuEntries.add(new SimpleEntry<>("Invite User", () -> {
 				return inviteToEvent(eventName);
@@ -596,7 +610,7 @@ public class CommandLineInterface {
 			printEmptyLines(EMPTY_LINES);
 			printLine();
 			printMenuEntries(removeParticipantMenuEntries);
-			int option = getUserInput(1, removeParticipantMenuEntries.size() - 1);
+			int option = getUserInput(1, removeParticipantMenuEntries.size());
 
 			try {
 				removeParticipantMenuEntries.get(option).getValue().call();
@@ -744,15 +758,15 @@ public class CommandLineInterface {
 		System.out.println("3- Party");
 		System.out.println("4- Musical");
 		System.out.println("5- Team Building\n");
-		System.out.print("Choose one type: ");
-		Integer option = Integer.parseInt(reader.nextLine());
+		//System.out.print("Choose one type: ");
+		Integer option = getUserInput(1, 5);
 
 		switch (option) {
-		case 1:  return new ConferenceQuote();
-		case 2:  return new TradeFairQuote();
-		case 3:  return new PartyQuote();
-		case 4:  return new MusicalQuote();
-		case 5:  return new TeamBuildingQuote();
+		case 0:  return new ConferenceQuote();
+		case 1:  return new TradeFairQuote();
+		case 2:  return new PartyQuote();
+		case 3:  return new MusicalQuote();
+		case 4:  return new TeamBuildingQuote();
 		default: System.out.println("Invalid option");
 		return null;
 		}
@@ -779,13 +793,8 @@ public class CommandLineInterface {
 			}
 			System.out.println();
 
-			System.out.print("Choose one service: ");
-			Integer option = Integer.parseInt(reader.nextLine());
-			if(option < 1 && option > services.size()) {
-				System.out.println("Invalid option");
-			} else {
-				center.addServiceToEvent(eventName, userName, services.get(option -  1));
-			}
+			Integer option = getUserInput(1, services.size());
+			center.addServiceToEvent(eventName, userName, services.get(option));
 		}
 		return (Event)center.events.get(eventName);
 	}
@@ -812,12 +821,8 @@ public class CommandLineInterface {
 			System.out.println();
 
 			System.out.print("Choose one service: ");
-			Integer option = Integer.parseInt(reader.nextLine());
-			if(option < 1 && option > services.size()) {
-				System.out.println("Invalid option");
-			} else {
-				center.removeServiceFromEvent(eventName, userName, services.get(option -  1));
-			}
+			Integer option = getUserInput(1, services.size());
+			center.removeServiceFromEvent(eventName, userName, services.get(option));
 		}
 		return (Event)center.events.get(eventName);
 	}
@@ -862,7 +867,28 @@ public class CommandLineInterface {
 		}
 		System.out.print("Staff member name: ");
 		String staffToRemove = reader.nextLine();
-		center.removeUserFromEvent(eventName, staffToRemove, new attendeeQuote());
+		try {
+			center.removeUserFromEvent(eventName, staffToRemove, new attendeeQuote());
+		} catch (IllegalArgumentException e) {
+			System.out.println("There is no such member staff called " + staffToRemove);
+			reader.nextLine();
+		}
+		return (Event)center.events.get(eventName);
+	}
+	
+	private Event addStaff(String eventName) {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+
+		System.out.print("User name: ");
+		String staff = reader.nextLine();
+		try {
+			center.addUserToEvent(eventName, staff, new staffQuote());
+		} catch(IllegalArgumentException e) {
+			System.out.println("There is no such user called " + staff);
+			reader.nextLine();
+		}
+		
 		return (Event)center.events.get(eventName);
 	}
 
@@ -872,7 +898,12 @@ public class CommandLineInterface {
 
 		System.out.print("User name: ");
 		String userToInvite = reader.nextLine();
-		center.inviteToEvent(eventName, userName, userToInvite);
+		try{
+			center.inviteToEvent(eventName, userName, userToInvite);
+		} catch(IllegalArgumentException e) {
+			System.out.println("There is no such user called " + userToInvite);
+			reader.nextLine();
+		}
 		return (Event)center.events.get(eventName);
 	}
 	

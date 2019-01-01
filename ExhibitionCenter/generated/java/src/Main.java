@@ -45,6 +45,8 @@ public class Main {
 		
 		User user1 = new User("User1", "1234");
 		center.addUser(user1);
+		User user2 = new User("User2", "1234");
+		center.addUser(user2);
 		center.createEvent("Event Test", 4, 5, new Utils_vdm.Date(2019, 1, 1), new Utils_vdm.Date(2019, 1, 7), true, new ConferenceQuote(), pavilion1, "User1");
 		
 		CommandLineInterface cli = new CommandLineInterface(center);
