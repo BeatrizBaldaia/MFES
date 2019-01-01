@@ -868,7 +868,7 @@ public class CommandLineInterface {
 		System.out.print("Staff member name: ");
 		String staffToRemove = reader.nextLine();
 		try {
-			center.removeUserFromEvent(eventName, staffToRemove, new attendeeQuote());
+			center.removeUserFromEvent(eventName, staffToRemove, new staffQuote());
 		} catch (IllegalArgumentException e) {
 			System.out.println("There is no such member staff called " + staffToRemove);
 			reader.nextLine();
