@@ -293,7 +293,7 @@ operations
 		for all ev in set rng events do 
 			if(hasDatesConflict(ev, b, e)) then (
 				if(card ev.attendees = ev.totalTickets) then skip;
-				if(ev.privacy and uName in set ev.guests union e.staff union {e.host, adminName}) then res := res union {ev};
+				if(ev.privacy and uName in set ev.guests union ev.staff union {ev.host, adminName}) then res := res union {ev};
 				if(not ev.privacy) then res := res union {ev}
 			);
 		return res	
