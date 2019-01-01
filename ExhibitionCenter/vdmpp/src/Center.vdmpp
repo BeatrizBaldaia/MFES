@@ -196,6 +196,7 @@ operations
 	public createEvent:  Utils_vdm`String * nat * real * Utils_vdm`Date * Utils_vdm`Date * bool * Event`EventType * Installation * Utils_vdm`String ==> Event
 	createEvent(n, tTickets, tPrice, b, e, p, t, inst, h) == (
 		dcl event: Event := new Event(n, tTickets, tPrice, b, e, p, t, inst, h);
+		users(h).addEvent(n);
 		events := events ++ {n |-> event};
 		return event
 	)
@@ -218,7 +219,7 @@ operations
 	listEvents(uName) == (
 		dcl res: set of Event := {};
 		for all event in set rng events do (
-			if(event.privacy and uName in set (event.guests union {event.host} union event.staff))
+			if(event.privacy and uName in set (event.guests union {event.host, adminName} union event.staff))
 				then res := res union {event}
 			elseif(not event.privacy) then res := res union {event}
 		);
@@ -275,9 +276,11 @@ operations
 	showAvailableEvents(uName) == (
 		dcl res: set of Event := {};
 		for all e in set rng events do (
-			if(card e.attendees = e.totalTickets) then skip;
-			if(e.privacy and uName in set e.guests) then res := res union {e};
-			if(not e.privacy) then res := res union {e}
+			if(card e.attendees = e.totalTickets) then skip
+			else (
+				if(e.privacy and uName in set e.guests union e.staff union {e.host, adminName}) then res := res union {e};
+				if(not e.privacy) then res := res union {e}
+			)
 		);
 		return res
 	)
@@ -291,7 +294,7 @@ operations
 		for all ev in set rng events do 
 			if(hasDatesConflict(ev, b, e)) then (
 				if(card ev.attendees = ev.totalTickets) then skip;
-				if(ev.privacy and uName in set ev.guests) then res := res union {ev};
+				if(ev.privacy and uName in set ev.guests union ev.staff union {ev.host, adminName}) then res := res union {ev};
 				if(not ev.privacy) then res := res union {ev}
 			);
 		return res	
@@ -306,7 +309,9 @@ operations
 	changeEventName(evName, hName, value) == (
 		dcl ev: Event := events(evName);
 		ev.setName(value);
-		
+		for all user in set (ev.attendees union ev.staff union {ev.host}) do (
+			users(user).events := (users(user).events \ {evName}) union {value}
+		);
 		events := ({evName} <-: events) ++ {value |-> ev}
 	)
 	pre evName in set dom events and value not in set dom events and
@@ -441,7 +446,7 @@ operations
 		cases uPos:
 			<attendee> -> (ev.addAttendee(uName); user.addEvent(evName)),
 			<staff> -> (ev.addStaff(uName); user.addEvent(evName)),
-			<host> -> (ev.setHost(uName); user.addEvent(evName))
+			<host> -> (users(ev.host).removeEvent(evName); ev.setHost(uName); user.addEvent(evName))
 		end
 	)
 	pre evName in set dom events and uName in set dom users and
