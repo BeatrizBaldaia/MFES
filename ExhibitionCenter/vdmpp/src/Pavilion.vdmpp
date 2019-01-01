@@ -90,9 +90,10 @@ functions
 --sum the elements of a seq
 	public sumElems: seq of real -> real
 	sumElems(list) == (
+		if(len list = 0) then 0 else (
 		if(len list = 1) then hd list
 		else hd list + sumElems(tl list)
-	)
+	))
 	measure len list;
 
 end Pavilion

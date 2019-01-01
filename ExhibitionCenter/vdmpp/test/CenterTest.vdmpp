@@ -37,6 +37,8 @@ operations
 		center.addInstallations("admin", auditorium1);
 		center.addInstallationToInstallation("admin", "Auditorium1", foyer1);
 		assertTrue(center.associatedInstallations(auditorium1, foyer1));
+		assertTrue(not center.hasInstallation(auditorium1, room1));
+		assertTrue(not center.hasInstallation(room1, auditorium1));
 		center.addInstallationToInstallation("admin", "Pavilion1", room1);
 		assertTrue(center.associatedInstallations(pavilion1, pavilion1));
 		assertTrue(center.associatedInstallations(pavilion1, room1));
@@ -119,10 +121,88 @@ operations
 	pre card dom center.users = 1
 	post card dom center.users = 5;
 
+	public testEdge: Center ==> ()
+	testEdge(center) == (
+	(
+		dcl pavilion3: Installation := new Pavilion("Pavilion3", 150, 50, 10, 50, 70, false, false, true, false, false);
+		dcl foyer4: Installation := new Foyer("Foyer4", 10, 15, 4, 6, 6, false, true, false, true);
+		center.addInstallations("admin", pavilion3);
+		center.addInstallationToInstallation("admin", "Pavilion3", foyer4);
+	);
+	(
+
+		dcl event2: Event := center.createEvent("Event2", 3, 10, mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4), false, <Conference>, center.installations("Pavilion3"), "User1");
+		dcl event3: Event := center.createEvent("Event3", 3, 10, mk_Utils_vdm`Date(2018, 12, 5), mk_Utils_vdm`Date(2018, 12, 5), true, <Conference>, center.installations("Foyer4"), "User1");
+		dcl event4: Event := center.createEvent("Event4", 3, 10, mk_Utils_vdm`Date(2018, 12, 6), mk_Utils_vdm`Date(2018, 12, 6), true, <Conference>, center.installations("Room1"), "User1");
+		dcl event5: Event := center.createEvent("Event5", 3, 10, mk_Utils_vdm`Date(2018, 12, 7), mk_Utils_vdm`Date(2018, 12, 7), true, <Conference>, center.installations("Room1"), "User1");
+		dcl service1: Service := new Service(10, <IT>);
+		
+		assertTrue("Pavilion3" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4)));
+		assertTrue("Foyer4" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4)));
+		assertTrue("Pavilion3" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 5), mk_Utils_vdm`Date(2018, 12, 5)));
+		assertTrue("Foyer4" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12,5), mk_Utils_vdm`Date(2018, 12, 5)));
+		
+		
+		center.addUserToEvent("Event3", "User2", <staff>);
+		assertTrue("User2" in set event3.staff);
+		center.addUserToEvent("Event3", "User3", <staff>);
+		assertTrue("User3" in set event3.staff);
+		center.addUserToEvent("Event3", "User2", <host>);
+		assertEqual(event3.host, "User2");
+		assertTrue(not "User2" in set event3.staff);
+		center.removeUserFromEvent("Event3", "User3", <staff>);
+		assertTrue(not "User3" in set event3.staff);
+		
+		center.addService("admin", service1);
+		center.changeEventPrivacy("Event2", "User1", true);
+		assertEqual(event2.privacy, true);
+		assertEqual(event2.guests, event2.attendees);
+		center.addServiceToEvent("Event2", "User1", <AudioVisual>);
+		center.addServiceToEvent("Event2", "User1", <IT>);
+		assertTrue(len event2.services = 2);
+		
+		assertTrue(center.listEventServices("Event2") union center.availableServicesForEvent("Event2") = rng center.services);
+		center.removeService("admin", <IT>);
+		assertTrue(len event2.services = 1);
+		
+		assertTrue(center.listEvents("admin") = rng center.events);
+		assertTrue(center.showAvailableEventsBetweenDates("admin",mk_Utils_vdm`Date(2018, 12, 7), mk_Utils_vdm`Date(2018, 12, 7)) = {event5});
+		center.addUserToEvent("Event5", "User2", <attendee>);
+		center.changeEventTotalTickets("Event5", "User1", 1);
+		assertTrue(card event5.attendees = event5.totalTickets);
+		assertTrue(center.showAvailableEventsBetweenDates("admin",mk_Utils_vdm`Date(2018, 12, 7), mk_Utils_vdm`Date(2018, 12, 7)) = {});
+		assertTrue(center.showAvailableEvents("admin") = rng center.events \ {event5});
+		
+		assertEqual(center.showEventDetails("admin", "Event3")("Name"), "Event3");
+		
+		assertTrue(center.events("Event3").earnedMoney() = 0);
+		assertTrue(center.events("Event3").remainingTickets() = 3);
+		
+		assertTrue(Event`typetoStringVDM(<TeamBuilding>) ="Team Building");
+		assertTrue(Event`typetoStringVDM(<TradeFair>) ="Trade Fair");
+		assertTrue(Event`typetoStringVDM(<Musical>) ="Musical");
+		
+		assertTrue(Service`typetoStringVDM(<Catering>) ="Catering");
+		assertTrue(Service`typetoStringVDM(<IT>) ="IT");
+		assertTrue(Service`typetoStringVDM(<Cleaning>) ="Cleaning");
+		assertTrue(Service`typetoStringVDM(<Security>) ="Security");
+		assertTrue(Service`typetoStringVDM(<Decoration>) ="Decoration");
+
+		assertTrue(Pavilion`sumElems([1, 0.1]) = 1.1);
+		
+		assertTrue(not center.users("admin").attendEvent("Event3"));
+		)
+	)
+	
+	
+	pre card dom center.events = 1
+	post card dom center.events = 5;
+
 --Create an event and change its attributes (event details, services and installation)	
 	public testEvent: Center ==> ()
 	testEvent(center) == (
 		dcl event1: Event := center.createEvent("Event1", 3, 10, mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3), true, <Conference>, center.installations("Room1"), "User1");
+
 		--Check event and its availability to the users
 		assertTrue("Room1" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)));
 		assertEqual(center.showAvailableEvents("User2"), {});
@@ -151,8 +231,8 @@ operations
 		center.changeEventPrivacy("New Event Name", "User1", false);
 		assertEqual(event1.privacy, false);
 		assertEqual(center.showAvailableEventsBetweenDates("User3", mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)), {event1});
-		center.changeEventType("New Event Name", "User1", <Party>)
-	)
+		center.changeEventType("New Event Name", "User1", <Party>);
+)	
 	pre card dom center.events = 0
 	post card dom center.events = 1;
 
@@ -208,11 +288,7 @@ operations
 		centerTest.testUsers(center);
 		centerTest.testEvent(center);
 		centerTest.testEventProfit(center);
-
-		/**new InstallationTest().testAll();
-		new EventTest().testAll();
-		new ServiceTest().testAll();
-		new UserTest().testAll();**/
+		centerTest.testEdge(center);
 		
 	);
 end CenterTest
