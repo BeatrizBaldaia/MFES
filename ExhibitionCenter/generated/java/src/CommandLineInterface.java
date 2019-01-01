@@ -335,12 +335,12 @@ public class CommandLineInterface {
 		}));
 
 		eventsMenuEntries.add(new SimpleEntry<>("Show All Available Events", () -> {
-			showEventsMenu("all");
+			showEventsMenu("available");
 			return null;
 		}));
 
 		eventsMenuEntries.add(new SimpleEntry<>("Show All Available Events Between Two Dates", () -> {
-			showEventsMenu("all");
+			showEventsMenu("between");
 			return null;
 		}));
 
@@ -359,6 +359,14 @@ public class CommandLineInterface {
 		VDMSet events = null;
 		if(range.compareTo("all") == 0) {
 			events = center.listEvents(userName);
+		} else if(range.compareTo("available") == 0) {
+			events = center.showAvailableEvents(userName);
+		} else {
+			System.out.println("\nStarting Date");
+			Utils_vdm.Date s = getDate();
+			System.out.println("\nEnding Date");
+			Utils_vdm.Date e = getDate();
+			events = center.showAvailableEventsBetweenDates(userName, s, e);
 		}
 		ArrayList<SimpleEntry<String, Callable<Object>>> showEventsMenuEntries = new ArrayList<>();
 		while (true) {
@@ -366,7 +374,7 @@ public class CommandLineInterface {
 			printLine();
 
 			if(events.size() == 0) {
-				System.out.println("There is no event yet");
+				System.out.println("There are no events yet");
 				System.out.println();
 			} else {
 				System.out.println("All Events");
@@ -378,8 +386,9 @@ public class CommandLineInterface {
 				System.out.println();
 			}
 			showEventsMenuEntries.clear();
+			final VDMSet eventsToSelect = events;
 			showEventsMenuEntries.add(new SimpleEntry<>("Select Event", () -> {
-				selectEventMenu();
+				selectEventMenu(eventsToSelect);
 				return null;
 			}));
 			showEventsMenuEntries.add(new SimpleEntry<>("Main Menu", () -> {
@@ -403,15 +412,16 @@ public class CommandLineInterface {
 	 * After that, more entries, related to the event selected,
 	 * are added to the menu
 	 */
-	private void selectEventMenu() {
+	private void selectEventMenu(VDMSet events) {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
 
 		System.out.print("Event name: ");
 		String event = reader.nextLine();
-		if(!center.events.containsKey(event)) {
+		if(!events.contains(event)) {
 			System.out.println("There is no event " + event + ". Try again...");
 			System.out.println();
+			reader.nextLine();
 			return;
 		}
 
@@ -445,7 +455,7 @@ public class CommandLineInterface {
 			viewEventDetails(eventName);
 			return null;
 		}));
-		if(event.attendees.contains(userName)) {
+		if(!event.attendees.contains(userName)) {
 			selectedEventMenuEntries.add(new SimpleEntry<>("Buy Ticket", () -> {
 				return null;
 			}));
@@ -509,11 +519,9 @@ public class CommandLineInterface {
 			int option = getUserInput(1, editEventMenuEntries.size() - 1);
 
 			try {
-
 				Future<Object> result = executor.submit(editEventMenuEntries.get(option).getValue());
 				Event event = (Event) result.get();
 				name = event.name;
-				//Event event = (Event) editEventMenuEntries.get(option).getValue().call();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -551,8 +559,7 @@ public class CommandLineInterface {
 			return changeEventType(eventName);
 		}));
 		editEventMenuEntries.add(new SimpleEntry<>("Change Intallation", () -> {
-
-			return null;
+			return changeEventInstallation(eventName);
 		}));
 		editEventMenuEntries.add(new SimpleEntry<>("Add Service", () -> {
 			return addServiceToEvent(eventName);
@@ -561,8 +568,8 @@ public class CommandLineInterface {
 			return removeServiceFromEvent(eventName);
 		}));
 		editEventMenuEntries.add(new SimpleEntry<>("Remove Participant", () -> {
-
-			return null;
+			removeParticipantMenu(eventName);
+			return event;
 		}));
 		if(event.privacy) {
 			editEventMenuEntries.add(new SimpleEntry<>("Invite User", () -> {
@@ -572,6 +579,40 @@ public class CommandLineInterface {
 		editEventMenuEntries.add(new SimpleEntry<>("Main Menu", () -> {
 			loggedInMenu();
 			return event;
+		}));
+	}
+	
+	private void removeParticipantMenu(String eventName) {
+		
+		ArrayList<SimpleEntry<String, Callable<Object>>> removeParticipantMenuEntries = new ArrayList<>();
+		while (true) {
+			removeParticipantMenuEntries.clear();
+			addRemoveParticipantMenuEntries(removeParticipantMenuEntries, eventName);
+			printEmptyLines(EMPTY_LINES);
+			printLine();
+			printMenuEntries(removeParticipantMenuEntries);
+			int option = getUserInput(1, removeParticipantMenuEntries.size() - 1);
+
+			try {
+				removeParticipantMenuEntries.get(option).getValue().call();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void addRemoveParticipantMenuEntries(ArrayList<SimpleEntry<String, Callable<Object>>> removeParticipantMenuEntries, String eventName) {
+		removeParticipantMenuEntries.add(new SimpleEntry<>("Attendee", () -> {
+			removeAttendeeFromEvent(eventName);
+			return null;
+		}));
+		removeParticipantMenuEntries.add(new SimpleEntry<>("Staff", () -> {
+			removeStaffFromEvent(eventName);
+			return null;
+		}));
+		removeParticipantMenuEntries.add(new SimpleEntry<>("Main Menu", () -> {
+			loggedInMenu();
+			return null;
 		}));
 	}
 
@@ -613,22 +654,10 @@ public class CommandLineInterface {
 		printLine();
 
 		System.out.print("New starting date\n\n");
-		System.out.print("  Day: ");
-		Float bDay = Float.parseFloat(reader.nextLine());
-		System.out.print("  Month: ");
-		Float bMonth = Float.parseFloat(reader.nextLine());
-		System.out.print("  Year: ");
-		Float bYear = Float.parseFloat(reader.nextLine());
-		Utils_vdm.Date newBeginDate = new Utils_vdm.Date(bYear, bMonth, bDay);
+		Utils_vdm.Date newBeginDate = getDate();
 
 		System.out.print("New ending date\n\n");
-		System.out.print("  Day: ");
-		Float eDay = Float.parseFloat(reader.nextLine());
-		System.out.print("  Month: ");
-		Float eMonth = Float.parseFloat(reader.nextLine());
-		System.out.print("  Year: ");
-		Float eYear = Float.parseFloat(reader.nextLine());
-		Utils_vdm.Date newEndingDate = new Utils_vdm.Date(eYear, eMonth, eDay);
+		Utils_vdm.Date newEndingDate = getDate();
 
 		center.changeEventDate(eventName, userName, new beginQuote(), newBeginDate);
 		center.changeEventDate(eventName, userName, new endingQuote(), newEndingDate);
@@ -736,6 +765,12 @@ public class CommandLineInterface {
 		printLine();
 
 		Event event = (Event)center.events.get(eventName);
+		if(event.attendees.size() == 0) {
+			System.out.println(eventName + " has no attendees yet");
+			reader.nextLine();
+			return null;
+		}
+		
 		Iterator<String> it = event.attendees.iterator();
 		System.out.println("Attendees:\n");
 		while(it.hasNext()) {
@@ -752,6 +787,12 @@ public class CommandLineInterface {
 		printLine();
 
 		Event event = (Event)center.events.get(eventName);
+		if(event.staff.size() == 0) {
+			System.out.println(eventName + " has no staff members yet");
+			reader.nextLine();
+			return null;
+		}
+		
 		Iterator<String> it = event.staff.iterator();
 		System.out.println("Staff members:\n");
 		while(it.hasNext()) {
@@ -771,5 +812,43 @@ public class CommandLineInterface {
 		String userToInvite = reader.nextLine();
 		center.inviteToEvent(eventName, userName, userToInvite);
 		return (Event)center.events.get(eventName);
+	}
+	
+	private Event changeEventInstallation(String eventName) {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		Event event = (Event) center.events.get(eventName);
+		System.out.println("All the available installations");
+		System.out.println("in " + eventName + " dates");
+		System.out.println();
+		
+		VDMMap availableInstallations = center.getAvailableInstallations(event.begin, event.ending);
+		Iterator<String> it = MapUtil.dom(availableInstallations).iterator();
+		while(it.hasNext()) {
+			String inst = (String) it.next();
+			System.out.println(inst);
+		}
+		
+		System.out.print("\nChoose one installation: ");
+		String selectedInst = reader.nextLine();
+		if(!MapUtil.dom(availableInstallations).contains(selectedInst)) {
+			System.out.println("There is no such installation named " + selectedInst);
+			reader.nextLine();
+		} else {
+			center.changeEventInstallation(eventName, userName, selectedInst);
+		}
+		return event;
+	}
+	
+	private Utils_vdm.Date getDate() {
+		System.out.print("  Day: ");
+		Float day = Float.parseFloat(reader.nextLine());
+		System.out.print("  Month: ");
+		Float month = Float.parseFloat(reader.nextLine());
+		System.out.print("  Year: ");
+		Float year = Float.parseFloat(reader.nextLine());
+		Utils_vdm.Date date = new Utils_vdm.Date(year, month, day);
+		
+		return date;
 	}
 }
