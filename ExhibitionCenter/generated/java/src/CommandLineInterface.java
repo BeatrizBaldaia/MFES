@@ -15,6 +15,7 @@ import org.overture.codegen.runtime.VDMSet;
 
 import ExhibitionCenter.Center;
 import ExhibitionCenter.Event;
+import ExhibitionCenter.Installation;
 import ExhibitionCenter.User;
 import ExhibitionCenter.Utils_vdm;
 import ExhibitionCenter.quotes.*;
@@ -25,7 +26,6 @@ public class CommandLineInterface {
 	private Scanner reader = new Scanner(System.in);
 	private Center center;
 	private String userName = null;
-	private String currEvent = null;
 
 	CommandLineInterface(Center center) {
 		this.center = center;
@@ -343,6 +343,11 @@ public class CommandLineInterface {
 			showEventsMenu("between");
 			return null;
 		}));
+		
+		eventsMenuEntries.add(new SimpleEntry<>("Create Event", () -> {
+			createEvent();
+			return null;
+		}));
 
 		eventsMenuEntries.add(new SimpleEntry<>("Main Menu", () -> {
 			loggedInMenu();
@@ -417,18 +422,18 @@ public class CommandLineInterface {
 		printLine();
 
 		System.out.print("Event name: ");
-		String event = reader.nextLine();
-		if(!events.contains(event)) {
-			System.out.println("There is no event " + event + ". Try again...");
+		String eventName = reader.nextLine();
+		Event event = (Event) center.events.get(eventName);
+		if(event == null || !events.contains(event)) {
+			System.out.println("There is no event " + eventName + ". Try again...");
 			System.out.println();
-			reader.nextLine();
 			return;
 		}
 
 		ArrayList<SimpleEntry<String, Callable<Object>>> selectedEventMenuEntries = new ArrayList<>();
 		while (true) {
 			selectedEventMenuEntries.clear();
-			addSelectedEventMenuEntries(selectedEventMenuEntries, event);
+			addSelectedEventMenuEntries(selectedEventMenuEntries, eventName);
 			printEmptyLines(EMPTY_LINES);
 			printLine();
 			printMenuEntries(selectedEventMenuEntries);
@@ -615,6 +620,63 @@ public class CommandLineInterface {
 			return null;
 		}));
 	}
+	
+	private void createEvent() {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		
+		System.out.print("\nEvent Name: ");
+		String eventName = reader.nextLine();
+		System.out.print("\nNumber of Tickets: ");
+		Integer totalTickets = Integer.parseInt(reader.nextLine());
+		System.out.print("\nTicket Price: ");
+		Float ticketPrice = Float.parseFloat(reader.nextLine());
+		System.out.print("\nStarting Date\n");
+		Utils_vdm.Date bDate = getDate();
+		System.out.print("\nEnding Date\n");
+		Utils_vdm.Date eDate = getDate();
+		System.out.print("\nIs Private? (yes or no): ");
+		String privacyStr = reader.nextLine();
+		boolean privacy = true;
+		if(privacyStr.compareTo("no") == 0) {
+			privacy = false;
+		}
+		Object type = getEventType();
+		String instName = selectInstallationBetweenDates(bDate, eDate);
+		if(instName == null) {
+			return;
+		}
+		Installation inst = (Installation)center.installations.get(instName);
+		
+		center.createEvent(eventName, totalTickets, ticketPrice, bDate, eDate, privacy, type, inst, userName);
+		
+	}
+	
+	private String selectInstallationBetweenDates(Utils_vdm.Date b, Utils_vdm.Date e) {
+		System.out.println("\nAll the available installations in the given dates");
+		System.out.println();
+		
+		VDMMap availableInstallations = center.getAvailableInstallations(b, e);
+		if(availableInstallations.size() == 0) {
+			System.out.println("There are no available installations\n");
+			reader.nextLine();
+			return null;
+		}
+		Iterator<String> it = MapUtil.dom(availableInstallations).iterator();
+		while(it.hasNext()) {
+			String inst = (String) it.next();
+			System.out.println(inst);
+		}
+		
+		System.out.print("\nChoose one installation: ");
+		String selectedInst = reader.nextLine();
+		if(!MapUtil.dom(availableInstallations).contains(selectedInst)) {
+			System.out.println("There is no such installation named " + selectedInst);
+			reader.nextLine();
+			return null;
+		}
+		return selectedInst;
+	}
 
 	private Event changeEventName(String eventName) {
 		printEmptyLines(EMPTY_LINES);
@@ -669,7 +731,14 @@ public class CommandLineInterface {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
 
-		System.out.print("Event Types\n\n");
+		Object type = getEventType();
+		center.changeEventType(eventName, userName, type);
+
+		return (Event)center.events.get(eventName);
+	}
+	
+	private Object getEventType() {
+		System.out.print("\nEvent Types\n\n");
 		System.out.println("1- Conference");
 		System.out.println("2- Trade Fair");
 		System.out.println("3- Party");
@@ -679,21 +748,14 @@ public class CommandLineInterface {
 		Integer option = Integer.parseInt(reader.nextLine());
 
 		switch (option) {
-		case 1:  center.changeEventType(eventName, userName, new ConferenceQuote());
-		break;
-		case 2:  center.changeEventType(eventName, userName, new TradeFairQuote());
-		break;
-		case 3:  center.changeEventType(eventName, userName, new PartyQuote());
-		break;
-		case 4:  center.changeEventType(eventName, userName, new MusicalQuote());
-		break;
-		case 5:  center.changeEventType(eventName, userName, new TeamBuildingQuote());
-		break;
+		case 1:  return new ConferenceQuote();
+		case 2:  return new TradeFairQuote();
+		case 3:  return new PartyQuote();
+		case 4:  return new MusicalQuote();
+		case 5:  return new TeamBuildingQuote();
 		default: System.out.println("Invalid option");
-		break;
+		return null;
 		}
-
-		return (Event)center.events.get(eventName);
 	}
 
 	private Event addServiceToEvent(String eventName) {
@@ -823,6 +885,11 @@ public class CommandLineInterface {
 		System.out.println();
 		
 		VDMMap availableInstallations = center.getAvailableInstallations(event.begin, event.ending);
+		if(availableInstallations.size() == 0) {
+			System.out.println("There are no available installations\n");
+			reader.nextLine();
+			return event;
+		}
 		Iterator<String> it = MapUtil.dom(availableInstallations).iterator();
 		while(it.hasNext()) {
 			String inst = (String) it.next();
