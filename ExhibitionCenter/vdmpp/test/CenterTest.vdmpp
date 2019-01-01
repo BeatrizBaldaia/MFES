@@ -37,6 +37,8 @@ operations
 		center.addInstallations("admin", auditorium1);
 		center.addInstallationToInstallation("admin", "Auditorium1", foyer1);
 		assertTrue(center.associatedInstallations(auditorium1, foyer1));
+		assertTrue(not center.hasInstallation(auditorium1, room1));
+		assertTrue(not center.hasInstallation(room1, auditorium1));
 		center.addInstallationToInstallation("admin", "Pavilion1", room1);
 		assertTrue(center.associatedInstallations(pavilion1, pavilion1));
 		assertTrue(center.associatedInstallations(pavilion1, room1));
@@ -119,40 +121,8 @@ operations
 	pre card dom center.users = 1
 	post card dom center.users = 5;
 
---Create an event and change its attributes (event details, services and installation)	
-	public testEvent: Center ==> ()
-	testEvent(center) == (
-		dcl event1: Event := center.createEvent("Event1", 3, 10, mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3), true, <Conference>, center.installations("Room1"), "User1");
-
-		--Check event and its availability to the users
-		assertTrue("Room1" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)));
-		assertEqual(center.showAvailableEvents("User2"), {});
-		center.inviteToEvent("Event1", "User1", "User2");
-		assertEqual(center.showAvailableEvents("User2"), {event1});
-		assertEqual(center.showAvailableEventsBetweenDates("User3", mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)), {});
-		--Add and remove services from event
-		center.addServiceToEvent("Event1", "User1", <AudioVisual>);
-		assertTrue(len event1.services = 1);
-		center.removeServiceFromEvent("Event1", "User1", <AudioVisual>);
-		assertTrue(len event1.services = 0);
-		center.addServiceToEvent("Event1", "User1", <AudioVisual>);
-		center.changeEventInstallation("Event1", "User1", "Foyer1");
-		assertEqual(event1.installation.id, "Foyer1");
-		--Change event attributes
-		center.changeEventName("Event1", "User1", "New Event Name");
-		assertEqual(event1.name, "New Event Name");
-		center.changeEventTotalTickets("New Event Name", "User1", 6);
-		assertEqual(event1.totalTickets, 6);
-		center.changeEventTicketPrice("New Event Name", "User1", 5);
-		assertEqual(event1.ticketPrice, 5);
-		center.changeEventDate("New Event Name", "User1", <begin>, mk_Utils_vdm`Date(2018, 12, 2));
-		assertEqual(event1.begin, mk_Utils_vdm`Date(2018, 12, 2));
-		center.changeEventDate("New Event Name", "User1", <ending>, mk_Utils_vdm`Date(2018, 12, 5));
-		assertEqual(event1.ending, mk_Utils_vdm`Date(2018, 12, 5));
-		center.changeEventPrivacy("New Event Name", "User1", false);
-		assertEqual(event1.privacy, false);
-		assertEqual(center.showAvailableEventsBetweenDates("User3", mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)), {event1});
-		center.changeEventType("New Event Name", "User1", <Party>);
+	public testEdge: Center ==> ()
+	testEdge(center) == (
 	(
 		dcl pavilion3: Installation := new Pavilion("Pavilion3", 150, 50, 10, 50, 70, false, false, true, false, false);
 		dcl foyer4: Installation := new Foyer("Foyer4", 10, 15, 4, 6, 6, false, true, false, true);
@@ -196,13 +166,75 @@ operations
 		assertTrue(len event2.services = 1);
 		
 		assertTrue(center.listEvents("admin") = rng center.events);
-			
+		assertTrue(center.showAvailableEventsBetweenDates("admin",mk_Utils_vdm`Date(2018, 12, 7), mk_Utils_vdm`Date(2018, 12, 7)) = {event5});
+		center.addUserToEvent("Event5", "User2", <attendee>);
+		center.changeEventTotalTickets("Event5", "User1", 1);
+		assertTrue(card event5.attendees = event5.totalTickets);
+		assertTrue(center.showAvailableEventsBetweenDates("admin",mk_Utils_vdm`Date(2018, 12, 7), mk_Utils_vdm`Date(2018, 12, 7)) = {});
+		assertTrue(center.showAvailableEvents("admin") = rng center.events \ {event5});
+		
+		assertEqual(center.showEventDetails("admin", "Event3")("Name"), "Event3");
+		
+		assertTrue(center.events("Event3").earnedMoney() = 0);
+		assertTrue(center.events("Event3").remainingTickets() = 3);
+		
+		assertTrue(Event`typetoStringVDM(<TeamBuilding>) ="Team Building");
+		assertTrue(Event`typetoStringVDM(<TradeFair>) ="Trade Fair");
+		assertTrue(Event`typetoStringVDM(<Musical>) ="Musical");
+		
+		assertTrue(Service`typetoStringVDM(<Catering>) ="Catering");
+		assertTrue(Service`typetoStringVDM(<IT>) ="IT");
+		assertTrue(Service`typetoStringVDM(<Cleaning>) ="Cleaning");
+		assertTrue(Service`typetoStringVDM(<Security>) ="Security");
+		assertTrue(Service`typetoStringVDM(<Decoration>) ="Decoration");
+
+		assertTrue(Pavilion`sumElems([1, 0.1]) = 1.1);
+		
+		assertTrue(not center.users("admin").attendEvent("Event3"));
 		)
 	)
 	
 	
-	pre card dom center.events = 0
+	pre card dom center.events = 1
 	post card dom center.events = 5;
+
+--Create an event and change its attributes (event details, services and installation)	
+	public testEvent: Center ==> ()
+	testEvent(center) == (
+		dcl event1: Event := center.createEvent("Event1", 3, 10, mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3), true, <Conference>, center.installations("Room1"), "User1");
+
+		--Check event and its availability to the users
+		assertTrue("Room1" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)));
+		assertEqual(center.showAvailableEvents("User2"), {});
+		center.inviteToEvent("Event1", "User1", "User2");
+		assertEqual(center.showAvailableEvents("User2"), {event1});
+		assertEqual(center.showAvailableEventsBetweenDates("User3", mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)), {});
+		--Add and remove services from event
+		center.addServiceToEvent("Event1", "User1", <AudioVisual>);
+		assertTrue(len event1.services = 1);
+		center.removeServiceFromEvent("Event1", "User1", <AudioVisual>);
+		assertTrue(len event1.services = 0);
+		center.addServiceToEvent("Event1", "User1", <AudioVisual>);
+		center.changeEventInstallation("Event1", "User1", "Foyer1");
+		assertEqual(event1.installation.id, "Foyer1");
+		--Change event attributes
+		center.changeEventName("Event1", "User1", "New Event Name");
+		assertEqual(event1.name, "New Event Name");
+		center.changeEventTotalTickets("New Event Name", "User1", 6);
+		assertEqual(event1.totalTickets, 6);
+		center.changeEventTicketPrice("New Event Name", "User1", 5);
+		assertEqual(event1.ticketPrice, 5);
+		center.changeEventDate("New Event Name", "User1", <begin>, mk_Utils_vdm`Date(2018, 12, 2));
+		assertEqual(event1.begin, mk_Utils_vdm`Date(2018, 12, 2));
+		center.changeEventDate("New Event Name", "User1", <ending>, mk_Utils_vdm`Date(2018, 12, 5));
+		assertEqual(event1.ending, mk_Utils_vdm`Date(2018, 12, 5));
+		center.changeEventPrivacy("New Event Name", "User1", false);
+		assertEqual(event1.privacy, false);
+		assertEqual(center.showAvailableEventsBetweenDates("User3", mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)), {event1});
+		center.changeEventType("New Event Name", "User1", <Party>);
+)	
+	pre card dom center.events = 0
+	post card dom center.events = 1;
 
 --By changing differente external factors, like services' price,
 -- installation's rent and number of attendees,
@@ -241,7 +273,7 @@ operations
 		assertEqual(center.moneySpentWithServices("User4", "New Event Name"), 120)--since service (<AudioVisual>) price is 10 and event days are 4
 		
 	)
-	pre card dom center.events = 5;
+	pre card dom center.events = 1;
  /***** TEST CASES WITH VALID INPUTS ******/
  
   /***** TEST CASES WITH INVALID INPUTS (EXECUTE ONE AT A TIME) ******/
@@ -256,6 +288,7 @@ operations
 		centerTest.testUsers(center);
 		centerTest.testEvent(center);
 		centerTest.testEventProfit(center);
+		centerTest.testEdge(center);
 		
 	);
 end CenterTest

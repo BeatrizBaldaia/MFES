@@ -277,8 +277,7 @@ operations
 	showAvailableEvents(uName) == (
 		dcl res: set of Event := {};
 		for all e in set rng events do (
-			if(card e.attendees = e.totalTickets) then skip
-			else (
+			if(card e.attendees = e.totalTickets) then skip else (
 				if(e.privacy and uName in set e.guests union e.staff union {e.host, adminName}) then res := res union {e};
 				if(not e.privacy) then res := res union {e}
 			)
@@ -294,9 +293,10 @@ operations
 		dcl res: set of Event := {};
 		for all ev in set rng events do 
 			if(hasDatesConflict(ev, b, e)) then (
-				if(card ev.attendees = ev.totalTickets) then skip;
-				if(ev.privacy and uName in set ev.guests union ev.staff union {ev.host, adminName}) then res := res union {ev};
-				if(not ev.privacy) then res := res union {ev}
+				if(card ev.attendees = ev.totalTickets) then skip else (
+					if(ev.privacy and uName in set ev.guests union ev.staff union {ev.host, adminName}) then res := res union {ev};
+					if(not ev.privacy) then res := res union {ev}
+				)
 			);
 		return res	
 	)
@@ -474,14 +474,13 @@ functions
 		if (isofclass(Auditorium, inst2)) then (
 			let inst = narrow_(inst2, Auditorium) in
 			if(isofclass(Foyer, inst1)) then let foyer = narrow_(inst1, Foyer) in foyer in set inst.foyers
-			else false
-		) elseif(isofclass(Pavilion, inst2)) then (
+			else false)
+			elseif(isofclass(Pavilion, inst2)) then (
 			let inst = narrow_(inst2, Pavilion) in
 			if(isofclass(Foyer, inst1)) then let foyer = narrow_(inst1, Foyer) in foyer in set inst.foyers
 			else(if(isofclass(Room, inst1)) then (let room = narrow_(inst1, Room) in room in set inst.rooms)else false)
 		) else (
-			false
-		)
+			false )
 	)
 	pre true;--(isofclass(Foyer, inst1) or isofclass(Room, inst1)) and
 	--(isofclass(Auditorium, inst2) or isofclass(Pavilion, inst2));
