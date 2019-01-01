@@ -135,7 +135,8 @@ operations
 		usedInsts := tmpUsedInsts;
 		for all inst1 in set rng tmpFreeInsts do (
 			for all inst2 in set tmpUsedInsts do (
-				if(inst1.hasInstallation(inst2)) then usedInsts :=  usedInsts union {inst1}
+				if(inst1.hasInstallation(inst2)) then usedInsts :=  usedInsts union {inst1};
+				if(inst2.hasInstallation(inst1)) then usedInsts :=  usedInsts union {inst1}
 			)
 		);
 		return tmpFreeInsts :-> usedInsts;
@@ -227,7 +228,7 @@ operations
 	)
 	pre uName in set dom users
 	post RESULT subset rng events and forall e in set RESULT &
-		not (e.privacy and uName not in set (e.guests union {e.host} union e.staff));
+		not (e.privacy and uName not in set (e.guests union {e.host} union e.staff union {adminName}));
 		
 --Return the services used in one event
 	public listEventServices: Utils_vdm`String ==> set of Service
@@ -488,8 +489,8 @@ functions
 --Checks if this event has conflicts with the period given in the arguments
 	public hasDatesConflict: Event * Utils_vdm`Date * Utils_vdm`Date -> bool
 	hasDatesConflict(ev, b2, e2) == (
-		if(Utils_vdm`before(b2, ev.begin)) then Utils_vdm`before(ev.begin, e2)
-		else Utils_vdm`before(b2, ev.ending)
+		if(Utils_vdm`before(b2, ev.begin)) then (Utils_vdm`before(ev.begin, e2) or ev.begin = e2)
+		else (Utils_vdm`before(b2, ev.ending) or b2 = ev.ending or b2 = ev.begin)
 	)
 	pre (Utils_vdm`before(ev.begin, ev.ending) or ev.begin = ev.ending) 
 		and (Utils_vdm`before(b2, e2) or b2 = e2);

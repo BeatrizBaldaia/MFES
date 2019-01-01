@@ -154,11 +154,24 @@ operations
 		assertEqual(center.showAvailableEventsBetweenDates("User3", mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3)), {event1});
 		center.changeEventType("New Event Name", "User1", <Party>);
 	(
-		dcl event2: Event := center.createEvent("Event2", 3, 10, mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4), false, <Conference>, center.installations("Room1"), "User1");
-		dcl event3: Event := center.createEvent("Event3", 3, 10, mk_Utils_vdm`Date(2018, 12, 5), mk_Utils_vdm`Date(2018, 12, 5), true, <Conference>, center.installations("Room1"), "User1");
+		dcl pavilion3: Installation := new Pavilion("Pavilion3", 150, 50, 10, 50, 70, false, false, true, false, false);
+		dcl foyer4: Installation := new Foyer("Foyer4", 10, 15, 4, 6, 6, false, true, false, true);
+		center.addInstallations("admin", pavilion3);
+		center.addInstallationToInstallation("admin", "Pavilion3", foyer4);
+	);
+	(
+
+		dcl event2: Event := center.createEvent("Event2", 3, 10, mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4), false, <Conference>, center.installations("Pavilion3"), "User1");
+		dcl event3: Event := center.createEvent("Event3", 3, 10, mk_Utils_vdm`Date(2018, 12, 5), mk_Utils_vdm`Date(2018, 12, 5), true, <Conference>, center.installations("Foyer4"), "User1");
 		dcl event4: Event := center.createEvent("Event4", 3, 10, mk_Utils_vdm`Date(2018, 12, 6), mk_Utils_vdm`Date(2018, 12, 6), true, <Conference>, center.installations("Room1"), "User1");
 		dcl event5: Event := center.createEvent("Event5", 3, 10, mk_Utils_vdm`Date(2018, 12, 7), mk_Utils_vdm`Date(2018, 12, 7), true, <Conference>, center.installations("Room1"), "User1");
 		dcl service1: Service := new Service(10, <IT>);
+		
+		assertTrue("Pavilion3" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4)));
+		assertTrue("Foyer4" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4)));
+		assertTrue("Pavilion3" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 5), mk_Utils_vdm`Date(2018, 12, 5)));
+		assertTrue("Foyer4" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12,5), mk_Utils_vdm`Date(2018, 12, 5)));
+		
 		
 		center.addUserToEvent("Event3", "User2", <staff>);
 		assertTrue("User2" in set event3.staff);
@@ -177,8 +190,13 @@ operations
 		center.addServiceToEvent("Event2", "User1", <AudioVisual>);
 		center.addServiceToEvent("Event2", "User1", <IT>);
 		assertTrue(len event2.services = 2);
-		center.removeServiceFromEvent("Event2", "User1", <AudioVisual>);
+		
+		assertTrue(center.listEventServices("Event2") union center.availableServicesForEvent("Event2") = rng center.services);
+		center.removeService("admin", <IT>);
 		assertTrue(len event2.services = 1);
+		
+		assertTrue(center.listEvents("admin") = rng center.events);
+			
 		)
 	)
 	
