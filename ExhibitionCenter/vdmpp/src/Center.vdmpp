@@ -95,8 +95,10 @@ operations
 	public removeInstallation: Utils_vdm`String * Utils_vdm`String ==> ()
 	removeInstallation(uName, instID) == (
 		dcl instToRemove: set of Utils_vdm`String := {instID}; 
-		for all inst in set rng installations \ {installations(instID)} do
+		for all inst in set rng installations \ {installations(instID)} do (
 			if(hasInstallation(inst, installations(instID))) then (instToRemove := instToRemove union {inst.id});
+			if(inst.hasInstallation(installations(instID))) then (removeInstallationFromInstallation(uName, inst.id, installations(instID)))
+		);
 		installations := instToRemove <-: installations
 	)
 	pre uName in set dom users and uName = adminName and
