@@ -1,5 +1,6 @@
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
@@ -14,9 +15,14 @@ import org.overture.codegen.runtime.Utils;
 import org.overture.codegen.runtime.VDMMap;
 import org.overture.codegen.runtime.VDMSet;
 
+import ExhibitionCenter.Auditorium;
+import ExhibitionCenter.CarParking;
 import ExhibitionCenter.Center;
 import ExhibitionCenter.Event;
+import ExhibitionCenter.Foyer;
 import ExhibitionCenter.Installation;
+import ExhibitionCenter.Pavilion;
+import ExhibitionCenter.Room;
 import ExhibitionCenter.User;
 import ExhibitionCenter.Utils_vdm;
 import ExhibitionCenter.quotes.*;
@@ -788,7 +794,6 @@ public class CommandLineInterface {
 		System.out.println("3- Party");
 		System.out.println("4- Musical");
 		System.out.println("5- Team Building\n");
-		//System.out.print("Choose one type: ");
 		Integer option = getUserInput(1, 5);
 
 		switch (option) {
@@ -1046,18 +1051,21 @@ public class CommandLineInterface {
 			showInstallationsMenu("between");
 			return null;
 		}));
-		installationsMenuEntries.add(new SimpleEntry<>("Add Installation", () -> {
-			return null;
-		}));
-		installationsMenuEntries.add(new SimpleEntry<>("Remove Installation", () -> {
-			return null;
-		}));
-		installationsMenuEntries.add(new SimpleEntry<>("Aggregate Installations", () -> {
-			return null;
-		}));
-		installationsMenuEntries.add(new SimpleEntry<>("Separate Installations", () -> {
-			return null;
-		}));
+		if(userName.compareTo("admin") == 0) {
+			installationsMenuEntries.add(new SimpleEntry<>("Add Installation", () -> {
+				addInstallation();
+				return null;
+			}));
+			installationsMenuEntries.add(new SimpleEntry<>("Remove Installation", () -> {
+				return null;
+			}));
+			installationsMenuEntries.add(new SimpleEntry<>("Aggregate Installations", () -> {
+				return null;
+			}));
+			installationsMenuEntries.add(new SimpleEntry<>("Separate Installations", () -> {
+				return null;
+			}));
+		}
 	}
 
 	/**
@@ -1127,7 +1135,6 @@ public class CommandLineInterface {
 		System.out.print("Installation name: ");
 		String installationName = reader.nextLine();
 		Installation installation = (Installation) center.installations.get(installationName);
-		System.out.println("Inst = "+installation);
 		if(installation == null || !installations.contains(installation.id)) {
 			System.out.println("There is no installation " + installationName + ". Try again...");
 			System.out.println();
@@ -1244,64 +1251,29 @@ public class CommandLineInterface {
 	private void changeMeasures(String installationName) {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
-		System.out.print("Capacity: ");
-		Float capacity = Float.parseFloat(reader.nextLine());
-		System.out.print("Heigth: ");
-		Float heigth = Float.parseFloat(reader.nextLine());
-		System.out.print("Width: ");
-		Float width = Float.parseFloat(reader.nextLine());
-		System.out.print("Lenght: ");
-		Float lenght = Float.parseFloat(reader.nextLine());
-		center.changeInstallationMeasures(userName, installationName, capacity, heigth, width, lenght);
-		
+		float[] measures = getMeasures();
+		center.changeInstallationMeasures(userName, installationName, measures[0], measures[1], measures[2], measures[3]);
 	}
 	
 	private void changeConditions(String installationName) {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
-		boolean airC = false, natL = false, ceilL = false, blackC = false, tele = false, compN = false, soundW = false, movW = false;
-		String input = "";
-		System.out.print("Air Condition (yes or no): ");
-		input = reader.nextLine();
-		if(input.compareTo("yes") == 0) {
-			airC = true;
+		String installationType = null;
+		Installation installation = (Installation)center.installations.get(installationName);
+		if(installation instanceof Pavilion) {
+			installationType = "pavilion";
+		} else if(installation instanceof Auditorium) {
+			installationType = "auditorium";
+		} else if(installation instanceof Room) {
+			installationType = "room";
+		} else if(installation instanceof Foyer) {
+			installationType = "foyer";
+		} else {
+			installationType = "parking";
 		}
-		System.out.print("Natural Light (yes or no): ");
-		input = reader.nextLine();
-		if(input.compareTo("yes") == 0) {
-			natL = true;
-		}
-		System.out.print("Ceiling Ligth (yes or no): ");
-		input = reader.nextLine();
-		if(input.compareTo("yes") == 0) {
-			ceilL = true;
-		}
-		System.out.print("Blackout Curtains (yes or no): ");
-		input = reader.nextLine();
-		if(input.compareTo("yes") == 0) {
-			blackC = true;
-		}
-		System.out.print("Telephones (yes or no): ");
-		input = reader.nextLine();
-		if(input.compareTo("yes") == 0) {
-			tele = true;
-		}
-		System.out.print("Computer Network (yes or no): ");
-		input = reader.nextLine();
-		if(input.compareTo("yes") == 0) {
-			compN = true;
-		}
-		System.out.print("Soundproof Walls (yes or no): ");
-		input = reader.nextLine();
-		if(input.compareTo("yes") == 0) {
-			soundW = true;
-		}
-		System.out.print("Moving Walls (yes or no): ");
-		input = reader.nextLine();
-		if(input.compareTo("yes") == 0) {
-			movW = true;
-		}
-		center.changeInstallationConditions(userName, installationName, airC, natL, ceilL, blackC, tele, compN, soundW, movW);
+		System.out.println("Check inst type = "+installationType);
+		boolean[] conditions = getConditions(installationType);
+		center.changeInstallationConditions(userName, installationName, conditions[0], conditions[1], conditions[2], conditions[3], conditions[4], conditions[5], conditions[6], conditions[7]);
 	}
 	
 	private void changeRent(String installationName) {
@@ -1311,5 +1283,125 @@ public class CommandLineInterface {
 		Float rent = Float.parseFloat(reader.nextLine());
 		
 		center.changeInstallationRent(userName, installationName, rent);
+	}
+	
+	private void addInstallation() {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		String installationType = getInstallationType();
+		System.out.print("\nInstallation Name: ");
+		String name = reader.nextLine();
+		float[] measures = getMeasures();
+		boolean[] conditions = getConditions(installationType);
+		System.out.print("\nRent Price (€ per day): ");
+		Float price = Float.parseFloat(reader.nextLine());
+		Installation installation = null;
+		if(installationType.compareTo("pavilion") == 0) {
+			installation = new Pavilion(name, price, measures[0], measures[1], measures[2], measures[3], conditions[0], conditions[1], conditions[2], conditions[3], conditions[5]);
+		} else if(installationType.compareTo("auditorium") == 0) {
+			installation = new Auditorium(name, price, measures[0], measures[1], measures[2], measures[3], conditions[0], conditions[1], conditions[2], conditions[3], conditions[5], conditions[6]);
+		} else if(installationType.compareTo("room") == 0) {
+			installation = new Room(name, price, measures[0], measures[1], measures[2], measures[3], conditions[0], conditions[1], conditions[2], conditions[3], conditions[4], conditions[5], conditions[6], conditions[7]);
+		} else if(installationType.compareTo("foyer") == 0) {
+			installation = new Foyer(name, price, measures[0], measures[1], measures[2], measures[3], conditions[0], conditions[1], conditions[2], conditions[5]);
+		} else {
+			installation = new CarParking(name, price, measures[0], measures[1], measures[2], measures[3]);
+		}
+		
+		center.addInstallations(userName, installation);
+	}
+	
+	private float[] getMeasures() {
+		float[] res = new float[4]; 
+		Arrays.fill(res, 0);
+		System.out.print("Capacity: ");
+		res[0] = Float.parseFloat(reader.nextLine());
+		System.out.print("Heigth: ");
+		res[1] = Float.parseFloat(reader.nextLine());
+		System.out.print("Width: ");
+		res[2] = Float.parseFloat(reader.nextLine());
+		System.out.print("Lenght: ");
+		res[3] = Float.parseFloat(reader.nextLine());
+		return res;
+	}
+	
+	/**
+	 * returns boolean[] => [airC, natL, ceilL, blackC, tele, compN, soundP, movW]
+	 * @param installationType
+	 * @return
+	 */
+	private boolean[] getConditions(String installationType) {
+		boolean[] res = new boolean[8]; 
+		Arrays.fill(res, false);
+		if(installationType.compareTo("parking") == 0) {
+			return res;
+		}
+		String input = "";
+		System.out.print("Air Condition (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			res[0] = true;
+		}
+		System.out.print("Natural Light (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			res[1] = true;
+		}
+		System.out.print("Ceiling Ligth (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			res[2] = true;
+		}
+		if(installationType.compareTo("foyer") != 0) {
+			System.out.print("Blackout Curtains (yes or no): ");
+			input = reader.nextLine();
+			if(input.compareTo("yes") == 0) {
+				res[3] = true;
+			}
+		}
+		if(installationType.compareTo("room") == 0) {
+			System.out.print("Telephones (yes or no): ");
+			input = reader.nextLine();
+			if(input.compareTo("yes") == 0) {
+				res[4] = true;
+			}
+			System.out.print("Moving Walls (yes or no): ");
+			input = reader.nextLine();
+			if(input.compareTo("yes") == 0) {
+				res[7] = true;
+			}
+		}
+		System.out.print("Computer Network (yes or no): ");
+		input = reader.nextLine();
+		if(input.compareTo("yes") == 0) {
+			res[5] = true;
+		}
+		if(installationType.compareTo("room") == 0 || installationType.compareTo("auditorium") == 0) {
+			System.out.print("Soundproof Walls (yes or no): ");
+			input = reader.nextLine();
+			if(input.compareTo("yes") == 0) {
+				res[6] = true;
+			}
+		}
+		return res;
+	}
+	private String getInstallationType() {
+		System.out.print("\nInstallations\n\n");
+		System.out.println("1- Pavilion");
+		System.out.println("2- Auditorium");
+		System.out.println("3- Room");
+		System.out.println("4- Foyer");
+		System.out.println("5- Car Parking\n");
+		Integer option = getUserInput(1, 5);
+
+		switch (option) {
+		case 0:  return "pavilion";
+		case 1:  return "auditorium";
+		case 2:  return "room";
+		case 3:  return "foyer";
+		case 4:  return "parking";
+		default: System.out.println("Invalid option");
+		return null;
+		}
 	}
 }
