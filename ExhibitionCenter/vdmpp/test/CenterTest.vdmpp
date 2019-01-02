@@ -41,11 +41,12 @@ operations
 		assertTrue(not center.hasInstallation(auditorium1, room1));
 		assertTrue(not center.hasInstallation(room1, auditorium1));
 		center.addInstallationToInstallation("admin", "Pavilion1", room1);
+		center.addInstallationToInstallation("admin", "Pavilion1", room2);
 		assertTrue(center.associatedInstallations(pavilion1, pavilion1));
 		assertTrue(center.associatedInstallations(pavilion1, room1));
 		center.addInstallationToInstallation("admin", "Pavilion1",  foyer2);
 		center.addInstallationToInstallation("admin", "Pavilion2",  foyer3);
-		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).rooms, {room1});
+		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).rooms, {room1,room2});
 		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).foyers, {foyer2});
 		
 		assertTrue(foyer2 in set rng center.installations);
@@ -55,10 +56,9 @@ operations
 		center.removeInstallationFromInstallation("admin", "Pavilion2", foyer3);
 		assertTrue(not pavilion2.hasInstallation(foyer3));
 		center.removeInstallationFromInstallation("admin", "Pavilion1", room1);
-		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).rooms, {});
+		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).rooms, {room2});
 		assertTrue(room1 in set rng center.installations);
 		
-		center.addInstallationToInstallation("admin", "Pavilion1", room2);
 		center.addInstallationToInstallation("admin", "Pavilion1", foyer1);
 		center.removeInstallation("admin", "Foyer2");
 		center.removeInstallation("admin", "Pavilion1");
@@ -144,6 +144,8 @@ operations
 		dcl event4: Event := center.createEvent("Event4", 3, 10, mk_Utils_vdm`Date(2018, 12, 6), mk_Utils_vdm`Date(2018, 12, 6), true, <Conference>, center.installations("Room1"), "User1");
 		dcl event5: Event := center.createEvent("Event5", 3, 10, mk_Utils_vdm`Date(2018, 12, 7), mk_Utils_vdm`Date(2018, 12, 7), true, <Conference>, center.installations("Room1"), "User1");
 		dcl service1: Service := new Service(10, <IT>);
+		dcl d1: Utils_vdm`Date := mk_Utils_vdm`Date(2020, 2, 4);
+		dcl d2: Utils_vdm`Date := mk_Utils_vdm`Date(2100, 2, 4);
 		
 		assertTrue("Pavilion3" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4)));
 		assertTrue("Foyer4" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4)));
@@ -199,6 +201,11 @@ operations
 		assertTrue(Service`typetoStringVDM(<Security>) ="Security");
 		assertTrue(Service`typetoStringVDM(<Decoration>) ="Decoration");
 
+		assertEqual(Utils_vdm`getRemainder(1.33,0),33);
+		assertEqual(Utils_vdm`mapNat(4),"4");
+		assertEqual(Utils_vdm`mapNat(7),"7");
+		assertEqual(Utils_vdm`mapNat(9),"9");
+
 		assertTrue(Pavilion`sumElems([1, 0.1]) = 1.1);
 		
 		assertTrue(not center.users("admin").attendEvent("Event3"));
@@ -210,11 +217,11 @@ operations
 		center.changeEventDate("Event5", "User1", <begin>, mk_Utils_vdm`Date(2019, 12, 2));
 		assertEqual(center.events("Event5").begin, mk_Utils_vdm`Date(2019, 12, 2));
 		
+		--for all k in set rng Utils_vdm`fMap[Utils_vdm`String, bool, nat](Utils_vdm`nattoStringVDM)(["11","1","2"], {"11"|->110, "1"|->10, "2"|->20}) do (
+	--		skip;)
 		)
 	)
 	
-
-			
 	pre card dom center.events = 1
 	post card dom center.events = 5;
 
