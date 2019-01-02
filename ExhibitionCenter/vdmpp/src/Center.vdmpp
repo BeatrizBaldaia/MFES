@@ -61,13 +61,14 @@ operations
 	pre uName in set dom users and uName = adminName and
 		instID in set dom installations and
 		(isofclass(Foyer, inst1) or isofclass(Room, inst1)) and
+		 (
+			(isofclass(Foyer, inst1) and (isofclass(Auditorium, installations(instID)) or isofclass(Pavilion, installations(instID)))) or
+			(isofclass(Room, inst1) and isofclass(Pavilion, installations(instID)))
+		) and
 		not exists inst in set rng installations & (
 			(isofclass(Auditorium, inst) or isofclass(Pavilion, inst)) and
 			hasInstallation(inst1, inst)
-		) and (
-			(isofclass(Foyer, inst1) and (isofclass(Auditorium, installations(instID)) or isofclass(Pavilion, installations(instID)))) or
-			(isofclass(Room, inst1) and isofclass(Pavilion, installations(instID)))
-		)
+		) 
 	post inst1 in set rng installations
 		and hasInstallation(inst1,installations(instID));
 	
@@ -356,9 +357,9 @@ operations
 	pre evName in set dom events and (dateType = <begin> or dateType = <ending>) and
 		hName in set dom users and events(evName).host = hName and
 		if(dateType = <begin>) then (forall e in set rng events \ {events(evName)} &
-			not (hasDatesConflict(e, value, events(evName).ending) and e.installation = events(evName).installation))
+			not ( e.installation = events(evName).installation and hasDatesConflict(e, value, events(evName).ending)))
 		else (forall e in set rng events \ {events(evName)} &
-			not (hasDatesConflict(e, events(evName).begin, value) and e.installation = events(evName).installation))
+			not (e.installation = events(evName).installation and hasDatesConflict(e, events(evName).begin, value)))
 	post if(dateType = <begin>) then events(evName).begin = value
 		else events(evName).ending = value;
 
