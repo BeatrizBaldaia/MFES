@@ -23,6 +23,7 @@ import ExhibitionCenter.Foyer;
 import ExhibitionCenter.Installation;
 import ExhibitionCenter.Pavilion;
 import ExhibitionCenter.Room;
+import ExhibitionCenter.Service;
 import ExhibitionCenter.User;
 import ExhibitionCenter.Utils_vdm;
 import ExhibitionCenter.quotes.*;
@@ -229,7 +230,7 @@ public class CommandLineInterface {
 				return null;
 			}));
 			loggedInMenuEntries.add(new SimpleEntry<>("Services", () -> {
-				//servicesMenu();
+				servicesMenu();
 				return null;
 			}));
 			loggedInMenuEntries.add(new SimpleEntry<>("Logout", () -> {
@@ -818,18 +819,18 @@ public class CommandLineInterface {
 		} else {
 			int i = 1;
 			System.out.println("Available Services\n");
-			Iterator<Object> it = availableServices.iterator();
-			ArrayList<Object> services = new ArrayList<Object>();
+			Iterator<Service> it = availableServices.iterator();
+			ArrayList<Service> services = new ArrayList<Service>();
 			while(it.hasNext()) {
-				Object service = it.next();
+				Service service = it.next();
 				services.add(service);
-				System.out.println(i + "- " + service);
+				System.out.println(i + "- " + service.type.toString());
 				i++;
 			}
 			System.out.println();
 
 			Integer option = getUserInput(1, services.size());
-			center.addServiceToEvent(eventName, userName, services.get(option));
+			center.addServiceToEvent(eventName, userName, services.get(option).type);
 		}
 		return (Event)center.events.get(eventName);
 	}
@@ -845,19 +846,19 @@ public class CommandLineInterface {
 		} else {
 			int i = 1;
 			System.out.println("Event's Services\n");
-			Iterator<Object> it = eventServices.iterator();
-			ArrayList<Object> services = new ArrayList<Object>();
+			Iterator<Service> it = eventServices.iterator();
+			ArrayList<Service> services = new ArrayList<Service>();
 			while(it.hasNext()) {
-				Object service = it.next();
+				Service service = it.next();
 				services.add(service);
-				System.out.println(i + "- " + service);
+				System.out.println(i + "- " + service.type.toString());
 				i++;
 			}
 			System.out.println();
 
 			System.out.print("Choose one service: ");
 			Integer option = getUserInput(1, services.size());
-			center.removeServiceFromEvent(eventName, userName, services.get(option));
+			center.removeServiceFromEvent(eventName, userName, services.get(option).type);
 		}
 		return (Event)center.events.get(eventName);
 	}
@@ -1216,7 +1217,7 @@ public class CommandLineInterface {
 		}
 		reader.nextLine();
 	}
-	
+
 	private void showFoyers(Installation installation) {
 		VDMSet foyers = null;
 		if(installation instanceof Auditorium) {
@@ -1240,7 +1241,7 @@ public class CommandLineInterface {
 			System.out.print(", " + it.next().id);
 		}
 	}
-	
+
 	private void showRooms(Pavilion pavilion) {
 		if(pavilion.rooms.size() == 0) {
 			return;
@@ -1294,14 +1295,14 @@ public class CommandLineInterface {
 			return null;
 		}));
 	}
-	
+
 	private void changeMeasures(String installationName) {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
 		float[] measures = getMeasures();
 		center.changeInstallationMeasures(userName, installationName, measures[0], measures[1], measures[2], measures[3]);
 	}
-	
+
 	private void changeConditions(String installationName) {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
@@ -1318,20 +1319,19 @@ public class CommandLineInterface {
 		} else {
 			installationType = "parking";
 		}
-		System.out.println("Check inst type = "+installationType);
 		boolean[] conditions = getConditions(installationType);
 		center.changeInstallationConditions(userName, installationName, conditions[0], conditions[1], conditions[2], conditions[3], conditions[4], conditions[5], conditions[6], conditions[7]);
 	}
-	
+
 	private void changeRent(String installationName) {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
 		System.out.print("New Rent Price (€ per day): ");
 		Float rent = Float.parseFloat(reader.nextLine());
-		
+
 		center.changeInstallationRent(userName, installationName, rent);
 	}
-	
+
 	private void addInstallation() {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
@@ -1354,10 +1354,10 @@ public class CommandLineInterface {
 		} else {
 			installation = new CarParking(name, price, measures[0], measures[1], measures[2], measures[3]);
 		}
-		
+
 		center.addInstallations(userName, installation);
 	}
-	
+
 	private void removeInstallation() {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
@@ -1370,7 +1370,7 @@ public class CommandLineInterface {
 		}
 		center.removeInstallation(userName, name);
 	}
-	
+
 	private void aggregateInstallations() {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
@@ -1389,9 +1389,9 @@ public class CommandLineInterface {
 			return;
 		}
 		center.addInstallationToInstallation(userName, superName, (Installation)center.installations.get(subName));
-		
+
 	}
-	
+
 	private void separateInstallations() {
 		printEmptyLines(EMPTY_LINES);
 		printLine();
@@ -1411,7 +1411,7 @@ public class CommandLineInterface {
 		}
 		center.removeInstallationFromInstallation(userName, superName, (Installation)center.installations.get(subName));
 	}
-	
+
 	private float[] getMeasures() {
 		float[] res = new float[4]; 
 		Arrays.fill(res, 0);
@@ -1425,7 +1425,7 @@ public class CommandLineInterface {
 		res[3] = Float.parseFloat(reader.nextLine());
 		return res;
 	}
-	
+
 	/**
 	 * returns boolean[] => [airC, natL, ceilL, blackC, tele, compN, soundP, movW]
 	 * @param installationType
@@ -1495,6 +1495,7 @@ public class CommandLineInterface {
 		System.out.println("5- Car Parking\n");
 		Integer option = getUserInput(1, 5);
 
+
 		switch (option) {
 		case 0:  return "pavilion";
 		case 1:  return "auditorium";
@@ -1503,6 +1504,158 @@ public class CommandLineInterface {
 		case 4:  return "parking";
 		default: System.out.println("Invalid option");
 		return null;
+		}
+	}
+
+	private void servicesMenu() {
+		ArrayList<SimpleEntry<String, Callable<Object>>> servicesMenuEntries = new ArrayList<>();
+		while (true) {
+			printEmptyLines(EMPTY_LINES);
+			printLine();
+			servicesMenuEntries.clear();
+			addServicesMenuEntries(servicesMenuEntries);
+			printMenuEntries(servicesMenuEntries);
+			int option = getUserInput(1, servicesMenuEntries.size());
+
+			try {
+				servicesMenuEntries.get(option).getValue().call();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void addServicesMenuEntries(ArrayList<SimpleEntry<String, Callable<Object>>> servicesMenuEntries) {
+
+		servicesMenuEntries.add(new SimpleEntry<>("Show All Services", () -> {
+			showServices();
+			return null;
+		}));
+		if(userName.compareTo("admin") == 0) {
+			servicesMenuEntries.add(new SimpleEntry<>("Add Service", () -> {
+				addService();
+				return null;
+			}));
+			servicesMenuEntries.add(new SimpleEntry<>("Remove Service", () -> {
+				removeService();
+				return null;
+			}));
+			servicesMenuEntries.add(new SimpleEntry<>("Change Service Price", () -> {
+				changeServicePrice();
+				return null;
+			}));
+		}
+
+		servicesMenuEntries.add(new SimpleEntry<>("Main Menu", () -> {
+			loggedInMenu();
+			return null;
+		}));
+	}
+
+	private void showServices() {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		System.out.println("All Services\n");
+		VDMSet servicesDetails = center.showServicesDetails();
+		if(servicesDetails.size() == 0) {
+			System.out.println("There are no services yet");
+			reader.nextLine();
+			return;
+		}
+		Iterator itServices = servicesDetails.iterator();
+		while(itServices.hasNext()) {
+			VDMMap service = (VDMMap) itServices.next();
+			Iterator it = service.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry pair = (Map.Entry)it.next();
+				System.out.print("| " + pair.getKey() + ": " + pair.getValue() + " |");
+				it.remove(); // avoids a ConcurrentModificationException
+			}
+			System.out.println();
+		}
+		
+		reader.nextLine();
+	}
+	
+	private void addService() {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		Object type = getServiceType();
+		System.out.print("Service Price: ");
+		Float price = Float.parseFloat(reader.nextLine());
+		Service service = new Service(price, type);
+		center.addService(userName, service);
+	}
+	
+	private void removeService() {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		System.out.print("Service Name: ");
+		String name = reader.nextLine();
+		Object type = stringToServiceType(name);
+		Service service = (Service) center.services.get(type);
+		if(service == null) {
+			System.out.println("There is no " + name + " service");
+			reader.nextLine();
+			return;
+		}
+		center.removeService(userName, service.type);
+	}
+	
+	private void changeServicePrice() {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		System.out.print("Service Name: ");
+		String name = reader.nextLine();
+		Object type = stringToServiceType(name);
+		System.out.print("New Price Value: ");
+		Float price = Float.parseFloat(reader.nextLine());
+		Service service = (Service) center.services.get(type);
+		if(service == null) {
+			System.out.println("There is no " + name + " service");
+			reader.nextLine();
+			return;
+		}
+		center.changeServicePrice(userName, service.type, price);
+	}
+	
+	private Object getServiceType() {
+		System.out.print("\nEvent Types\n\n");
+		System.out.println("1- Audio Visual");
+		System.out.println("2- Catering");
+		System.out.println("3- Cleaning");
+		System.out.println("4- Decoration");
+		System.out.println("5- IT");
+		System.out.println("6- Security\n");
+		Integer option = getUserInput(1, 6);
+
+		switch (option) {
+		case 0:  return new AudioVisualQuote();
+		case 1:  return new CateringQuote();
+		case 2:  return new CleaningQuote();
+		case 3:  return new DecorationQuote();
+		case 4:  return new ITQuote();
+		case 5:  return new SecurityQuote();
+		default: System.out.println("Invalid option");
+		return null;
+		}
+	}
+	
+	private Object stringToServiceType(String typeStr) {
+		if(typeStr.compareTo("Audio Visual") == 0) {
+			return new AudioVisualQuote();
+		} else if(typeStr.compareTo("Audio Visual") == 0) {
+			return new AudioVisualQuote();
+		} else if(typeStr.compareTo("Catering") == 0) {
+			return new CateringQuote();
+		} else if(typeStr.compareTo("Cleaning") == 0) {
+			return new CleaningQuote();
+		} else if(typeStr.compareTo("Decoration") == 0) {
+			return new DecorationQuote();
+		} else if(typeStr.compareTo("IT") == 0) {
+			return new ITQuote();
+		} else {
+			return new SecurityQuote();
 		}
 	}
 }
