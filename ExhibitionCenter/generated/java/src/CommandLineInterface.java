@@ -1057,12 +1057,15 @@ public class CommandLineInterface {
 				return null;
 			}));
 			installationsMenuEntries.add(new SimpleEntry<>("Remove Installation", () -> {
+				removeInstallation();
 				return null;
 			}));
 			installationsMenuEntries.add(new SimpleEntry<>("Aggregate Installations", () -> {
+				aggregateInstallations();
 				return null;
 			}));
 			installationsMenuEntries.add(new SimpleEntry<>("Separate Installations", () -> {
+				separateInstallations();
 				return null;
 			}));
 		}
@@ -1199,11 +1202,55 @@ public class CommandLineInterface {
 				System.out.println("  " + pair.getKey() + ": " + pair.getValue());
 				it.remove(); // avoids a ConcurrentModificationException
 			}
+			Installation inst = (Installation) center.installations.get(installationName);
+			if(inst instanceof Auditorium || inst instanceof Pavilion) {
+				System.out.println();
+				showFoyers(inst);
+				if(inst instanceof Pavilion) {
+					showRooms((Pavilion) inst);
+				}
+			}
 		} catch (IllegalArgumentException e) {
-			System.out.println("There is no event " + installationName + ". Try again...");
+			System.out.println("There is no installation " + installationName + ". Try again...");
 			reader.nextLine();
 		}
 		reader.nextLine();
+	}
+	
+	private void showFoyers(Installation installation) {
+		VDMSet foyers = null;
+		if(installation instanceof Auditorium) {
+			Auditorium auditorium = (Auditorium) installation;
+			if(auditorium.foyers.size() == 0) {
+				return;
+			} else {
+				foyers = auditorium.foyers;
+			}
+		} else {
+			Pavilion pavilion = (Pavilion) installation;
+			if(pavilion.foyers.size() == 0) {
+				return;
+			} else {
+				foyers = pavilion.foyers;
+			}
+		}
+		Iterator<Foyer> it = foyers.iterator();
+		System.out.print("  Foyers: " + it.next().id);
+		while(it.hasNext()) {
+			System.out.print(", " + it.next().id);
+		}
+	}
+	
+	private void showRooms(Pavilion pavilion) {
+		if(pavilion.rooms.size() == 0) {
+			return;
+		} else {
+			Iterator<Room> it = pavilion.rooms.iterator();
+			System.out.print("  Rooms: " + it.next().id);
+			while(it.hasNext()) {
+				System.out.print(", " + it.next().id);
+			}
+		}
 	}
 
 	private void editInstallationMenu(String installationName) {
@@ -1309,6 +1356,60 @@ public class CommandLineInterface {
 		}
 		
 		center.addInstallations(userName, installation);
+	}
+	
+	private void removeInstallation() {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		System.out.print("\nInstallation Name: ");
+		String name = reader.nextLine();
+		if(!center.installations.containsKey(name)) {
+			System.out.println("There is no such installation named " + name);
+			reader.nextLine();
+			return;
+		}
+		center.removeInstallation(userName, name);
+	}
+	
+	private void aggregateInstallations() {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		System.out.print("\nName of the main installation: ");
+		String superName = reader.nextLine();
+		if(!center.installations.containsKey(superName)) {
+			System.out.println("There is no such installation named " + superName);
+			reader.nextLine();
+			return;
+		}
+		System.out.print("\nName of the installation you want to add: ");
+		String subName = reader.nextLine();
+		if(!center.installations.containsKey(subName)) {
+			System.out.println("There is no such installation named " + subName);
+			reader.nextLine();
+			return;
+		}
+		center.addInstallationToInstallation(userName, superName, (Installation)center.installations.get(subName));
+		
+	}
+	
+	private void separateInstallations() {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+		System.out.print("\nName of the main installation: ");
+		String superName = reader.nextLine();
+		if(!center.installations.containsKey(superName)) {
+			System.out.println("There is no such installation named " + superName);
+			reader.nextLine();
+			return;
+		}
+		System.out.print("\nName of the installation you want to remove: ");
+		String subName = reader.nextLine();
+		if(!center.installations.containsKey(subName)) {
+			System.out.println("There is no such installation named " + subName);
+			reader.nextLine();
+			return;
+		}
+		center.removeInstallationFromInstallation(userName, superName, (Installation)center.installations.get(subName));
 	}
 	
 	private float[] getMeasures() {
