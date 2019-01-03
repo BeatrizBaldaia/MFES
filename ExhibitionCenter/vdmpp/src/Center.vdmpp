@@ -55,7 +55,6 @@ operations
 		let inst2 = installations(instID) in (
 			if(isofclass(Foyer, inst1)) then let foyer = narrow_(inst1, Foyer) in inst2.addFoyer(foyer)
 			elseif(isofclass(Room, inst1)) then let room = narrow_(inst1, Room) in inst2.addRoom(room)
-			--TODO: else error 
 		)
 	)
 	pre uName in set dom users and uName = adminName and
@@ -78,7 +77,6 @@ operations
 		let inst2 = installations(instID) in (
 			if(isofclass(Foyer, inst1)) then let foyer = narrow_(inst1, Foyer) in inst2.removeFoyer(foyer)
 			elseif(isofclass(Room, inst1)) then let room = narrow_(inst1, Room) in inst2.removeRoom(room)
-			--TODO: else error 
 		)
 	)
 	pre uName in set dom users and uName = adminName and
