@@ -362,12 +362,12 @@ public class CommandLineInterface {
 			showEventsMenu("between");
 			return null;
 		}));
-
-		eventsMenuEntries.add(new SimpleEntry<>("Create Event", () -> {
-			createEvent();
-			return null;
-		}));
-
+		if(userName.compareTo("admin") != 0) {
+			eventsMenuEntries.add(new SimpleEntry<>("Create Event", () -> {
+				createEvent();
+				return null;
+			}));
+		}
 		eventsMenuEntries.add(new SimpleEntry<>("Main Menu", () -> {
 			loggedInMenu();
 			return null;
