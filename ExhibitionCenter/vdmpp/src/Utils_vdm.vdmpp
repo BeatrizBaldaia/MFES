@@ -84,12 +84,9 @@ functions
 	setTOseq(tmpSet) == (
 		[x | x in set tmpSet]
 	)
-	post elems RESULT subset tmpSet
-	measure msetTOseq;
+	post elems RESULT subset tmpSet;
 	
--- setTOseq measure function
-	public msetTOseq[@elem]: set of @elem -> nat
-	msetTOseq(tmpSet) == card tmpSet;
+
 	
 -- converts an element to string
 --	public toStringVDM[@elem]: @elem -> String

@@ -21,6 +21,7 @@ operations
 	public testInstallations: Center ==> ()
 	testInstallations(center) == (
 		dcl room1: Installation := new Room("Room1", 15, 10, 7, 20, 20, false, true, true, true, false, false, true, false);
+		dcl room2: Installation := new Room("Room2", 15, 10, 7, 20, 20, false, true, true, true, false, false, true, false);
 		dcl pavilion1: Installation := new Pavilion("Pavilion1", 150, 50, 10, 50, 70, false, false, true, false, false);
 		dcl pavilion2: Installation := new Pavilion("Pavilion2", 150, 50, 10, 50, 70, false, false, true, false, false);
 		dcl foyer1: Installation := new Foyer("Foyer1", 10, 15, 4, 6, 6, false, true, false, true);
@@ -40,12 +41,14 @@ operations
 		assertTrue(not center.hasInstallation(auditorium1, room1));
 		assertTrue(not center.hasInstallation(room1, auditorium1));
 		center.addInstallationToInstallation("admin", "Pavilion1", room1);
+		center.addInstallationToInstallation("admin", "Pavilion1", room2);
 		assertTrue(center.associatedInstallations(pavilion1, pavilion1));
 		assertTrue(center.associatedInstallations(pavilion1, room1));
 		center.addInstallationToInstallation("admin", "Pavilion1",  foyer2);
 		center.addInstallationToInstallation("admin", "Pavilion2",  foyer3);
-		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).rooms, {room1});
+		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).rooms, {room1,room2});
 		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).foyers, {foyer2});
+		
 		assertTrue(foyer2 in set rng center.installations);
 		--Remove installations
 		center.removeInstallationFromInstallation("admin", "Auditorium1", foyer1);
@@ -53,11 +56,14 @@ operations
 		center.removeInstallationFromInstallation("admin", "Pavilion2", foyer3);
 		assertTrue(not pavilion2.hasInstallation(foyer3));
 		center.removeInstallationFromInstallation("admin", "Pavilion1", room1);
-		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).rooms, {});
+		assertEqual(narrow_(center.installations("Pavilion1"), Pavilion).rooms, {room2});
 		assertTrue(room1 in set rng center.installations);
+		
+		center.addInstallationToInstallation("admin", "Pavilion1", foyer1);
+		center.removeInstallation("admin", "Foyer2");
 		center.removeInstallation("admin", "Pavilion1");
-		center.removeInstallation("admin", "Pavilion2");
 		center.removeInstallation("admin", "Foyer3");
+		center.removeInstallation("admin", "Pavilion2");
 		assertTrue(rng center.installations inter {pavilion1, foyer2} = {});
 		--Change installation attributes
 		center.addInstallations("admin", pavilion1);
@@ -85,7 +91,9 @@ operations
 		assertTrue((parking1.airCondition or parking1.naturalLigth or parking1.ceilingLighting or parking1.blackOutCurtains and 
 			parking1.telephones or parking1.computerNetwork or parking1.soundproofWalls or parking1.movingWalls) = false);
 		
-		assertEqual(card center.showInstallationsDetails(), card dom center.installations)	
+		assertEqual(card center.showInstallationsDetails(), card dom center.installations);
+		center.addInstallations("admin", foyer1);
+		
 	)
 	pre card dom center.installations = 1
 	post card dom center.installations = 6;
@@ -136,6 +144,8 @@ operations
 		dcl event4: Event := center.createEvent("Event4", 3, 10, mk_Utils_vdm`Date(2018, 12, 6), mk_Utils_vdm`Date(2018, 12, 6), true, <Conference>, center.installations("Room1"), "User1");
 		dcl event5: Event := center.createEvent("Event5", 3, 10, mk_Utils_vdm`Date(2018, 12, 7), mk_Utils_vdm`Date(2018, 12, 7), true, <Conference>, center.installations("Room1"), "User1");
 		dcl service1: Service := new Service(10, <IT>);
+		dcl d1: Utils_vdm`Date := mk_Utils_vdm`Date(2020, 2, 4);
+		dcl d2: Utils_vdm`Date := mk_Utils_vdm`Date(2100, 2, 4);
 		
 		assertTrue("Pavilion3" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4)));
 		assertTrue("Foyer4" not in set dom center.getAvailableInstallations(mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4)));
@@ -165,6 +175,8 @@ operations
 		center.removeService("admin", <IT>);
 		assertTrue(len event2.services = 1);
 		
+		center.addService("admin", service1);
+		assertTrue(center.listEventServices("Event2") union center.availableServicesForEvent("Event2") = rng center.services);
 		assertTrue(center.listEvents("admin") = rng center.events);
 		assertTrue(center.showAvailableEventsBetweenDates("admin",mk_Utils_vdm`Date(2018, 12, 7), mk_Utils_vdm`Date(2018, 12, 7)) = {event5});
 		center.addUserToEvent("Event5", "User2", <attendee>);
@@ -174,7 +186,8 @@ operations
 		assertTrue(center.showAvailableEvents("admin") = rng center.events \ {event5});
 		
 		assertEqual(center.showEventDetails("admin", "Event3")("Name"), "Event3");
-		
+		assertEqual(center.showEventDetails("User2", "Event3")("Name"), "Event3");
+				
 		assertTrue(center.events("Event3").earnedMoney() = 0);
 		assertTrue(center.events("Event3").remainingTickets() = 3);
 		
@@ -188,12 +201,26 @@ operations
 		assertTrue(Service`typetoStringVDM(<Security>) ="Security");
 		assertTrue(Service`typetoStringVDM(<Decoration>) ="Decoration");
 
+		assertEqual(Utils_vdm`getRemainder(1.33,0),33);
+		assertEqual(Utils_vdm`mapNat(4),"4");
+		assertEqual(Utils_vdm`mapNat(7),"7");
+		assertEqual(Utils_vdm`mapNat(9),"9");
+
 		assertTrue(Pavilion`sumElems([1, 0.1]) = 1.1);
 		
 		assertTrue(not center.users("admin").attendEvent("Event3"));
+		
+		assertTrue(center.showUserDetails("User1","User1")("Name") = "User1");
+
+		center.changeEventDate("Event5", "User1", <ending>, mk_Utils_vdm`Date(2019, 12, 5));
+		assertEqual(center.events("Event5").ending, mk_Utils_vdm`Date(2019, 12, 5));
+		center.changeEventDate("Event5", "User1", <begin>, mk_Utils_vdm`Date(2019, 12, 2));
+		assertEqual(center.events("Event5").begin, mk_Utils_vdm`Date(2019, 12, 2));
+		
+		--for all k in set rng Utils_vdm`fMap[Utils_vdm`String, bool, nat](Utils_vdm`nattoStringVDM)(["11","1","2"], {"11"|->110, "1"|->10, "2"|->20}) do (
+	--		skip;)
 		)
 	)
-	
 	
 	pre card dom center.events = 1
 	post card dom center.events = 5;
@@ -267,7 +294,9 @@ operations
 		);
 		--Check money spent with the event
 		assertEqual(center.moneySpentWithServices("User4", "New Event Name"), 40);--since service (<AudioVisual>) price is 10 and event days are 4
+		assertEqual(center.moneySpentWithServices("admin", "New Event Name"), 40);--since service (<AudioVisual>) price is 10 and event days are 4
 		assertEqual(center.moneySpentWithInstallation("User4", "New Event Name"), 40);--since installation ("Foyer1") rent is 10 and event days are 4
+		assertEqual(center.moneySpentWithInstallation("admin", "New Event Name"), 40);--since installation ("Foyer1") rent is 10 and event days are 4
 		center.changeServicePrice("admin", <AudioVisual>, 30);
 		assertEqual(center.services(<AudioVisual>).price, 30);
 		assertEqual(center.moneySpentWithServices("User4", "New Event Name"), 120)--since service (<AudioVisual>) price is 10 and event days are 4
