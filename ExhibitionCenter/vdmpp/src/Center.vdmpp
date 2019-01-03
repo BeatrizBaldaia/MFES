@@ -45,7 +45,7 @@ operations
 		addInstallations(uName, inst) == let instID = inst.getID() in 
 		installations := installations ++ {instID |-> inst}
 		pre uName in set dom users and uName = adminName and
-			inst not in set rng installations and isofbaseclass(Installation, inst)
+			inst.id not in set dom installations and isofbaseclass(Installation, inst)
 		post card dom installations = card dom installations~ + 1 and inst in set rng installations;
 	
 -- Add installation, foyer or room, to other installation, auditorium or pavilion\
