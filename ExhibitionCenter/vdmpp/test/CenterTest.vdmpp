@@ -1,6 +1,4 @@
 class CenterTest  is subclass of Test_vdm
--- TODO not possible new Room(), teste failing
- --TODO addFoyer/ Room ; pre = false
 operations
  
  /***** USE CASE SCENARIOS ******/
@@ -217,8 +215,6 @@ operations
 		center.changeEventDate("Event5", "User1", <begin>, mk_Utils_vdm`Date(2019, 12, 2));
 		assertEqual(center.events("Event5").begin, mk_Utils_vdm`Date(2019, 12, 2));
 		
-		--for all k in set rng Utils_vdm`fMap[Utils_vdm`String, bool, nat](Utils_vdm`nattoStringVDM)(["11","1","2"], {"11"|->110, "1"|->10, "2"|->20}) do (
-	--		skip;)
 		)
 	)
 	
@@ -305,8 +301,6 @@ operations
 	pre card dom center.events = 1;
  /***** TEST CASES WITH VALID INPUTS ******/
  
-  /***** TEST CASES WITH INVALID INPUTS (EXECUTE ONE AT A TIME) ******/
-
 	public static main: () ==> ()
 	main() ==
  (
@@ -319,5 +313,11 @@ operations
 		centerTest.testEventProfit(center);
 		centerTest.testEdge(center);
 		
+	);
+	  /***** TEST CASES WITH INVALID INPUTS (EXECUTE ONE AT A TIME) ******/
+	public static testCreateRoomWithoutParameters: () ==> ()
+	testCreateRoomWithoutParameters() == (
+		dcl r : Room := new Room(); -- pre-condition fail
+		skip;
 	);
 end CenterTest
