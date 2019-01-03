@@ -148,6 +148,13 @@ public class CommandLineInterface {
 		System.out.println("Create account menu");
 		System.out.print("Name: ");
 		String name = reader.nextLine();
+		if(MapUtil.dom(center.users).contains(name)) {
+			System.out.println("This name is already being used");
+			reader.nextLine();
+			printEmptyLines(EMPTY_LINES);
+			printLine();
+			return;
+		}
 		System.out.print("Password: ");
 		String password = reader.nextLine();
 		try{
