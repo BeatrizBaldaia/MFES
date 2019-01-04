@@ -320,6 +320,18 @@ operations
 		centerTest.testEdge(center);
 	);
 	  /***** TEST CASES WITH INVALID INPUTS (EXECUTE ONE AT A TIME) ******/
+	public static testRoomToTwoPavilions: () ==> ()
+	testRoomToTwoPavilions() == (
+		dcl center: Center := new CenterTest().createCenter("Super Center", new Foyer("Foyer1", 10, 15, 4, 6, 6, false, true, false, true));
+		dcl room1: Installation := new Room("Room1", 15, 10, 7, 20, 20, false, true, true, true, false, false, true, false);
+		dcl pavilion1: Installation := new Pavilion("Pavilion1", 150, 50, 10, 50, 70, false, false, true, false, false);
+		dcl pavilion2: Installation := new Pavilion("Pavilion2", 150, 50, 10, 50, 70, false, false, true, false, false);
+		--Add installations
+		center.addInstallations("admin", pavilion1);
+		center.addInstallations("admin", pavilion2);
+		center.addInstallationToInstallation("admin", "Pavilion1", room1);
+		center.addInstallationToInstallation("admin", "Pavilion2", room1);
+	);
 	public static testCreateRoomWithoutParameters: () ==> ()
 	testCreateRoomWithoutParameters() == (
 		dcl r : Room := new Room(); -- pre-condition fail
