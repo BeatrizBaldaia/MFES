@@ -374,6 +374,11 @@ public class CommandLineInterface {
 				createEvent();
 				return null;
 			}));
+		} else {
+			eventsMenuEntries.add(new SimpleEntry<>("Profit", () -> {
+				showProfit();
+				return null;
+			}));
 		}
 		eventsMenuEntries.add(new SimpleEntry<>("Main Menu", () -> {
 			loggedInMenu();
@@ -694,6 +699,31 @@ public class CommandLineInterface {
 
 		center.createEvent(eventName, totalTickets, ticketPrice, bDate, eDate, privacy, type, inst, userName);
 
+	}
+	
+	private void showProfit() {
+		printEmptyLines(EMPTY_LINES);
+		printLine();
+
+		System.out.print("\nYear: ");
+		Integer year = Integer.parseInt(reader.nextLine());
+		Utils_vdm.Date b = new Utils_vdm.Date(year, 1, 1);
+		Utils_vdm.Date e = new Utils_vdm.Date(year, 12, 31);
+		float profit = 0;
+		
+		VDMSet events = MapUtil.rng(center.events);
+		Iterator<Event> it = events.iterator();
+		
+		while(it.hasNext()) {
+			Event event = it.next();
+			if(center.hasDatesConflict(event, b, e)) {
+				profit += center.moneySpentWithInstallation(userName, event.name).floatValue() + 
+						center.moneySpentWithServices(userName, event.name).floatValue();
+			}
+		}
+		
+		System.out.println("\nThe profit of " + year + " was " + profit + "€");
+		reader.nextLine();
 	}
 
 	private String selectInstallationBetweenDates(Utils_vdm.Date b, Utils_vdm.Date e) {
