@@ -16,6 +16,7 @@ operations
 -- Here we add installations to the center, aggregate installations to other installations,
 -- remove installations from other installations and from center and
 -- change installations' attributes
+--RF16, RF17, RF18, RF19, RF20, RF21
 	public testInstallations: Center ==> ()
 	testInstallations(center) == (
 		dcl room1: Installation := new Room("Room1", 15, 10, 7, 20, 20, false, true, true, true, false, false, true, false);
@@ -96,7 +97,8 @@ operations
 	pre card dom center.installations = 1
 	post card dom center.installations = 6;
 
---Simple action to add and remove a service from the center	
+--Simple action to add and remove a service from the center
+--RF22, RF23, RF24	
 	public testServices: Center ==> ()
 	testServices(center) == (
 		dcl service1: Service := new Service(10, <AudioVisual>);
@@ -112,6 +114,7 @@ operations
 	post card dom center.services = 1;
 
 --Simple action of adding users to our center
+--RF1
 	public testUsers: Center ==> ()
 	testUsers(center) == (
 		dcl user1: User := new User("User1", "1234");
@@ -127,6 +130,7 @@ operations
 	pre card dom center.users = 1
 	post card dom center.users = 5;
 
+--RF2, RF5, RF8, RF9, RF14, RF15
 	public testEdge: Center ==> ()
 	testEdge(center) == (
 	(
@@ -222,6 +226,7 @@ operations
 	post card dom center.events = 5;
 
 --Create an event and change its attributes (event details, services and installation)	
+--RF4, RF6, RF7, RF13
 	public testEvent: Center ==> ()
 	testEvent(center) == (
 		dcl event1: Event := center.createEvent("Event1", 3, 10, mk_Utils_vdm`Date(2018, 12, 1), mk_Utils_vdm`Date(2018, 12, 3), true, <Conference>, center.installations("Room1"), "User1");
@@ -262,6 +267,7 @@ operations
 --By changing differente external factors, like services' price,
 -- installation's rent and number of attendees,
 -- we will analise the money earned and lost with the event	
+--RF2, RF3, RF9, RF11, RF12, RF25
 	public testEventProfit: Center ==> ()
 	testEventProfit(center) == (
 		dcl event1: Event := center.events("New Event Name");
