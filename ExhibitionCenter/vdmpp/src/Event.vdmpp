@@ -142,7 +142,7 @@ operations
 	public addAttendee: Utils_vdm`String ==> ()
 	addAttendee(user) == attendees := attendees union {user}
 	pre user not in set attendees and card attendees < totalTickets and
-		user not in set staff and user <> host
+		user not in set staff and user <> host and (not privacy or user in set guests)
 	post user in set attendees;
 	
 --Add user to staff set 

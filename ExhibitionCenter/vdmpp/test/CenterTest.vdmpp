@@ -181,6 +181,7 @@ operations
 		assertTrue(center.listEventServices("Event2") union center.availableServicesForEvent("Event2") = rng center.services);
 		assertTrue(center.listEvents("admin") = rng center.events);
 		assertTrue(center.showAvailableEventsBetweenDates("admin",mk_Utils_vdm`Date(2018, 12, 7), mk_Utils_vdm`Date(2018, 12, 7)) = {event5});
+		center.inviteToEvent("Event5", "User1", "User2");
 		center.addUserToEvent("Event5", "User2", <attendee>);
 		center.changeEventTotalTickets("Event5", "User1", 1);
 		assertTrue(card event5.attendees = event5.totalTickets);
@@ -320,6 +321,16 @@ operations
 		centerTest.testEdge(center);
 	);
 	  /***** TEST CASES WITH INVALID INPUTS (EXECUTE ONE AT A TIME) ******/
+	public static testBuyTicketToPrivateWhileNotInvited: () ==> ()
+	testBuyTicketToPrivateWhileNotInvited() == (
+		dcl center: Center := new CenterTest().createCenter("Super Center", new Foyer("Foyer1", 10, 15, 4, 6, 6, false, true, false, true));
+		dcl user1: User := new User("User1", "1234");
+		dcl user2: User := new User("User2", "1234");
+		(
+		dcl e : Event := new Event("Event1", 3, 10, mk_Utils_vdm`Date(2018, 12, 4), mk_Utils_vdm`Date(2018, 12, 4), true, <Conference>, center.installations("Foyer1"), "User1");		
+		e.addAttendee("User2");
+		)
+	);
 	public static testRoomToTwoPavilions: () ==> ()
 	testRoomToTwoPavilions() == (
 		dcl center: Center := new CenterTest().createCenter("Super Center", new Foyer("Foyer1", 10, 15, 4, 6, 6, false, true, false, true));
